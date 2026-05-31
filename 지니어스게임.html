@@ -1,0 +1,3465 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="THE GENIUS">
+<meta name="theme-color" content="#08080b">
+<meta name="format-detection" content="telephone=no">
+<title>THE GENIUS — 두뇌 게임</title>
+<style>
+  :root{
+    --bg:#08080b; --bg-glow:#16131e; --panel:#15151c; --panel2:#1e1e29; --panel3:#26262f;
+    --gold:#c9a23f; --gold2:#edcf78; --gold3:#f6e7ad; --goldsoft:#8a7228; --golddeep:#3c3012;
+    --ink:#efe9da; --muted:#928d82; --line:#2c2c37; --line2:#3a3a48;
+    --win:#62b87e; --lose:#cf6464; --tie:#8090a6;
+    --black-tile:#191920; --white-tile:#ece7d8;
+    --gold-grad:linear-gradient(135deg,var(--gold3),var(--gold2) 42%,var(--gold) 72%,var(--goldsoft));
+    --shadow:0 18px 48px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+  html,body{margin:0;padding:0;color:var(--ink);
+    font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;}
+  body{min-height:100vh;
+    background:
+      radial-gradient(1100px 760px at 50% -8%, var(--bg-glow) 0%, transparent 58%),
+      radial-gradient(820px 560px at 92% 108%, #100f17 0%, transparent 55%),
+      var(--bg);
+    background-repeat:no-repeat;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px;}
+  .screen{display:none;animation:fade .35s ease;}
+  .screen.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  /* ---------- Header / branding ---------- */
+  .brand{text-align:center;padding:18px 0 6px;}
+  .brand .kr{font-size:13px;letter-spacing:.62em;color:var(--gold);margin-bottom:8px;
+    text-indent:.62em;}
+  .brand .en{font-size:37px;font-weight:800;letter-spacing:.2em;text-indent:.2em;line-height:1.05;
+    background:linear-gradient(176deg,var(--gold3),var(--gold2) 38%,var(--gold) 68%,var(--goldsoft));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 2px 12px rgba(201,162,63,.22));}
+  .brand .sub{font-size:12px;color:var(--muted);margin-top:10px;letter-spacing:.28em;text-indent:.28em;}
+  .rule-divider{height:1px;margin:20px 0;
+    background:linear-gradient(90deg,transparent,var(--goldsoft) 18%,var(--gold2) 50%,var(--goldsoft) 82%,transparent);
+    opacity:.7;}
+
+  /* ---------- Menu cards ---------- */
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:8px;}
+  @media(max-width:560px){.menu-grid{grid-template-columns:1fr;}}
+  .card{position:relative;
+    background:
+      radial-gradient(135% 95% at 50% -25%, rgba(237,207,120,.07), transparent 56%),
+      linear-gradient(158deg,var(--panel2),var(--panel) 72%);
+    border:1px solid var(--line);border-radius:16px;padding:20px 18px;cursor:pointer;overflow:hidden;
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    box-shadow:0 4px 14px rgba(0,0,0,.28);}
+  .card::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--goldsoft),transparent);opacity:.55;}
+  .card:hover{border-color:var(--gold);transform:translateY(-4px);
+    box-shadow:0 16px 40px rgba(0,0,0,.46),0 6px 18px rgba(201,162,63,.16);}
+  .card:active{transform:translateY(-1px);}
+  .card .num{font-size:12px;color:var(--gold);letter-spacing:.3em;}
+  .card h3{margin:8px 0 6px;font-size:21px;color:var(--ink);letter-spacing:.01em;}
+  .card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.62;}
+  .card .badge{position:absolute;top:14px;right:14px;font-size:10px;border:1px solid var(--goldsoft);
+    color:var(--gold);padding:3px 8px;border-radius:20px;letter-spacing:.1em;
+    background:rgba(60,48,18,.35);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+  .card .ico{font-size:26px;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
+
+  /* ---------- Common game UI ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;gap:10px;}
+  .btn{background:linear-gradient(180deg,var(--panel3),var(--panel2));border:1px solid var(--line2);color:var(--ink);
+    padding:9px 14px;border-radius:10px;font-size:14px;cursor:pointer;transition:.15s;
+    font-family:inherit;box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 2px 6px rgba(0,0,0,.25);}
+  .btn:hover{border-color:var(--gold);color:var(--gold2);}
+  .btn:active{transform:translateY(1px);}
+  .btn.gold{background:var(--gold-grad);color:#241b04;
+    border:none;font-weight:700;text-shadow:0 1px 0 rgba(255,255,255,.25);
+    box-shadow:0 3px 12px rgba(201,162,63,.28), inset 0 1px 0 rgba(255,255,255,.4);}
+  .btn.gold:hover{filter:brightness(1.06);color:#241b04;
+    box-shadow:0 5px 18px rgba(201,162,63,.38), inset 0 1px 0 rgba(255,255,255,.45);}
+  .btn:disabled{opacity:.38;cursor:not-allowed;border-color:var(--line);filter:saturate(.6);
+    box-shadow:none;transform:none;}
+  .btn.sm{padding:6px 10px;font-size:12.5px;}
+  .gtitle{font-size:21px;font-weight:800;letter-spacing:.06em;
+    background:linear-gradient(180deg,var(--gold3),var(--gold) 70%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .panel{background:linear-gradient(180deg,var(--panel),#111118);border:1px solid var(--line);border-radius:14px;
+    padding:16px;margin-bottom:14px;
+    box-shadow:0 8px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.025);}
+  .score-row{display:flex;justify-content:space-around;text-align:center;}
+  .score-box{flex:1;}
+  .score-box .lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;}
+  .score-box .val{font-size:30px;font-weight:800;margin-top:2px;}
+  .score-box.me .val{color:var(--gold2);}
+  .score-box.ai .val{color:#c98a8a;}
+  .vs{align-self:center;color:var(--muted);font-size:13px;letter-spacing:.2em;}
+  .log{background:#0d0d11;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    font-size:13px;color:var(--muted);min-height:42px;line-height:1.6;}
+  .log b{color:var(--gold2);}
+  .center{text-align:center;}
+  .hint{font-size:12.5px;color:var(--muted);line-height:1.7;}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;
+    border:1px solid var(--line);margin:2px;}
+
+  /* tiles */
+  .tile{width:54px;height:70px;border-radius:9px;display:flex;align-items:center;
+    justify-content:center;font-size:26px;font-weight:800;cursor:pointer;transition:.15s;
+    border:2px solid transparent;user-select:none;position:relative;}
+  .tile.white{background:var(--white-tile);color:#16161c;}
+  .tile.black{background:var(--black-tile);color:#ece7d8;border-color:#33333f;}
+  .tile.sel{outline:3px solid var(--gold);outline-offset:2px;transform:translateY(-6px);}
+  .tile.used{opacity:.22;pointer-events:none;filter:grayscale(.6);}
+  .tile.hidden-face{background:repeating-linear-gradient(45deg,#23232c,#23232c 6px,#1c1c24 6px,#1c1c24 12px);
+    color:var(--gold);font-size:15px;}
+  .tile-row{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;}
+  .tile.small{width:42px;height:56px;font-size:20px;border-radius:7px;}
+
+  .reveal-stage{display:flex;align-items:center;justify-content:center;gap:30px;
+    min-height:120px;}
+  .reveal-stage .side{text-align:center;}
+  .reveal-stage .side .who{font-size:12px;color:var(--muted);margin-bottom:8px;letter-spacing:.1em;}
+  .big-tile{width:80px;height:104px;border-radius:12px;display:inline-flex;align-items:center;
+    justify-content:center;font-size:40px;font-weight:800;}
+
+  .keypad{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;max-width:380px;margin:10px auto;}
+  .keypad button{padding:11px 0;font-size:16px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);cursor:pointer;font-family:inherit;}
+  .keypad button:hover{border-color:var(--gold);}
+  .keypad button:disabled{opacity:.3;cursor:not-allowed;}
+
+  .rps-grid{display:flex;gap:14px;justify-content:center;margin:14px 0;}
+  .rps-btn{font-size:42px;width:88px;height:88px;border-radius:50%;border:2px solid var(--line);
+    background:var(--panel2);cursor:pointer;transition:.15s;}
+  .rps-btn:hover{border-color:var(--gold);transform:scale(1.06);}
+  .rps-btn.sel{border-color:var(--gold);background:#241f0d;}
+
+  .bet-row{display:flex;align-items:center;gap:12px;justify-content:center;margin:10px 0;}
+  input[type=range]{accent-color:var(--gold);width:200px;}
+
+  .grid369{display:flex;gap:12px;justify-content:center;margin:18px 0;}
+  .num-display{font-size:64px;font-weight:800;color:var(--gold2);text-align:center;
+    min-height:90px;line-height:90px;}
+  .turn-ind{text-align:center;font-size:14px;color:var(--muted);letter-spacing:.15em;margin-bottom:6px;}
+
+  .grid-find{display:grid;gap:8px;justify-content:center;margin:14px auto;}
+  .find-cell{width:52px;height:52px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;cursor:pointer;}
+  .find-cell:hover{border-color:var(--gold);}
+  .find-cell.hit{background:#1d3324;border-color:var(--win);color:var(--win);}
+  .find-cell.miss{background:#33201f;border-color:var(--lose);}
+
+  .result-banner{text-align:center;padding:18px;border-radius:14px;margin:14px 0;font-size:24px;
+    font-weight:800;letter-spacing:.08em;animation:pop .4s cubic-bezier(.2,.9,.3,1.2);
+    box-shadow:0 10px 30px rgba(0,0,0,.4);}
+  @keyframes pop{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
+  .result-banner.win{background:linear-gradient(180deg,#1f3a28,#12241a);color:var(--win);
+    border:1px solid var(--win);box-shadow:0 10px 30px rgba(98,184,126,.16);}
+  .result-banner.lose{background:linear-gradient(180deg,#3a2321,#231413);color:var(--lose);
+    border:1px solid var(--lose);box-shadow:0 10px 30px rgba(207,100,100,.14);}
+  .result-banner.draw{background:linear-gradient(180deg,#20202b,#16161f);color:var(--tie);border:1px solid var(--tie);}
+
+  .tabs{display:flex;gap:8px;margin-bottom:12px;}
+  .tabs .tab{flex:1;text-align:center;padding:9px;border-radius:10px;border:1px solid var(--line);
+    cursor:pointer;font-size:13.5px;color:var(--muted);}
+  .tabs .tab.active{border-color:var(--gold);color:var(--gold2);background:#1d1a0e;}
+  .footer-note{text-align:center;color:#5a5750;font-size:11px;margin-top:30px;letter-spacing:.1em;}
+  .slot-label{font-size:11px;color:var(--muted);margin-top:4px;}
+  .flash{animation:flash .5s ease;}
+  @keyframes flash{0%{background:#2a2410;}100%{background:transparent;}}
+
+  /* 즉결심판 */
+  .jp-card{width:96px;height:128px;border-radius:14px;display:inline-flex;align-items:center;
+    justify-content:center;font-size:54px;font-weight:800;background:linear-gradient(160deg,#23232c,#16161c);
+    border:2px solid var(--gold);color:var(--gold2);margin:6px;}
+  .jp-card.back{background:repeating-linear-gradient(45deg,#23232c,#23232c 8px,#1c1c24 8px,#1c1c24 16px);
+    color:var(--gold);font-size:30px;}
+
+  /* 오목 */
+  .om-wrap{display:inline-block;background:#caa45e;padding:10px;border-radius:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:100%;}
+  .om-grid{display:grid;gap:0;}
+  .om-cell{position:relative;background:transparent;border:none;padding:0;cursor:pointer;}
+  .om-cell::before,.om-cell::after{content:"";position:absolute;background:#5a4423;}
+  .om-cell::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-.5px);}
+  .om-cell::after{top:50%;left:0;right:0;height:1px;transform:translateY(-.5px);}
+  .om-stone{position:absolute;left:12%;top:12%;width:76%;height:76%;border-radius:50%;z-index:2;}
+  .om-stone.b{background:radial-gradient(circle at 35% 30%,#555,#000);}
+  .om-stone.w{background:radial-gradient(circle at 35% 30%,#fff,#bbb);}
+  .om-stone.last{box-shadow:0 0 0 2px var(--gold);}
+
+  /* 틱택토 */
+  .ttt-wrap{display:inline-block;padding:12px;border-radius:18px;border:1px solid var(--line2);
+    background:linear-gradient(160deg,var(--panel2),var(--panel));box-shadow:var(--shadow);}
+  .ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:min(82vw,322px);}
+  .ttt-cell{aspect-ratio:1/1;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    font-size:min(17vw,64px);font-weight:800;cursor:pointer;transition:.16s;user-select:none;line-height:1;
+    background:linear-gradient(160deg,#23232e,#191920);border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);}
+  .ttt-cell:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .ttt-cell.x{color:var(--gold2);text-shadow:0 2px 8px rgba(237,207,120,.3);}
+  .ttt-cell.o{color:#8fb7d6;text-shadow:0 2px 8px rgba(143,183,214,.25);}
+  .ttt-cell.win{background:linear-gradient(160deg,#1f3a28,#13251a);border-color:var(--win);}
+  .ttt-cell.full{cursor:default;transform:none;}
+  .ttt-cell.full:hover{border-color:var(--line);transform:none;}
+
+  /* Nim */
+  .nim-stone{width:34px;height:34px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#9a8a6a,#4a3f2a);border:1px solid #2a2418;}
+
+  /* 장기 (선·교차점 기반) */
+  .jg-wrap{position:relative;display:inline-block;background:#e0bd72;padding:18px;border-radius:8px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:100%;}
+  .jg-inner{position:relative;width:min(94vw,440px);}
+  .jg-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+  .jg-svg line{stroke:#6e5026;stroke-width:1.4;vector-effect:non-scaling-stroke;}
+  .jg-grid{position:relative;display:grid;grid-template-columns:repeat(9,1fr);z-index:1;}
+  .jg-cell{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .jg-piece{width:84%;height:84%;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:min(5.4vw,27px);z-index:2;user-select:none;box-shadow:0 2px 5px rgba(0,0,0,.4);}
+  .jg-piece.cho{background:radial-gradient(circle at 35% 30%,#3a6f3a,#143a14);color:#eafbe6;border:2px solid #0c2a0c;}
+  .jg-piece.han{background:radial-gradient(circle at 35% 30%,#b34040,#5a1414);color:#ffeaea;border:2px solid #3a0c0c;}
+  .jg-cell.sel::before{content:"";position:absolute;left:50%;top:50%;width:92%;height:92%;
+    transform:translate(-50%,-50%);border-radius:50%;background:rgba(240,217,138,.5);z-index:1;}
+  .jg-cell.move::after{content:"";position:absolute;left:50%;top:50%;width:30%;height:30%;
+    transform:translate(-50%,-50%);border-radius:50%;background:rgba(40,120,40,.6);z-index:1;}
+  .jg-cell.cap::after{content:"";position:absolute;left:50%;top:50%;width:84%;height:84%;
+    transform:translate(-50%,-50%);border-radius:50%;border:3px solid rgba(200,40,40,.85);z-index:3;}
+
+  /* 십이장기 */
+  .mj-wrap{display:inline-block;background:#d8b56a;padding:8px;border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .mj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(94vw,420px);}
+  .mj-cell{position:relative;aspect-ratio:1/1;background:#f0dca0;border-radius:10px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid transparent;}
+  .mj-cell.zh{background:#ecc6b8;}   /* 한(위) 진영 — 연한 붉은톤 */
+  .mj-cell.zc{background:#cfe1bd;}   /* 초(아래) 진영 — 연한 초록톤 */
+  .mj-cell .pc{position:relative;z-index:2;font-size:min(18vw,74px);line-height:1;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+  .mj-cell .pc.han{transform:rotate(180deg);}   /* 상대 말은 뒤집어 구분 */
+  .mj-dir{position:absolute;width:0;height:0;border-top:3px solid transparent;border-bottom:3px solid transparent;
+    border-left:6px solid #15521a;pointer-events:none;z-index:3;transform-origin:center;}
+  .mj-dir.han{border-left-color:#9a2a2a;}
+  .mj-cell.sel{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);}
+  .mj-cell.move::after{content:"";position:absolute;left:50%;top:50%;width:26%;height:26%;
+    transform:translate(-50%,-50%);border-radius:50%;background:rgba(40,120,40,.55);z-index:1;}
+  .mj-cell.cap{box-shadow:inset 0 0 0 3px rgba(180,40,40,.7);}
+  .mj-cell.drop::after{content:"";position:absolute;inset:18%;border-radius:8px;
+    border:2px dashed rgba(40,90,160,.75);z-index:1;}
+  .mj-hand{min-height:40px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;}
+  .mj-chip{font-size:24px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+    padding:2px 8px;cursor:pointer;}
+  .mj-chip.sel{border-color:var(--gold);background:#241f0d;}
+  .mj-chip.locked{cursor:default;opacity:.85;}
+
+  /* 게임 방법 패널 */
+  .howto{background:#11131a;border:1px solid var(--line);border-radius:12px;padding:0 14px;margin-bottom:14px;}
+  .howto summary{cursor:pointer;padding:12px 2px;color:var(--gold2);font-weight:700;font-size:14px;list-style:none;}
+  .howto summary::-webkit-details-marker{display:none;}
+  .howto summary::before{content:"📖 ";}
+  .howto[open] summary{border-bottom:1px solid var(--line);margin-bottom:8px;}
+  .howto .rc{padding:4px 2px 14px;font-size:13px;color:var(--ink);line-height:1.85;}
+  .howto .rc b{color:var(--gold2);}
+  .howto .rc .goal{color:var(--gold);font-weight:700;}
+  .howto .rc ul{margin:6px 0;padding-left:18px;}
+  .howto .rc li{margin:4px 0;}
+  .howto .rc .k{display:inline-block;min-width:64px;color:var(--muted);}
+  /* 메뉴 카테고리 라벨 (개별 카드 유지, 순서만 표시) */
+  .cat-label{grid-column:1/-1;font-size:12px;letter-spacing:.28em;color:var(--gold2);
+    margin:16px 0 0;padding:2px 0 2px 10px;border-left:3px solid var(--gold);
+    text-transform:uppercase;font-weight:700;}
+  .cat-label:first-child{margin-top:2px;}
+  /* 게임 방법 도식(그림) */
+  .howto .diagram{background:#0d0f16;border:1px solid var(--line);border-radius:10px;padding:12px 10px;
+    margin:10px 0;display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center;}
+  .howto .dcap{font-size:11.5px;color:var(--muted);width:100%;text-align:center;margin-top:4px;line-height:1.55;}
+  .howto .dtile{width:30px;height:40px;border-radius:6px;display:inline-flex;align-items:center;
+    justify-content:center;font-weight:800;font-size:16px;}
+  .howto .dtile.w{background:var(--white-tile);color:#16161c;}
+  .howto .dtile.b{background:var(--black-tile);color:#ece7d8;border:1px solid #3a3a45;}
+  .howto .dtile.hid{background:repeating-linear-gradient(45deg,#23232c,#23232c 5px,#1c1c24 5px,#1c1c24 10px);color:var(--gold);}
+  .howto .darrow{color:var(--gold2);font-size:17px;font-weight:700;}
+  .howto .dnote{font-size:12.5px;color:var(--ink);}
+  .howto .dwin{color:var(--win);font-weight:700;} .howto .dlose{color:var(--lose);font-weight:700;}
+  .howto .dstone{width:22px;height:22px;border-radius:50%;display:inline-block;}
+  .howto .dstone.b{background:radial-gradient(circle at 35% 30%,#555,#000);}
+  .howto .dstone.e{background:#1a1a22;border:1px dashed #4a4a55;}
+  .howto .dmini{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:#caa45e;padding:4px;border-radius:6px;}
+  .howto .dmc{width:30px;height:30px;border-radius:5px;background:#f0dca0;display:flex;align-items:center;
+    justify-content:center;font-size:17px;}
+  .howto .drock{font-size:18px;}
+
+  /* ===== 다인전 공통 (좌석) ===== */
+  .seats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0;}
+  .seat{min-width:92px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:10px 12px;text-align:center;transition:.2s;position:relative;}
+  .seat.me{border-color:var(--gold);}
+  .seat.turn{box-shadow:0 0 0 2px var(--gold);border-color:var(--gold);}
+  .seat.out{opacity:.4;filter:grayscale(.7);}
+  .seat.safe{border-color:var(--win);} .seat.dead{border-color:var(--lose);}
+  .seat .nm{font-size:13px;font-weight:700;color:var(--ink);}
+  .seat .nm.me{color:var(--gold2);}
+  .seat .st{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .seat .big{font-size:22px;font-weight:800;color:var(--gold2);margin-top:2px;}
+  .seat .pickbadge{display:inline-block;margin-top:4px;font-size:13px;padding:2px 8px;border-radius:8px;
+    background:#1d1a0e;border:1px solid var(--goldsoft);color:var(--gold2);}
+  .lives{color:var(--lose);letter-spacing:2px;}
+  .chips-ico{color:var(--gold2);}
+
+  /* 인디언 포커 카드 */
+  .ip-card{width:64px;height:86px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;
+    font-size:34px;font-weight:800;background:linear-gradient(160deg,#23232c,#16161c);border:2px solid var(--gold);
+    color:var(--gold2);margin:2px auto;}
+  .ip-card.back{background:repeating-linear-gradient(45deg,#23232c,#23232c 7px,#1c1c24 7px,#1c1c24 14px);
+    color:var(--gold);font-size:22px;}
+  .ip-card.mini{width:42px;height:58px;font-size:22px;border-width:1px;}
+
+  /* 동전 */
+  .coin{width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+    font-size:22px;background:radial-gradient(circle at 35% 30%,#e8c96a,#9a7d28);color:#23200c;font-weight:800;
+    border:2px solid #6a5418;margin:3px;}
+
+  /* 숫자야구 / 업다운 기록 */
+  .sb-hist{max-height:200px;overflow:auto;font-size:14px;line-height:1.9;text-align:left;
+    background:#0d0d11;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:8px;}
+  .sb-hist .g{color:var(--ink);} .sb-hist .r{color:var(--gold2);font-weight:700;}
+  .sb-hist .who{color:var(--muted);display:inline-block;min-width:42px;}
+  .digit-pad{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;max-width:320px;margin:10px auto;}
+  .digit-pad button{padding:12px 0;font-size:18px;border-radius:8px;border:1px solid var(--line);
+    background:var(--panel2);color:var(--ink);cursor:pointer;font-family:inherit;}
+  .digit-pad button:hover{border-color:var(--gold);}
+  .digit-pad button:disabled{opacity:.3;cursor:not-allowed;}
+  .guess-slots{display:flex;gap:8px;justify-content:center;margin:8px 0;}
+  .gslot{width:50px;height:60px;border-radius:10px;border:2px solid var(--line);display:flex;align-items:center;
+    justify-content:center;font-size:28px;font-weight:800;color:var(--gold2);background:var(--panel2);}
+  .gslot.fill{border-color:var(--gold);}
+
+  /* 경매 */
+  .auc-item{font-size:40px;font-weight:800;color:var(--gold2);}
+  .bidbar input[type=range]{width:220px;}
+
+  /* 소수결 / 중복회피 선택 버튼 */
+  .choice-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0;}
+  .choice-btn{min-width:74px;padding:16px 18px;font-size:20px;font-weight:800;border-radius:12px;
+    border:2px solid var(--line);background:var(--panel2);color:var(--ink);cursor:pointer;transition:.15s;}
+  .choice-btn:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .choice-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .choice-btn.sel{border-color:var(--gold);background:#241f0d;color:var(--gold2);}
+
+  /* 가위바위보 토너먼트 브래킷 */
+  .bracket{display:flex;flex-direction:column;gap:8px;margin:10px 0;}
+  .match{display:flex;align-items:center;justify-content:center;gap:10px;background:#0d0d11;
+    border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13.5px;}
+  .match.now{border-color:var(--gold);}
+  .match .pl{padding:3px 8px;border-radius:8px;background:var(--panel2);}
+  .match .pl.win{background:#1d3324;color:var(--win);} .match .pl.lose{opacity:.5;}
+  .match .pl.me{color:var(--gold2);font-weight:700;}
+
+  /* 가라사대 */
+  .simon-cmd{font-size:30px;font-weight:800;min-height:60px;line-height:60px;color:var(--gold2);letter-spacing:.05em;}
+  .simon-pad{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:300px;margin:12px auto;}
+  .simon-pad button{padding:20px 0;font-size:20px;border-radius:12px;border:2px solid var(--line);
+    background:var(--panel2);color:var(--ink);cursor:pointer;font-family:inherit;font-weight:700;}
+  .simon-pad button:hover{border-color:var(--gold);}
+  .simon-wait{grid-column:1/-1;background:#1a1a22;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ MAIN MENU ============ -->
+  <section id="menu" class="screen active">
+    <div class="brand">
+      <div class="kr">두 뇌 게 임</div>
+      <div class="en">THE GENIUS</div>
+      <div class="sub">생존을 위한 심리전 · AI 대전</div>
+    </div>
+    <div class="rule-divider"></div>
+    <div class="menu-grid">
+      <div class="cat-label">① 심리 · 블러프</div>
+      <div class="card" onclick="Game.open('bw')">
+        <div class="badge">심리</div>
+        <div class="ico">⚫⚪</div>
+        <div class="num">GAME 01</div>
+        <h3>흑과백</h3>
+        <p>0~8 타일을 한 장씩 내어 더 높은 수로 라운드를 가져가는 베팅 심리전. 색만 보이고 숫자는 모릅니다.</p>
+      </div>
+      <div class="card" onclick="Game.open('rps')">
+        <div class="badge">베팅</div>
+        <div class="ico">✊✋✌️</div>
+        <div class="num">GAME 02</div>
+        <h3>가위바위보 플러스</h3>
+        <p>매 라운드 점수를 베팅하고 가위바위보. 이기면 판돈을 가져옵니다. 단순하지만 잔혹한 두뇌싸움.</p>
+      </div>
+      <div class="card" onclick="Game.open('jp')">
+        <div class="badge">심리</div>
+        <div class="ico">⚖️</div>
+        <div class="num">GAME 03</div>
+        <h3>즉결심판</h3>
+        <p>피고는 진실 혹은 거짓을 선고하고, 심판은 그 진위를 가린다. 역할을 바꿔가며 벌이는 거짓말 추리전.</p>
+      </div>
+      <div class="card" onclick="Game.open('ip')">
+        <div class="badge">다인·블러프</div>
+        <div class="ico">🃏</div>
+        <div class="num">GAME 04</div>
+        <h3>인디언 포커</h3>
+        <p>내 카드만 못 보고 남의 카드는 다 보이는 베팅 심리전. AI 3명과 칩을 걸고 폴드·콜. 마지막까지 살아남으세요.</p>
+      </div>
+      <div class="card" onclick="Game.open('bean')">
+        <div class="badge">다인·눈치</div>
+        <div class="ico">🫘</div>
+        <div class="num">GAME 05</div>
+        <h3>콩 게임</h3>
+        <p>주먹 안에 콩 0~3개를 숨기고, 모두의 콩 합계를 맞히기. 겹치지 않게 외치고 정확히 맞히면 생존. AI 3명과 대결.</p>
+      </div>
+      <div class="card" onclick="Game.open('coin')">
+        <div class="badge">심리</div>
+        <div class="ico">🪙</div>
+        <div class="num">GAME 06</div>
+        <h3>동전 게임</h3>
+        <p>한 명은 동전을 숨기고, 한 명은 홀·짝을 맞힌다. 역할을 바꿔가며 상대의 패턴을 읽는 1대1 심리전.</p>
+      </div>
+      <div class="card" onclick="Game.open('trust')">
+        <div class="badge">심리</div>
+        <div class="ico">🤝</div>
+        <div class="num">GAME 07</div>
+        <h3>신뢰 게임</h3>
+        <p>매 라운드 협력·배신을 동시에 선택. 둘 다 협력하면 같이 이득, 혼자 배신하면 크게 한탕. 신뢰를 쌓다 막판 배신 타이밍을 노리는 10라운드 심리전.</p>
+      </div>
+
+      <div class="cat-label">② 추리</div>
+      <div class="card" onclick="Game.open('dv')">
+        <div class="badge">추리</div>
+        <div class="ico">🔢</div>
+        <div class="num">GAME 08</div>
+        <h3>다빈치코드</h3>
+        <p>오름차순으로 숨겨진 상대의 흑백 숫자 타일을 추리해 모두 공개시키면 승리.</p>
+      </div>
+      <div class="card" onclick="Game.open('baseball')">
+        <div class="badge">추리</div>
+        <div class="ico">⚾</div>
+        <div class="num">GAME 09</div>
+        <h3>숫자 야구</h3>
+        <p>서로 세 자리 비밀번호(중복 없는 숫자)를 정하고, 스트라이크·볼 힌트로 상대 숫자를 먼저 추리하면 승리.</p>
+      </div>
+      <div class="card" onclick="Game.open('updown')">
+        <div class="badge">추리</div>
+        <div class="ico">🔼🔽</div>
+        <div class="num">GAME 10</div>
+        <h3>업·다운 레이스</h3>
+        <p>1~50 사이 서로의 비밀수를 업/다운 힌트만으로 추리. 더 적은 횟수로 상대 수를 먼저 맞히면 승리.</p>
+      </div>
+
+      <div class="cat-label">③ 전략 · 보드</div>
+      <div class="card" onclick="Game.open('omok')">
+        <div class="badge">전략</div>
+        <div class="ico">⬤</div>
+        <div class="num">GAME 11</div>
+        <h3>오목</h3>
+        <p>가로·세로·대각선으로 돌 다섯 개를 먼저 잇는 사람이 승리. 위협을 읽는 AI와의 수읽기 대결.</p>
+      </div>
+      <div class="card" onclick="Game.open('ttt')">
+        <div class="badge">전략</div>
+        <div class="ico">❌⭕</div>
+        <div class="num">GAME 12</div>
+        <h3>틱택토</h3>
+        <p>3×3 칸에 번갈아 두어 한 줄(가로·세로·대각선) 3개를 먼저 잇는 게임. 두 방향 동시 위협(더블)으로 AI의 빈틈을 노리세요.</p>
+      </div>
+      <div class="card" onclick="Game.open('nim')">
+        <div class="badge">수학전략</div>
+        <div class="ico">🪨</div>
+        <div class="num">GAME 13</div>
+        <h3>돌 가져가기</h3>
+        <p>한 번에 1~3개씩 돌을 가져가고, 마지막 돌을 가져가면 승리. 최적 전략으로 두는 AI를 이겨보세요.</p>
+      </div>
+      <div class="card" onclick="Game.open('jg')">
+        <div class="badge">보드</div>
+        <div class="ico">將</div>
+        <div class="num">GAME 14</div>
+        <h3>장기</h3>
+        <p>한국 장기 한 판. 차·포·마·상·사·졸을 움직여 상대 궁(왕)을 잡으면 승리. AI 대국.</p>
+      </div>
+      <div class="card" onclick="Game.open('mj')">
+        <div class="badge">미니보드</div>
+        <div class="ico">🐯</div>
+        <div class="num">GAME 15</div>
+        <h3>십이장기</h3>
+        <p>3×4 동물 장기. 호랑이·곰·토끼·병아리를 움직이고 잡은 말을 다시 둔다. 호랑이를 잡거나, 끝줄에 올려 한 턴 버티면 승리.</p>
+      </div>
+
+      <div class="cat-label">④ 전략 · 다인전</div>
+      <div class="card" onclick="Game.open('minor')">
+        <div class="badge">다인·생존</div>
+        <div class="ico">⚖️</div>
+        <div class="num">GAME 16</div>
+        <h3>소수결 게임</h3>
+        <p>모두가 A·B 중 하나를 고르면, 사람이 더 적은 쪽만 생존. 군중 심리를 거슬러야 사는 7인 서바이벌.</p>
+      </div>
+      <div class="card" onclick="Game.open('auction')">
+        <div class="badge">다인·전략</div>
+        <div class="ico">🔨</div>
+        <div class="num">GAME 17</div>
+        <h3>경매 게임</h3>
+        <p>한정된 예산으로 점수 카드를 입찰. 최고가만 낙찰되고 예산은 소모됩니다. 가장 많은 점수를 모으세요.</p>
+      </div>
+      <div class="card" onclick="Game.open('uniq')">
+        <div class="badge">다인·생존</div>
+        <div class="ico">🎯</div>
+        <div class="num">GAME 18</div>
+        <h3>중복 회피</h3>
+        <p>각자 숫자를 하나 고르고, 같은 숫자를 낸 사람끼리 동반 탈락. 나만의 숫자를 골라 끝까지 살아남기.</p>
+      </div>
+      <div class="card" onclick="Game.open('rpst')">
+        <div class="badge">다인·토너먼트</div>
+        <div class="ico">🏆</div>
+        <div class="num">GAME 19</div>
+        <h3>가위바위보 토너먼트</h3>
+        <p>8인 단판 토너먼트(피의게임식). 3판 2선승으로 매치를 이겨 올라가 최종 우승을 차지하세요.</p>
+      </div>
+
+      <div class="cat-label">⑤ 순발력</div>
+      <div class="card" onclick="Game.open('react')">
+        <div class="badge">순발력</div>
+        <div class="ico">⚡</div>
+        <div class="num">GAME 20</div>
+        <h3>369 · 같은 숫자</h3>
+        <p>3·6·9에서 박수치는 369 게임과, 같은 숫자를 빠르게 찾는 순발력 게임 모음.</p>
+      </div>
+      <div class="card" onclick="Game.open('simon')">
+        <div class="badge">순발력</div>
+        <div class="ico">🙊</div>
+        <div class="num">GAME 21</div>
+        <h3>가라사대</h3>
+        <p>"가라사대"가 붙은 명령만 따르기. 안 붙은 명령에 반응하면 실수. 함정 명령을 피해 끝까지 버티세요.</p>
+      </div>
+    </div>
+    <div class="footer-note">SELECT YOUR GAME · 게임을 선택하세요</div>
+  </section>
+
+  <!-- ============ 흑과백 ============ -->
+  <section id="bw" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">흑과백</div>
+      <button class="btn sm" onclick="BW.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dtile w">0</span><span class="dtile b">1</span><span class="dtile w">2</span><span class="dtile b">3</span><span class="dtile w">4</span><span class="dtile b">5</span><span class="dtile w">6</span><span class="dtile b">7</span><span class="dtile w">8</span>
+          <div class="dcap">내 카드 0~8 · 흰=짝수, 검정=홀수</div>
+        </div>
+        <div class="diagram">
+          <span class="dtile b">5</span><span class="darrow">vs</span><span class="dtile b">3</span>&nbsp;<span class="dnote dwin">5 &gt; 3 → 라운드 승리</span>
+          <div class="dcap">매 라운드 한 장씩 제출 → 큰 수가 이김. 낸 카드는 사라집니다.</div>
+        </div>
+        <span class="goal">목표</span> — 9라운드 중 더 많은 라운드를 이기기. <b>5승을 먼저 달성하면 즉시 승리.</b>
+        <ul>
+          <li><span class="k">카드</span> 0~8 각 한 장. <b>흰색=짝수</b>(0·2·4·6·8), <b>검정=홀수</b>(1·3·5·7).</li>
+          <li><span class="k">진행</span> 매 라운드 카드를 한 장 골라 제출 → AI도 한 장 제출. 숫자가 큰 쪽이 라운드 승리, 같으면 무승부(둘 다 소모).</li>
+          <li><span class="k">규칙</span> 한 번 낸 카드는 사라집니다. 상대가 낸 카드의 '색'으로 홀짝을 추리하세요.</li>
+          <li><span class="k">전략</span> 높은 카드(8)를 언제 쓸지, 낮은 카드로 언제 버틸지가 핵심.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">나의 승</div><div class="val" id="bw-me">0</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 승</div><div class="val" id="bw-ai">0</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="center hint" id="bw-round">라운드 1 / 9 — 5승을 먼저 달성하면 승리</div>
+      <div class="reveal-stage" id="bw-stage">
+        <div class="side"><div class="who">나</div><div class="big-tile hidden-face" id="bw-myplay">?</div></div>
+        <div class="vs">VS</div>
+        <div class="side"><div class="who">AI</div><div class="big-tile hidden-face" id="bw-aiplay">?</div></div>
+      </div>
+      <div class="log" id="bw-log">아래에서 카드를 한 장 선택해 제출하세요. 같은 숫자면 무승부입니다.</div>
+    </div>
+    <div class="panel">
+      <div class="center hint" style="margin-bottom:10px;">나의 카드 (흰=짝수, 검정=홀수)</div>
+      <div class="tile-row" id="bw-hand"></div>
+      <div class="center" style="margin-top:14px;">
+        <button class="btn gold" id="bw-submit" onclick="BW.submit()" disabled>카드 제출</button>
+      </div>
+    </div>
+    <div id="bw-result"></div>
+  </section>
+
+  <!-- ============ 다빈치코드 ============ -->
+  <section id="dv" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">다빈치코드</div>
+      <button class="btn sm" onclick="DV.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dtile hid">?</span><span class="dtile hid">?</span><span class="dtile w">5</span><span class="dtile hid">?</span>
+          <div class="dcap">상대 카드는 항상 <b>작은 수 → 큰 수</b> 순서. 3번째가 <b>5</b>로 공개되면 왼쪽 두 장은 5보다 작고, 오른쪽 한 장은 5보다 큽니다.</div>
+        </div>
+        <div class="diagram">
+          <span class="dtile b">3</span><span class="dtile w">3</span>&nbsp;<span class="dnote">같은 숫자면 <b>검정이 왼쪽</b></span>
+        </div>
+        <div class="diagram">
+          <span class="dnote">① 카드 뽑기</span><span class="darrow">→</span><span class="dnote">② 위치 선택</span><span class="darrow">→</span><span class="dnote">③ 숫자 추리</span>
+          <div class="dcap"><span class="dwin">맞으면 공개 + 계속 추리</span> &nbsp;/&nbsp; <span class="dlose">틀리면 내가 뽑은 카드가 공개</span></div>
+        </div>
+        <span class="goal">목표</span> — AI가 숨긴 카드 4장의 숫자를 모두 먼저 맞히면 승리.
+        <ul>
+          <li><span class="k">카드</span> 0~11 흑·백. 항상 <b>오름차순 정렬</b>, 같은 숫자면 <b>검정이 왼쪽</b>.</li>
+          <li><span class="k">진행</span> 내 차례에 덱에서 한 장 뽑은 뒤, 상대 카드 위치를 누르고 숫자를 추리합니다.</li>
+          <li><span class="k">맞히면</span> 그 카드가 공개됩니다 → '계속 추리' 또는 '멈추고 뽑은 카드 숨기기' 선택.</li>
+          <li><span class="k">틀리면</span> 방금 뽑은 카드가 공개되고 차례가 넘어갑니다.</li>
+          <li><span class="k">전략</span> 공개된 카드와 정렬 규칙(좌우 이웃의 숫자 범위)으로 후보를 좁히세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint">AI의 카드 (숨김) — 위치를 눌러 숫자를 추리하세요</div>
+      <div class="tile-row" id="dv-ai" style="margin-top:10px;"></div>
+    </div>
+    <div class="panel center">
+      <div class="hint" id="dv-status">새 게임을 시작하세요.</div>
+      <div id="dv-draw" style="margin:12px 0;"></div>
+      <div class="keypad" id="dv-keypad" style="display:none;"></div>
+      <div id="dv-actions" style="margin-top:8px;"></div>
+    </div>
+    <div class="panel">
+      <div class="center hint">나의 카드 (오름차순 · 동수면 검정이 왼쪽)</div>
+      <div class="tile-row" id="dv-me" style="margin-top:10px;"></div>
+    </div>
+    <div class="log" id="dv-log"></div>
+    <div id="dv-result"></div>
+  </section>
+
+  <!-- ============ 가위바위보 플러스 ============ -->
+  <section id="rps" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">가위바위보 플러스</div>
+      <button class="btn sm" onclick="RPS.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span style="font-size:26px;">✊</span><span class="darrow">vs</span><span style="font-size:26px;">✌️</span>
+          &nbsp;<span class="dnote dwin">바위 &gt; 가위 · 베팅 10 → +10점</span>
+          <div class="dcap">베팅 금액을 정하고 가위바위보 → 이기면 그만큼 얻고, 지면 잃습니다.</div>
+        </div>
+        <span class="goal">목표</span> — 10라운드 후 점수가 더 높으면 승리(또는 상대 점수를 0으로).
+        <ul>
+          <li><span class="k">시작</span> 양쪽 50점.</li>
+          <li><span class="k">진행</span> 매 라운드 베팅 금액(슬라이더)을 정하고 ✊바위·✋보·✌️가위 중 하나를 고른 뒤 <b>승부!</b></li>
+          <li><span class="k">정산</span> 이기면 베팅만큼 <b>+</b>, 지면 <b>−</b>, 비기면 변동 없음.</li>
+          <li><span class="k">전략</span> 큰 베팅은 한 방에 역전·역전패. 흐름을 보며 금액을 조절하세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 점수</div><div class="val" id="rps-me">50</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 점수</div><div class="val" id="rps-ai">50</div></div>
+      </div>
+      <div class="center hint" id="rps-round" style="margin-top:8px;">라운드 1 / 10</div>
+    </div>
+    <div class="panel center">
+      <div class="reveal-stage">
+        <div class="side"><div class="who">나</div><div class="big-tile" id="rps-myshow" style="background:var(--panel2);">❔</div></div>
+        <div class="vs">VS</div>
+        <div class="side"><div class="who">AI</div><div class="big-tile" id="rps-aishow" style="background:var(--panel2);">❔</div></div>
+      </div>
+      <div class="bet-row">
+        <span class="hint">베팅</span>
+        <input type="range" id="rps-bet" min="1" max="50" value="10" oninput="RPS.betLabel()">
+        <span class="pill" id="rps-betval">10 점</span>
+      </div>
+      <div class="rps-grid">
+        <button class="rps-btn" data-rps="0" onclick="RPS.pick(0,this)">✊</button>
+        <button class="rps-btn" data-rps="1" onclick="RPS.pick(1,this)">✋</button>
+        <button class="rps-btn" data-rps="2" onclick="RPS.pick(2,this)">✌️</button>
+      </div>
+      <button class="btn gold" id="rps-go" onclick="RPS.go()" disabled>승부!</button>
+      <div class="log" id="rps-log" style="margin-top:12px;">베팅 금액을 정하고 가위바위보를 선택하세요.</div>
+    </div>
+    <div id="rps-result"></div>
+  </section>
+
+  <!-- ============ 369 / 같은 숫자 ============ -->
+  <section id="react" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">순발력 게임</div>
+      <span style="width:60px;"></span>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote"><b>13</b> → 👏 박수 <span style="color:var(--muted)">(3 있음)</span></span>
+          <span class="darrow">·</span>
+          <span class="dnote"><b>12</b> → 🔢 숫자 <span style="color:var(--muted)">(없음)</span></span>
+          <div class="dcap">3·6·9가 들어간 수에서는 박수, 아니면 숫자. AI와 번갈아 가며 진행합니다.</div>
+        </div>
+        <b>369 게임</b> — 1부터 번갈아 셉니다. 현재 숫자에 <b>3·6·9가 들어있으면 👏박수</b>, 없으면 <b>🔢숫자</b>를 누르세요. 틀리면 탈락. AI는 숫자가 커질수록 실수 확률이 올라갑니다. AI가 먼저 틀리면 승리!
+        <br><br>
+        <b>같은 숫자 찾기</b> — 30초 동안 화면의 <b>목표 숫자</b>를 모두 클릭하세요. 맞으면 <b>+10</b>, 틀리면 <b>−5</b>. 다 찾으면 새 판이 나오고, 시간이 끝나면 최종 점수가 표시됩니다.
+      </div>
+    </details>
+    <div class="tabs">
+      <div class="tab active" id="tab-369" onclick="React.tab('369')">369 게임</div>
+      <div class="tab" id="tab-find" onclick="React.tab('find')">같은 숫자 찾기</div>
+    </div>
+
+    <!-- 369 -->
+    <div id="r369" class="panel center">
+      <div class="turn-ind" id="r369-turn">새 게임을 시작하세요</div>
+      <div class="num-display" id="r369-num">—</div>
+      <div class="hint" id="r369-hint">현재 숫자에 3·6·9가 들어있으면 그 개수만큼 박수, 아니면 숫자를 외칩니다.</div>
+      <div class="grid369" id="r369-controls" style="display:none;">
+        <button class="btn" style="font-size:18px;padding:14px 20px;" onclick="React.say369()">🔢 숫자</button>
+        <button class="btn gold" style="font-size:18px;padding:14px 20px;" onclick="React.clap369()">👏 박수</button>
+      </div>
+      <button class="btn gold" id="r369-start" onclick="React.start369()">시작</button>
+      <div class="log" id="r369-log" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- find -->
+    <div id="rfind" class="panel center" style="display:none;">
+      <div class="hint" id="rfind-status">제한시간 안에 화면의 목표 숫자를 모두 찾으세요.</div>
+      <div style="margin:10px 0;font-size:14px;">목표: <b id="rfind-target" style="color:var(--gold2);font-size:20px;">—</b>
+        &nbsp;·&nbsp; 남은 시간: <b id="rfind-time" style="color:var(--gold2);">—</b>
+        &nbsp;·&nbsp; 점수: <b id="rfind-score" style="color:var(--gold2);">0</b></div>
+      <div class="grid-find" id="rfind-grid"></div>
+      <button class="btn gold" id="rfind-start" onclick="React.startFind()">시작</button>
+    </div>
+  </section>
+
+  <!-- ============ 즉결심판 ============ -->
+  <section id="jp" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">즉결심판</div>
+      <button class="btn sm" onclick="JP.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">피고 카드 <b>4</b></span><span class="darrow">→</span>
+          <span class="dnote">선고 "<b>6</b>" <span class="dlose">거짓</span></span><span class="darrow">→</span>
+          <span class="dnote">심판이 "거짓" 판정</span>
+          <div class="dcap"><span class="dwin">심판 적중 → 피고 생명 −1</span> · 틀리면 심판 생명 −1 · 역할은 매 라운드 교대</div>
+        </div>
+        <span class="goal">목표</span> — 생명 3에서 시작. 상대 생명을 먼저 0으로 만들면 승리.
+        <ul>
+          <li><span class="k">역할</span> 매 라운드 <b>피고</b>와 <b>심판</b>을 번갈아 맡습니다.</li>
+          <li><span class="k">피고</span> 1~6 카드를 받아 숫자를 '선고'. 진짜 숫자(진실) 또는 다른 숫자(거짓)로 선고할 수 있습니다.</li>
+          <li><span class="k">심판</span> 그 선고가 <b>진실(무죄)</b>인지 <b>거짓(유죄)</b>인지 판정합니다.</li>
+          <li><span class="k">결과</span> 심판이 맞히면 피고 생명 −1, 틀리면 심판 생명 −1.</li>
+          <li><span class="k">전략</span> 피고일 땐 들키지 않게, 심판일 땐 패턴을 읽기. (AI는 당신의 거짓말 빈도를 학습합니다)</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">나의 생명</div><div class="val" id="jp-me">3</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 생명</div><div class="val" id="jp-ai">3</div></div>
+      </div>
+      <div class="center hint" id="jp-round" style="margin-top:8px;">라운드 1 — 생명이 먼저 0이 되면 패배</div>
+    </div>
+    <div class="panel center">
+      <div class="hint" id="jp-role">역할 배정 중...</div>
+      <div id="jp-stage" style="margin:14px 0;"></div>
+      <div id="jp-actions"></div>
+      <div class="log" id="jp-log" style="margin-top:12px;">피고는 카드(1~6)를 받아 숫자를 선고하고, 심판은 그 선고가 진실인지 거짓인지 가립니다.</div>
+    </div>
+    <div id="jp-result"></div>
+  </section>
+
+  <!-- ============ 오목 ============ -->
+  <section id="omok" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">오목</div>
+      <button class="btn sm" onclick="OM.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dstone b"></span><span class="dstone b"></span><span class="dstone b"></span><span class="dstone b"></span><span class="dstone e"></span>
+          <div class="dcap">한 줄로 <b>5개</b>를 먼저 이으면 승리. 상대가 4개를 늘어놓으면 빈 끝(점선)을 막으세요.</div>
+        </div>
+        <span class="goal">목표</span> — 가로·세로·대각선 어느 방향이든 돌 <b>5개</b>를 먼저 잇기.
+        <ul>
+          <li><span class="k">진행</span> 당신은 <b>흑돌</b>. 선공은 무작위로 정해지며, 빈 칸을 번갈아 둡니다.</li>
+          <li><span class="k">전략</span> 양쪽이 열린 3·4를 만들어 공격하고, 상대의 4(또는 열린 3)는 반드시 막으세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="om-status">당신은 흑돌입니다. 먼저 두세요. 다섯 개를 먼저 이으면 승리!</div>
+      <div id="om-board" style="margin:12px auto 0;"></div>
+    </div>
+    <div id="om-result"></div>
+  </section>
+
+  <!-- ============ 틱택토 ============ -->
+  <section id="ttt" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">틱택토</div>
+      <button class="btn sm" onclick="TTT.start()">↻ 새 판</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <div class="dmini" style="width:max-content;grid-template-columns:repeat(3,1fr);">
+            <div class="dmc dwin">✕</div><div class="dmc">◯</div><div class="dmc">◯</div>
+            <div class="dmc">◯</div><div class="dmc dwin">✕</div><div class="dmc"></div>
+            <div class="dmc"></div><div class="dmc"></div><div class="dmc dwin">✕</div>
+          </div>
+          <div class="dcap">대각선으로 <b>✕ 3개</b> 완성 → 승리. 가로·세로·대각선 아무 줄이나 3개면 됩니다.</div>
+        </div>
+        <span class="goal">목표</span> — 3×3 칸에 번갈아 두어 <b>한 줄(가로·세로·대각선) 3개</b>를 먼저 완성하면 승리. 당신은 <b>✕</b>, AI는 <b>◯</b>.
+        <ul>
+          <li><span class="k">진행</span> 빈 칸을 눌러 둡니다. 선공은 시작할 때 무작위로 정해집니다.</li>
+          <li><span class="k">더블</span> 두 방향을 동시에 위협(한 수로 두 줄 리치)하면 상대가 한 곳밖에 못 막아 승리합니다.</li>
+          <li><span class="k">AI</span> 기본은 정석을 두지만 <b>가끔 빈틈</b>을 보입니다 — 실수를 놓치지 말고 더블로 몰아붙이세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="ttt-status">새 판을 시작하세요.</div>
+      <div id="ttt-board" style="margin:14px auto 0;"></div>
+    </div>
+    <div id="ttt-result"></div>
+  </section>
+
+  <!-- ============ 돌 가져가기 (Nim) ============ -->
+  <section id="nim" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">돌 가져가기</div>
+      <button class="btn sm" onclick="NIM.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="drock">🪨🪨🪨🪨🪨🪨🪨🪨</span>
+          <div class="dcap">한 번에 <b>1~3개</b>씩 번갈아 가져가기. 내 차례가 끝났을 때 남은 돌을 <b>4의 배수</b>(4·8·12…)로 만들면 유리합니다.</div>
+        </div>
+        <span class="goal">목표</span> — <b>마지막 돌</b>을 가져가는 사람이 승리.
+        <ul>
+          <li><span class="k">진행</span> 한 번에 1~3개씩 번갈아 가져갑니다. 선공은 시작할 때 무작위로 정해집니다.</li>
+          <li><span class="k">필승 전략</span> 내 차례가 끝났을 때 남은 돌을 <b>4의 배수</b>로 만들면 유리합니다. (AI는 최적으로 둡니다 — 유리한 위치를 선점하세요)</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint">한 번에 1~3개씩 돌을 가져갑니다. <b>마지막 돌을 가져가는 사람이 승리</b>. 선공은 시작할 때 무작위로 정해집니다.</div>
+    </div>
+    <div class="panel center" id="nim-play" style="display:none;">
+      <div class="turn-ind" id="nim-turn">당신 차례</div>
+      <div id="nim-stones" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0;min-height:60px;"></div>
+      <div class="hint" style="margin-bottom:8px;">남은 돌: <b id="nim-count" style="color:var(--gold2);">21</b></div>
+      <div id="nim-controls">
+        <button class="btn" onclick="NIM.take(1)">1개</button>
+        <button class="btn" onclick="NIM.take(2)">2개</button>
+        <button class="btn" onclick="NIM.take(3)">3개</button>
+      </div>
+      <div class="log" id="nim-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="nim-result"></div>
+  </section>
+
+  <!-- ============ 장기 ============ -->
+  <section id="jg" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">장기</div>
+      <button class="btn sm" onclick="JG.start()">↻ 새 판</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <svg width="84" height="84" viewBox="0 0 100 100" style="background:#e0bd72;border-radius:6px;">
+            <g stroke="#6e5026" stroke-width="2" fill="none">
+              <line x1="20" y1="20" x2="20" y2="80"/><line x1="50" y1="20" x2="50" y2="80"/><line x1="80" y1="20" x2="80" y2="80"/>
+              <line x1="20" y1="20" x2="80" y2="20"/><line x1="20" y1="50" x2="80" y2="50"/><line x1="20" y1="80" x2="80" y2="80"/>
+            </g>
+            <circle cx="50" cy="50" r="14" fill="#2e7d32" stroke="#0c2a0c" stroke-width="2"/>
+          </svg>
+          <span class="dnote">말은 칸 안이 아니라 <b>선이 만나는 교차점</b> 위에 놓입니다.</span>
+          <div class="dcap">차=직선 끝까지 · 마=직선1+대각1 · 상=직선1+대각2 · 포=한 기물을 넘어 이동 · 졸=앞·옆 한 칸</div>
+        </div>
+        <span class="goal">목표</span> — 상대 궁(漢)을 잡으면 승리. 당신은 <b>초(楚·아래·녹색)</b>.
+        <ul>
+          <li><span class="k">차 車</span> 직선으로 끝까지(막힐 때까지).</li>
+          <li><span class="k">포 包</span> 사이에 기물 하나를 넘어 이동/잡기. 포는 넘지도 잡지도 못함.</li>
+          <li><span class="k">마 馬</span> 직선 1 + 대각 1. 직선 칸이 막히면 못 감.</li>
+          <li><span class="k">상 象</span> 직선 1 + 대각 2. 경로가 막히면 못 감.</li>
+          <li><span class="k">사·궁 士楚</span> 궁성(3×3) 안에서 한 칸, 궁성 대각선 따라 이동.</li>
+          <li><span class="k">졸 卒</span> 앞·옆으로 한 칸(뒤로 불가).</li>
+          <li><span class="k">조작</span> 기물을 누르면 <b>녹색=이동</b>, <b>빨간 테두리=잡기</b> 칸이 표시됩니다.</li>
+          <li><span class="k">참고</span> 이 버전은 장군/외통 없이 <b>궁을 직접 잡으면</b> 종료됩니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="jg-status">당신은 아래쪽(초). 기물을 누르고 이동할 곳을 누르세요. 상대 궁을 잡으면 승리.</div>
+      <div id="jg-board" style="margin:12px auto 0;"></div>
+    </div>
+    <div id="jg-result"></div>
+  </section>
+
+  <!-- ============ 십이장기 (동물장기) ============ -->
+  <section id="mj" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">십이장기</div>
+      <button class="btn sm" onclick="MJ.start()">↻ 새 판</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <div class="dmini">
+            <div class="dmc">🐰</div><div class="dmc">🐯</div><div class="dmc">🐻</div>
+            <div class="dmc"></div><div class="dmc">🐤</div><div class="dmc"></div>
+            <div class="dmc"></div><div class="dmc">🐤</div><div class="dmc"></div>
+            <div class="dmc">🐻</div><div class="dmc">🐯</div><div class="dmc">🐰</div>
+          </div>
+          <div class="dcap">시작 배치(아래가 나) · 🐯호랑이=8방향 · 🐻곰=상하좌우 · 🐰토끼=대각선 · 🐤병아리=앞으로(끝줄서 🐔닭)</div>
+        </div>
+        <span class="goal">목표</span> — 상대 <b>호랑이🐯를 잡거나</b>, 내 호랑이를 <b>맨 윗줄</b>에 올린 뒤 <b>상대 턴을 한 번 버티면</b> 승리. 당신은 아래쪽.
+        <ul>
+          <li><span class="k">🐯 호랑이</span> 8방향 한 칸(왕).</li>
+          <li><span class="k">🐻 곰</span> 상·하·좌·우 한 칸.</li>
+          <li><span class="k">🐰 토끼</span> 대각선 한 칸.</li>
+          <li><span class="k">🐤 병아리</span> 앞으로 한 칸. 맨 끝줄에 닿으면 <b>🐔 닭</b>으로 승급(뒤 대각선만 빼고 6방향).</li>
+          <li><span class="k">트라이</span> 호랑이를 끝줄에 올려도 바로 끝이 아닙니다. <b>상대가 다음 턴에 잡지 못해야</b> 승리.</li>
+          <li><span class="k">진영·방향</span> 맨 위·맨 아래 끝줄만 각 진영 색입니다. 말 주위의 작은 <b>삼각형</b>이 그 말의 이동 방향을 가리킵니다.</li>
+          <li><span class="k">포로</span> 잡은 말은 내 차례에 빈 칸에 다시 둘 수 있습니다('내 포로'에서 선택 후 빈 칸 클릭). 단, <b>상대 맨 끝줄(상대 진영)에는 바로 둘 수 없습니다.</b></li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="mj-status">당신은 아래쪽. 호랑이(🐯)를 잡거나, 호랑이를 맨 윗줄에 올린 뒤 한 턴 버티면 승리. 맨 위·아래 끝줄만 각 진영 색, 말 주위 삼각형은 이동 방향입니다.</div>
+      <div class="mj-hand" id="mj-hand-ai" style="margin-top:10px;"><span class="hint">AI 포로:</span></div>
+      <div id="mj-board" style="margin:10px auto;"></div>
+      <div class="mj-hand" id="mj-hand-me"><span class="hint">내 포로(눌러서 투입):</span></div>
+    </div>
+    <div id="mj-result"></div>
+  </section>
+
+  <!-- ============ 인디언 포커 ============ -->
+  <section id="ip" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">인디언 포커</div>
+      <button class="btn sm" onclick="IP.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="ip-card back">나?</span><span class="darrow">·</span>
+          <span class="ip-card mini">7</span><span class="ip-card mini">2</span><span class="ip-card mini">9</span>
+          <div class="dcap">내 카드는 <b>나만 못 봅니다</b>. 남의 카드(예: 7·2·9)를 보고 내 카드 강함을 추리해 베팅하세요.</div>
+        </div>
+        <span class="goal">목표</span> — AI 3명과 칩 대결. 다른 참가자들의 칩을 모두 잃게 만들어 <b>최후의 1인</b>이 되면 승리.
+        <ul>
+          <li><span class="k">카드</span> 매 라운드 1~20 중 한 장씩. 자기 카드만 가려져 있습니다.</li>
+          <li><span class="k">진행</span> 모두 1칩씩 기본 베팅(앤티) 후, 순서대로 <b>콜/레이즈</b> 또는 <b>다이(폴드)</b>.</li>
+          <li><span class="k">승부</span> 끝까지 남은 사람 중 카드가 가장 높은 사람이 판돈(팟)을 모두 가져갑니다.</li>
+          <li><span class="k">전략</span> 남들이 크게 베팅하면 "내 카드가 약할 수 있다"는 신호. 칩이 0이 되면 탈락.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="ip-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="ip-seats"></div>
+      <div class="center hint">팟(판돈): <b id="ip-pot" style="color:var(--gold2);font-size:18px;">0</b> 칩</div>
+    </div>
+    <div class="panel center">
+      <div id="ip-controls"></div>
+      <div class="log" id="ip-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="ip-result"></div>
+  </section>
+
+  <!-- ============ 콩 게임 ============ -->
+  <section id="bean" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">콩 게임</div>
+      <button class="btn sm" onclick="BEAN.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">✊ 내 콩 <b>2</b></span><span class="darrow">+</span>
+          <span class="dnote">AI들 콩 합 <b>5</b></span><span class="darrow">=</span>
+          <span class="dnote dwin">전체 합 7 → "7" 외친 사람 승</span>
+          <div class="dcap">손 안에 콩 0~3개를 숨기고, 4명 전체의 콩 합계를 맞히기. 이미 나온 숫자는 못 외칩니다.</div>
+        </div>
+        <span class="goal">목표</span> — AI 3명과 함께 4인 대결. 생명 3개로 시작, 합계를 정확히 맞히면 <b>다른 모두의 생명을 1씩 깎습니다</b>(맞힌 사람은 안전). 마지막 생존자가 승리.
+        <ul>
+          <li><span class="k">콩 숨기기</span> 매 라운드 0~3개를 주먹에 숨깁니다.</li>
+          <li><span class="k">외치기</span> 순서대로 전체 콩 합(0~12)을 하나씩 부릅니다. <b>앞사람이 부른 수는 못 부릅니다.</b></li>
+          <li><span class="k">정산</span> 실제 합과 일치한 사람이 있으면 그 사람 외 전원 생명 −1. 아무도 못 맞히면 다음 라운드.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="bean-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="bean-seats"></div>
+    </div>
+    <div class="panel center">
+      <div id="bean-controls"></div>
+      <div class="log" id="bean-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="bean-result"></div>
+  </section>
+
+  <!-- ============ 동전 게임 ============ -->
+  <section id="coin" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">동전 게임</div>
+      <button class="btn sm" onclick="COIN.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="coin">🪙</span><span class="coin">🪙</span><span class="coin">🪙</span>
+          <span class="darrow">→</span><span class="dnote">3개 = <b>홀</b></span>
+          <div class="dcap">숨긴 사람은 동전 1~4개, 맞히는 사람은 홀·짝을 추리. 역할은 매 라운드 교대됩니다.</div>
+        </div>
+        <span class="goal">목표</span> — 10라운드 동안 점수가 더 높으면 승리.
+        <ul>
+          <li><span class="k">숨기기</span> 동전 1~4개 중 하나를 숨깁니다(개수의 홀짝이 핵심).</li>
+          <li><span class="k">맞히기</span> 상대가 숨긴 개수가 <b>홀</b>인지 <b>짝</b>인지 선택.</li>
+          <li><span class="k">정산</span> 맞히는 쪽이 적중하면 +1점, 빗나가면 숨긴 쪽 +1점. 역할 교대.</li>
+          <li><span class="k">전략</span> AI는 당신의 홀짝 습관을 학습합니다. 패턴을 흔드세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 점수</div><div class="val" id="coin-me">0</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 점수</div><div class="val" id="coin-ai">0</div></div>
+      </div>
+      <div class="center hint" id="coin-round" style="margin-top:8px;">라운드 1 / 10</div>
+    </div>
+    <div class="panel center">
+      <div class="hint" id="coin-role">역할 배정 중...</div>
+      <div id="coin-stage" style="margin:14px 0;min-height:60px;"></div>
+      <div id="coin-actions"></div>
+      <div class="log" id="coin-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="coin-result"></div>
+  </section>
+
+  <!-- ============ 신뢰 게임 ============ -->
+  <section id="trust" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">신뢰 게임</div>
+      <button class="btn sm" onclick="TR.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">🤝+🤝 → <span class="dwin">+3 / +3</span></span><span class="darrow">·</span>
+          <span class="dnote">🔪+🤝 → <span class="dwin">배신자 +5</span> / 협력자 0</span><span class="darrow">·</span>
+          <span class="dnote">🔪+🔪 → +1 / +1</span>
+          <div class="dcap">매 라운드 둘이 동시에 협력/배신을 선택. 함께 협력하면 사이좋게 이득, 혼자 배신하면 한탕, 둘 다 배신하면 쥐꼬리.</div>
+        </div>
+        <span class="goal">목표</span> — 10라운드 후 <b>누적 점수가 더 높으면 승리</b>.
+        <ul>
+          <li><span class="k">협력 🤝</span> 둘 다 협력하면 +3씩. 가장 안정적인 공동 이득.</li>
+          <li><span class="k">배신 🔪</span> 나만 배신하면 +5(상대 0). 하지만 들키면 보복당합니다.</li>
+          <li><span class="k">AI</span> 첫 수는 <b>한 번 떠봅니다(배신)</b>. 이후엔 당신이 하는 대로 되갚아요 — 협력엔 협력, 배신엔 보복. 배신만 일삼으면 끝까지 등을 돌리고, <b>막판엔 반드시 배신을 노립니다.</b></li>
+          <li><span class="k">전략</span> 초반 떠보기에 말려들지 말고 신뢰를 쌓되, 게임이 끝나기 전에 <b>먼저 배신할 타이밍</b>을 잡으세요. 너무 자주 배신하면 AI가 끝까지 보복합니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 점수</div><div class="val" id="tr-me">0</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 점수</div><div class="val" id="tr-ai">0</div></div>
+      </div>
+      <div class="center hint" id="tr-round" style="margin-top:8px;">라운드 1 / 10</div>
+    </div>
+    <div class="panel center">
+      <div class="reveal-stage">
+        <div class="side"><div class="who">나</div><div class="big-tile" id="tr-myshow" style="background:var(--panel2);">❔</div></div>
+        <div class="vs">VS</div>
+        <div class="side"><div class="who">AI</div><div class="big-tile" id="tr-aishow" style="background:var(--panel2);">❔</div></div>
+      </div>
+      <div class="choice-row" id="tr-controls">
+        <button class="choice-btn" onclick="TR.choose(0)">🤝 협력</button>
+        <button class="choice-btn" onclick="TR.choose(1)">🔪 배신</button>
+      </div>
+      <div class="log" id="tr-log" style="margin-top:12px;">협력으로 신뢰를 쌓을지, 배신으로 한탕 할지 선택하세요.</div>
+      <div class="sb-hist" id="tr-hist" style="margin-top:10px;"></div>
+    </div>
+    <div id="tr-result"></div>
+  </section>
+
+  <!-- ============ 숫자 야구 ============ -->
+  <section id="baseball" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">숫자 야구</div>
+      <button class="btn sm" onclick="BB.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">정답 <b>3 1 7</b></span><span class="darrow">·</span>
+          <span class="dnote">추측 <b>1 2 7</b> → <span class="dwin">1S</span> <span style="color:var(--gold2)">1B</span></span>
+          <div class="dcap">자리·숫자 모두 맞으면 <b>스트라이크(S)</b>, 숫자만 맞고 자리가 다르면 <b>볼(B)</b>. (예: 7은 자리까지 정확 1S, 1은 자리만 다른 볼)</div>
+        </div>
+        <span class="goal">목표</span> — 상대(AI)의 세 자리 비밀번호를 먼저 알아내 <b>3 스트라이크</b>를 만들면 승리. 서로 번갈아 추측합니다.
+        <ul>
+          <li><span class="k">비밀번호</span> 서로 <b>중복 없는 세 자리</b>(0~9). 당신 것은 자동 배정됩니다.</li>
+          <li><span class="k">진행</span> 내 차례에 세 자리를 추측 → S/B 결과 확인. 이어서 AI가 내 번호를 추측.</li>
+          <li><span class="k">전략</span> 결과를 조합해 후보를 좁히세요. AI도 논리적으로 추리합니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="bb-status">새 게임을 시작하세요.</div>
+      <div class="hint" style="margin-top:6px;">내 비밀번호: <b id="bb-mynum" style="color:var(--gold2);letter-spacing:.3em;">— — —</b></div>
+      <div class="guess-slots" id="bb-slots"></div>
+      <div class="digit-pad" id="bb-pad"></div>
+      <div id="bb-actions"></div>
+    </div>
+    <div class="panel">
+      <div class="hint center" style="margin-bottom:4px;">기록</div>
+      <div class="sb-hist" id="bb-hist"></div>
+    </div>
+    <div id="bb-result"></div>
+  </section>
+
+  <!-- ============ 업·다운 레이스 ============ -->
+  <section id="updown" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">업·다운 레이스</div>
+      <button class="btn sm" onclick="UD.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">추측 25 → <b>🔼 UP</b></span><span class="darrow">·</span>
+          <span class="dnote">추측 40 → <b>🔽 DOWN</b></span>
+          <div class="dcap">정답이 추측보다 크면 UP, 작으면 DOWN. 범위를 좁혀 정확한 수를 먼저 맞히세요.</div>
+        </div>
+        <span class="goal">목표</span> — 1~50 사이 상대(AI)의 비밀수를 <b>더 적은 횟수</b>로 먼저 맞히면 승리. 번갈아 추측합니다.
+        <ul>
+          <li><span class="k">진행</span> 내 차례에 1~50 중 한 수를 추측 → UP/DOWN 힌트. 이어서 AI가 내 수를 추측.</li>
+          <li><span class="k">승리</span> 상대 수를 정확히 맞힌 사람이 즉시 승리. 동시에 맞으면 무승부.</li>
+          <li><span class="k">전략</span> 이분 탐색(가운데부터)이 가장 빠릅니다. AI도 최적에 가깝게 둡니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="ud-status">새 게임을 시작하세요.</div>
+      <div style="margin:10px 0;">추측: <b id="ud-cur" style="color:var(--gold2);font-size:30px;">25</b>
+        <div class="bet-row"><span class="hint">1</span>
+          <input type="range" id="ud-range" min="1" max="50" value="25" oninput="UD.label()"><span class="hint">50</span></div>
+        <button class="btn gold" id="ud-go" onclick="UD.guess()">이 수로 추측</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="hint center" style="margin-bottom:4px;">기록</div>
+      <div class="sb-hist" id="ud-hist"></div>
+    </div>
+    <div id="ud-result"></div>
+  </section>
+
+  <!-- ============ 소수결 게임 ============ -->
+  <section id="minor" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">소수결 게임</div>
+      <button class="btn sm" onclick="MN.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">A 선택: 5명 <span class="dlose">(다수·탈락)</span></span><span class="darrow">·</span>
+          <span class="dnote">B 선택: 2명 <span class="dwin">(소수·생존)</span></span>
+          <div class="dcap">사람이 더 <b>적은</b> 쪽이 생존합니다. 동수면 전원 생존(아무도 안 죽음).</div>
+        </div>
+        <span class="goal">목표</span> — 7명(나 + AI 6명)이 매 라운드 A/B를 선택. <b>소수파만 생존</b>, 다수파는 탈락. 마지막까지 살아남으면 승리.
+        <ul>
+          <li><span class="k">진행</span> 모두 동시에 A 또는 B 선택 → 더 적은 인원의 진영만 생존.</li>
+          <li><span class="k">동수</span> 양쪽 인원이 같으면 그 라운드는 전원 생존.</li>
+          <li><span class="k">2인</span> 두 명만 남으면 서로 다른 쪽을 고를 때까지(동전 던지기처럼) 진행, 갈리면 소수=승.</li>
+          <li><span class="k">전략</span> 다들 어디로 몰릴지 거꾸로 읽으세요. AI들도 군중을 피하려 합니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="mn-status">새 게임을 시작하세요.</div>
+      <div class="center hint" id="mn-round" style="margin-top:4px;"></div>
+      <div class="seats" id="mn-seats"></div>
+    </div>
+    <div class="panel center">
+      <div id="mn-controls"></div>
+      <div class="log" id="mn-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="mn-result"></div>
+  </section>
+
+  <!-- ============ 경매 게임 ============ -->
+  <section id="auction" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">경매 게임</div>
+      <button class="btn sm" onclick="AC.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="auc-item">+8</span><span class="darrow">→</span>
+          <span class="dnote">최고 입찰자 낙찰 · 입찰액만큼 예산 소모</span>
+          <div class="dcap">점수 카드를 입찰해 가져갑니다. 비싸게 사면 점수는 얻지만 예산이 줄어듭니다.</div>
+        </div>
+        <span class="goal">목표</span> — 예산 100으로 시작(나 + AI 3명). 점수 카드 8장을 경매로 사들여 <b>최종 점수 합이 가장 높으면</b> 승리.
+        <ul>
+          <li><span class="k">진행</span> 카드마다 모두가 비공개 입찰 → 최고가가 낙찰, 그만큼 예산 차감.</li>
+          <li><span class="k">동점 입찰</span> 동일 최고가면 무작위로 한 명이 낙찰.</li>
+          <li><span class="k">전략</span> 예산을 아끼되 좋은 카드(높은 점수, 가끔 마이너스 함정)는 적극 입찰하세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="ac-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="ac-seats"></div>
+    </div>
+    <div class="panel center">
+      <div class="hint">이번 경매 카드</div>
+      <div class="auc-item" id="ac-item">—</div>
+      <div class="hint" id="ac-progress" style="margin:4px 0;"></div>
+      <div class="bidbar bet-row"><span class="hint">입찰</span>
+        <input type="range" id="ac-bid" min="0" max="100" value="0" oninput="AC.label()">
+        <span class="pill" id="ac-bidval">0</span></div>
+      <button class="btn gold" id="ac-go" onclick="AC.bid()">입찰</button>
+      <div class="log" id="ac-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="ac-result"></div>
+  </section>
+
+  <!-- ============ 중복 회피 ============ -->
+  <section id="uniq" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">중복 회피</div>
+      <button class="btn sm" onclick="UQ.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">나 <b>3</b> · A <b>1</b> · B <b>3</b> · C <b>5</b></span>
+          <div class="dcap">나와 B가 같은 <b>3</b> → 둘 다 탈락. 겹치지 않은 1·5는 생존.</div>
+        </div>
+        <span class="goal">목표</span> — 5명(나 + AI 4명)이 매 라운드 1~N 중 하나를 선택. <b>같은 수를 낸 사람끼리 모두 탈락</b>. 마지막 생존자가 승리.
+        <ul>
+          <li><span class="k">진행</span> 모두 동시에 숫자 선택 → 중복된 숫자를 낸 사람 전원 탈락.</li>
+          <li><span class="k">선택 범위</span> 생존 인원 수만큼(1 ~ 남은 인원 수). 인원이 줄면 범위도 줄어 더 치열해집니다.</li>
+          <li><span class="k">전원 중복</span> 모두 겹쳐 전멸 위기면, 그 라운드는 무효 처리하고 다시 진행.</li>
+          <li><span class="k">전략</span> 남들이 안 고를 것 같은 수를 노리세요. AI는 인기 숫자를 피하려 합니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="uq-status">새 게임을 시작하세요.</div>
+      <div class="center hint" id="uq-round" style="margin-top:4px;"></div>
+      <div class="seats" id="uq-seats"></div>
+    </div>
+    <div class="panel center">
+      <div id="uq-controls"></div>
+      <div class="log" id="uq-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="uq-result"></div>
+  </section>
+
+  <!-- ============ 가위바위보 토너먼트 ============ -->
+  <section id="rpst" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">가위바위보 토너먼트</div>
+      <button class="btn sm" onclick="RT.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">8강 → 4강 → 결승</span><span class="darrow">·</span>
+          <span class="dnote">매 매치 <b>3판 2선승</b></span>
+          <div class="dcap">8명 단판 토너먼트. 내 매치만 직접 플레이하고, 다른 매치는 AI끼리 자동 진행됩니다.</div>
+        </div>
+        <span class="goal">목표</span> — 8인 토너먼트에서 매치를 연달아 이겨 <b>최종 우승</b>하면 승리.
+        <ul>
+          <li><span class="k">매치</span> 3판 2선승. 비기면 다시.</li>
+          <li><span class="k">진행</span> ✊바위·✋보·✌️가위 중 선택 → 결과 확인. 한 번 지면(2패) 토너먼트 탈락.</li>
+          <li><span class="k">전략</span> 단순하지만 잔혹한 운·심리. 상대 버릇을 노려보세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="rt-status">새 게임을 시작하세요.</div>
+      <div class="bracket" id="rt-bracket"></div>
+    </div>
+    <div class="panel center" id="rt-playarea" style="display:none;">
+      <div class="reveal-stage">
+        <div class="side"><div class="who">나</div><div class="big-tile" id="rt-myshow" style="background:var(--panel2);">❔</div></div>
+        <div class="vs" id="rt-score">0 : 0</div>
+        <div class="side"><div class="who" id="rt-oppname">상대</div><div class="big-tile" id="rt-aishow" style="background:var(--panel2);">❔</div></div>
+      </div>
+      <div class="rps-grid">
+        <button class="rps-btn" onclick="RT.pick(0,this)">✊</button>
+        <button class="rps-btn" onclick="RT.pick(1,this)">✋</button>
+        <button class="rps-btn" onclick="RT.pick(2,this)">✌️</button>
+      </div>
+      <div class="log" id="rt-log" style="margin-top:10px;"></div>
+    </div>
+    <div id="rt-result"></div>
+  </section>
+
+  <!-- ============ 가라사대 ============ -->
+  <section id="simon" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">가라사대</div>
+      <button class="btn sm" onclick="SM.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote dwin">"가라사대 왼쪽" → 왼쪽 누르기</span><span class="darrow">·</span>
+          <span class="dnote dlose">"오른쪽" → 누르면 실수!</span>
+          <div class="dcap">"가라사대"가 붙은 명령만 따릅니다. 안 붙은 명령엔 <b>대기</b>를 눌러야 합니다.</div>
+        </div>
+        <span class="goal">목표</span> — 함정 명령을 피해 최대한 오래 버티기. 생명 3개, 실수하면 −1. 점수(정답 수)를 높여보세요.
+        <ul>
+          <li><span class="k">명령</span> 왼쪽·오른쪽·위·아래 방향이 제한시간 안에 깜빡입니다.</li>
+          <li><span class="k">규칙</span> "가라사대 ○○"이면 ○○를, "○○"만 있으면 <b>대기</b>를 누르세요.</li>
+          <li><span class="k">시간초과</span> 가라사대 명령에 시간 안에 못 누르면 실수. 점점 빨라집니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="sm-status">시작을 누르면 명령이 나옵니다.</div>
+      <div style="margin:8px 0;">생명 <b id="sm-lives" class="lives">♥♥♥</b> &nbsp;·&nbsp; 점수 <b id="sm-score" style="color:var(--gold2);">0</b></div>
+      <div class="simon-cmd" id="sm-cmd">—</div>
+      <div class="simon-pad" id="sm-pad">
+        <button onclick="SM.tap('up')">⬆️ 위</button>
+        <button onclick="SM.tap('down')">⬇️ 아래</button>
+        <button onclick="SM.tap('left')">⬅️ 왼쪽</button>
+        <button onclick="SM.tap('right')">➡️ 오른쪽</button>
+        <button class="simon-wait" onclick="SM.tap('wait')">✋ 대기 (가라사대 없음)</button>
+      </div>
+      <button class="btn gold" id="sm-start" onclick="SM.begin()">시작</button>
+    </div>
+    <div id="sm-result"></div>
+  </section>
+
+</div>
+
+<script>
+/* =====================================================================
+   THE GENIUS — 두뇌 게임 모음 (vanilla JS)
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const rand = n => Math.floor(Math.random()*n);
+const pick = arr => arr[rand(arr.length)];
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+const Game = {
+  open(id){ Game.show(id);
+    if(id==='bw') BW.start();
+    if(id==='dv') DV.start();
+    if(id==='rps') RPS.start();
+    if(id==='react') React.init();
+    if(id==='jp') JP.start();
+    if(id==='omok') OM.start();
+    if(id==='ttt') TTT.start();
+    if(id==='nim') NIM.start();
+    if(id==='jg') JG.start();
+    if(id==='mj') MJ.start();
+    if(id==='ip') IP.start();
+    if(id==='bean') BEAN.start();
+    if(id==='coin') COIN.start();
+    if(id==='trust') TR.start();
+    if(id==='baseball') BB.start();
+    if(id==='updown') UD.start();
+    if(id==='minor') MN.start();
+    if(id==='auction') AC.start();
+    if(id==='uniq') UQ.start();
+    if(id==='rpst') RT.start();
+    if(id==='simon') SM.start();
+  },
+  show(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    $(id).classList.add('active');
+    window.scrollTo(0,0);
+  },
+  home(){ Game.show('menu'); },
+  // ----- AI 설정 (단일·고정, 난이도 선택 없음) -----
+  PARAMS:{blunder:0.0, omDef:1.08, dvAcc:0.90, dvStop:0.26, mjDepth:4, jgReply:1.1, nim:0.12, jpJudge:0.90, jpLie:0.5, rpsRead:0.5, tttErr:0.22, r369:c=>Math.min(0.24,c*0.006)},
+  p(){ return Game.PARAMS; },
+  // ----- 선(先) 무작위 결정: 'me' 또는 'ai' (각 50%) -----
+  coin(){ return Math.random()<0.5 ? 'me' : 'ai'; }
+};
+
+/* =====================================================================
+   GAME 01 — 흑과백 (Black & White)
+   ===================================================================== */
+const BW = {
+  hand:[], aiHand:[], sel:null, meWin:0, aiWin:0, round:0, over:false,
+  start(){
+    this.hand=[0,1,2,3,4,5,6,7,8];
+    this.aiHand=[0,1,2,3,4,5,6,7,8];
+    this.sel=null; this.meWin=0; this.aiWin=0; this.round=0; this.over=false;
+    $('bw-result').innerHTML='';
+    $('bw-myplay').className='big-tile hidden-face'; $('bw-myplay').textContent='?';
+    $('bw-aiplay').className='big-tile hidden-face'; $('bw-aiplay').textContent='?';
+    $('bw-log').innerHTML='카드를 한 장 선택해 제출하세요. <b>흰=짝수, 검정=홀수</b>. 더 높은 숫자가 라운드를 가져갑니다.';
+    this.render(); this.updateScore();
+  },
+  color(n){ return n%2===0 ? 'white':'black'; },
+  render(){
+    const wrap=$('bw-hand'); wrap.innerHTML='';
+    this.hand.forEach(n=>{
+      const d=document.createElement('div');
+      d.className='tile '+this.color(n)+(this.sel===n?' sel':'');
+      d.textContent=n;
+      d.onclick=()=>{ if(this.over) return; this.sel=n; this.render();
+        $('bw-submit').disabled=false; };
+      wrap.appendChild(d);
+    });
+  },
+  updateScore(){ $('bw-me').textContent=this.meWin; $('bw-ai').textContent=this.aiWin;
+    $('bw-round').textContent=`라운드 ${this.round+1} / 9 — 5승을 먼저 달성하면 승리`; },
+  aiChoose(){
+    const P=Game.p();
+    const h=[...this.aiHand].sort((a,b)=>a-b);
+    if(Math.random()<P.blunder) return h[0];   // 약: 가장 낮은 카드를 내어 라운드를 내줌
+    const remaining=h.length;
+    const r=Math.random();
+    // If close to losing match, play aggressively high
+    if(this.aiWin===4 || (this.meWin>=3 && r<0.5)) return h[h.length-1];
+    if(remaining>=7 && r<0.45) return pick(h.slice(0,4)); // dump low early sometimes
+    if(r<0.30) return h[h.length-1];                       // play strong
+    if(r<0.60) return h[Math.floor(h.length/2)];           // play mid
+    return pick(h);                                         // random
+  },
+  async submit(){
+    if(this.sel===null||this.over) return;
+    $('bw-submit').disabled=true;
+    const my=this.sel; const ai=this.aiChoose();
+    this.hand.splice(this.hand.indexOf(my),1);
+    this.aiHand.splice(this.aiHand.indexOf(ai),1);
+    this.sel=null; this.render();
+    // reveal AI color first (suspense)
+    const mE=$('bw-myplay'), aE=$('bw-aiplay');
+    mE.className='big-tile '+this.color(my); mE.textContent=my;
+    aE.className='big-tile hidden-face'; aE.textContent='?';
+    $('bw-log').innerHTML=`AI가 <b>${this.color(ai)==='white'?'흰색':'검정색'}</b> 카드를 냈습니다...`;
+    await sleep(700);
+    aE.className='big-tile '+this.color(ai); aE.textContent=ai;
+    this.round++;
+    let msg;
+    if(my>ai){ this.meWin++; msg=`<b>${my}</b> vs ${ai} — 라운드 승리! 🎉`; }
+    else if(my<ai){ this.aiWin++; msg=`${my} vs <b>${ai}</b> — 라운드 패배.`; }
+    else { msg=`${my} vs ${ai} — 무승부, 카드만 소모됐습니다.`; }
+    $('bw-log').innerHTML=msg;
+    this.updateScore();
+    if(this.meWin>=5||this.aiWin>=5||this.hand.length===0){ this.finish(); return; }
+    $('bw-log').innerHTML+=' 다음 카드를 선택하세요.';
+  },
+  finish(){
+    this.over=true; $('bw-submit').disabled=true;
+    let cls,txt;
+    if(this.meWin>this.aiWin){cls='win';txt='🏆 승리';}
+    else if(this.meWin<this.aiWin){cls='lose';txt='💀 패배';}
+    else {cls='draw';txt='무승부';}
+    $('bw-result').innerHTML=`<div class="result-banner ${cls}">${txt} · ${this.meWin} : ${this.aiWin}</div>
+      <div class="center"><button class="btn gold" onclick="BW.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 02 — 다빈치코드 (Da Vinci Code)
+   값: 0~11, color black/white. 정렬: 숫자 오름차순, 동수면 black<white
+   ===================================================================== */
+const DV = {
+  deck:[], me:[], ai:[], drawn:null, over:false, selSlot:null, turn:'me',
+  cmp(a,b){ if(a.n!==b.n) return a.n-b.n; return a.c==='black'?-1:1; },
+  start(){
+    // build deck of 24 tiles
+    this.deck=[];
+    for(let n=0;n<=11;n++){ this.deck.push({n,c:'black'}); this.deck.push({n,c:'white'}); }
+    for(let i=this.deck.length-1;i>0;i--){const j=rand(i+1);[this.deck[i],this.deck[j]]=[this.deck[j],this.deck[i]];}
+    this.me=[]; this.ai=[]; this.over=false; this.selSlot=null; this.drawn=null; this.turn=Game.coin();
+    for(let i=0;i<4;i++){ this.me.push(this.draw()); this.ai.push(this.draw()); }
+    this.me.forEach(t=>t.revealed=false); this.ai.forEach(t=>t.revealed=false);
+    this.me.sort(this.cmp); this.ai.sort(this.cmp);
+    $('dv-result').innerHTML='';
+    $('dv-log').innerHTML = this.turn==='me'
+      ? '🙋 당신이 선(先)! 카드를 뽑아 상대 카드를 맞히세요.'
+      : '🤖 AI가 선(先)! AI가 먼저 추리합니다.';
+    this.beginTurn();
+  },
+  draw(){ return this.deck.length? this.deck.pop():null; },
+  knownToMe(){ // tiles I can see: my tiles + revealed ai tiles + drawn
+    const arr=[...this.me]; this.ai.forEach(t=>{if(t.revealed)arr.push(t);});
+    if(this.drawn) arr.push(this.drawn); return arr;
+  },
+  beginTurn(){
+    if(this.over) return;
+    if(this.turn==='me'){
+      this.drawn = this.draw();
+      if(this.drawn) this.drawn.revealed=false;
+      $('dv-status').innerHTML = this.drawn
+        ? `당신 차례 — 뽑은 카드를 확인하고 상대 카드 위치를 눌러 추리하세요.`
+        : `덱이 비었습니다. 상대 카드 위치를 눌러 추리하세요.`;
+      this.selSlot=null;
+      this.render();
+    } else {
+      this.render();
+      this.aiTurn();
+    }
+  },
+  render(){
+    // AI tiles (hidden unless revealed)
+    const aiWrap=$('dv-ai'); aiWrap.innerHTML='';
+    this.ai.forEach((t,i)=>{
+      const d=document.createElement('div');
+      if(t.revealed){ d.className='tile small '+t.c; d.textContent=t.n; }
+      else { d.className='tile small hidden-face'+(this.selSlot===i?' sel':'');
+        d.textContent='?'; d.style.borderColor = (t.c==='black')? '#33333f':'#c9c4b5';
+        d.onclick=()=>{ if(this.over||this.turn!=='me') return; this.selSlot=i; this.render(); this.showKeypad(); };
+      }
+      aiWrap.appendChild(d);
+    });
+    // my tiles
+    const meWrap=$('dv-me'); meWrap.innerHTML='';
+    this.me.forEach(t=>{
+      const d=document.createElement('div');
+      d.className='tile small '+t.c+(t.revealed?'':'');
+      d.textContent=t.n;
+      if(t.revealed) d.style.outline='2px solid var(--lose)';
+      meWrap.appendChild(d);
+    });
+    // drawn card display
+    const dr=$('dv-draw');
+    if(this.turn==='me' && this.drawn){
+      dr.innerHTML=`<span class="hint">뽑은 카드 → </span>
+        <span class="tile small ${this.drawn.c}" style="display:inline-flex;vertical-align:middle;">${this.drawn.n}</span>`;
+    } else dr.innerHTML='';
+    if(this.selSlot===null){ $('dv-keypad').style.display='none'; $('dv-actions').innerHTML=''; }
+  },
+  showKeypad(){
+    const kp=$('dv-keypad'); kp.style.display='grid'; kp.innerHTML='';
+    // candidate numbers: not impossible given known tiles
+    for(let n=0;n<=11;n++){
+      const b=document.createElement('button');
+      b.textContent=n;
+      b.onclick=()=>this.guess(n);
+      kp.appendChild(b);
+    }
+    $('dv-actions').innerHTML=`<span class="hint">위치 ${this.selSlot+1}번 카드의 숫자를 고르세요</span>`;
+  },
+  guess(n){
+    if(this.over||this.selSlot===null) return;
+    const t=this.ai[this.selSlot];
+    if(t.revealed) return;
+    if(t.n===n){
+      t.revealed=true;
+      $('dv-log').innerHTML=`✅ 정답! 상대 ${this.selSlot+1}번 카드는 <b>${n}</b> 이었습니다.`;
+      this.selSlot=null; $('dv-keypad').style.display='none';
+      if(this.ai.every(x=>x.revealed)){ this.finish('win'); return; }
+      // continue: choose to guess again or stop
+      $('dv-actions').innerHTML=`<button class="btn gold sm" onclick="DV.continueGuess()">계속 추리</button>
+        &nbsp;<button class="btn sm" onclick="DV.stopGuess()">멈추고 카드 숨기기</button>`;
+      this.render();
+    } else {
+      $('dv-log').innerHTML=`❌ 오답! 내 카드 <b>${this.drawn?this.drawn.n:'?'}</b> 가 공개됩니다.`;
+      if(this.drawn){ this.drawn.revealed=true; this.me.push(this.drawn); this.me.sort(this.cmp); this.drawn=null; }
+      this.selSlot=null; $('dv-keypad').style.display='none'; $('dv-actions').innerHTML='';
+      this.endMyTurn();
+    }
+  },
+  continueGuess(){ $('dv-status').innerHTML='상대 카드 위치를 다시 눌러 추리하세요.'; $('dv-actions').innerHTML=''; },
+  stopGuess(){
+    // keep drawn card hidden in my hand
+    if(this.drawn){ this.drawn.revealed=false; this.me.push(this.drawn); this.me.sort(this.cmp); this.drawn=null; }
+    $('dv-actions').innerHTML=''; this.endMyTurn();
+  },
+  endMyTurn(){
+    if(this.me.every(x=>x.revealed)){ this.finish('lose'); return; }
+    this.turn='ai'; this.render(); setTimeout(()=>this.beginTurn(),650);
+  },
+  async aiTurn(){
+    const P=Game.p();
+    $('dv-status').innerHTML='AI가 추리 중...';
+    await sleep(800);
+    const aiDraw=this.draw(); if(aiDraw) aiDraw.revealed=false;
+    // candidates AI doesn't know: full set minus AI tiles minus revealed-me minus aiDraw
+    const used=new Set();
+    const key=t=>t.n+t.c;
+    this.ai.forEach(t=>used.add(key(t)));
+    if(aiDraw) used.add(key(aiDraw));
+    this.me.forEach(t=>{ if(t.revealed) used.add(key(t)); });
+    // pick a hidden target slot in my hand
+    const hidden=this.me.map((t,i)=>({t,i})).filter(o=>!o.t.revealed);
+    if(hidden.length===0){ this.finish('lose'); return; }
+    let success=true; let guesses=0;
+    while(success && hidden.length>0){
+      guesses++;
+      const target=pick(hidden.map(o=>o.i));
+      const slot=this.me[target];
+      // candidate numbers for this slot consistent with ordering & unknown set
+      let cands=[];
+      for(let n=0;n<=11;n++){
+        if(!used.has(n+'black')||!used.has(n+'white')) cands.push(n);
+      }
+      // ordering constraint: between revealed neighbors
+      let lo=-1,hi=12;
+      for(let j=target-1;j>=0;j--){ if(this.me[j].revealed){lo=this.me[j].n;break;} }
+      for(let j=target+1;j<this.me.length;j++){ if(this.me[j].revealed){hi=this.me[j].n;break;} }
+      cands=cands.filter(n=>n>=lo&&n<=hi);
+      if(cands.length===0) cands=[rand(12)];
+      // AI accuracy scales with how few candidates remain
+      const g = cands.length<=1 ? cands[0]
+              : (Math.random()<P.dvAcc ? pick(cands) : rand(12));
+      if(g===slot.n && !slot.revealed){
+        slot.revealed=true;
+        $('dv-log').innerHTML=`🤖 AI가 내 ${target+1}번 카드 <b>${slot.n}</b> 를 맞혔습니다!`;
+        used.add(slot.n+slot.c);
+        this.render();
+        if(this.me.every(x=>x.revealed)){ this.finish('lose'); return; }
+        hidden.splice(hidden.findIndex(o=>o.i===target),1);
+        await sleep(700);
+        // AI may stop to play safe
+        if(Math.random()<P.dvStop){ success=false; }
+      } else {
+        success=false;
+        if(aiDraw){ aiDraw.revealed=true; this.ai.push(aiDraw); this.ai.sort(this.cmp);
+          $('dv-log').innerHTML=`🤖 AI가 오답! AI 카드 <b>${aiDraw.n}</b> 공개.`; }
+        this.render();
+        if(this.ai.every(x=>x.revealed)){ this.finish('win'); return; }
+      }
+    }
+    if(aiDraw && !aiDraw.revealed){ this.ai.push(aiDraw); this.ai.sort(this.cmp); }
+    this.turn='me'; await sleep(500); this.beginTurn();
+  },
+  finish(who){
+    this.over=true; this.render();
+    $('dv-keypad').style.display='none'; $('dv-actions').innerHTML=''; $('dv-draw').innerHTML='';
+    // reveal everything
+    this.ai.forEach(t=>t.revealed=true); this.render();
+    const cls= who==='win'?'win':'lose';
+    const txt= who==='win'?'🏆 승리 — 상대 카드를 모두 간파!':'💀 패배 — 내 카드가 모두 공개됨';
+    $('dv-status').innerHTML='게임 종료';
+    $('dv-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+      <div class="center"><button class="btn gold" onclick="DV.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 03 — 가위바위보 플러스
+   ===================================================================== */
+const RPS = {
+  me:50, ai:50, round:0, sel:null, over:false, myHist:[], names:['바위','보','가위'], emo:['✊','✋','✌️'],
+  start(){
+    this.me=50; this.ai=50; this.round=0; this.sel=null; this.over=false; this.myHist=[];
+    $('rps-result').innerHTML='';
+    $('rps-myshow').textContent='❔'; $('rps-aishow').textContent='❔';
+    $('rps-myshow').style.background='var(--panel2)'; $('rps-aishow').style.background='var(--panel2)';
+    document.querySelectorAll('#rps .rps-btn').forEach(b=>b.classList.remove('sel'));
+    $('rps-bet').value=10; this.betLabel();
+    $('rps-log').textContent='베팅 금액을 정하고 가위바위보를 선택하세요.';
+    this.update();
+  },
+  betLabel(){ const max=Math.min(this.me, 50); const bet=$('rps-bet');
+    bet.max=Math.max(1,this.me); if(+bet.value>this.me) bet.value=this.me;
+    $('rps-betval').textContent=bet.value+' 점'; },
+  update(){
+    $('rps-me').textContent=this.me; $('rps-ai').textContent=this.ai;
+    $('rps-round').textContent=`라운드 ${this.round+1} / 10`;
+    this.betLabel();
+    $('rps-go').disabled = (this.sel===null||this.over);
+  },
+  pick(v,el){ if(this.over) return; this.sel=v;
+    document.querySelectorAll('#rps .rps-btn').forEach(b=>b.classList.remove('sel'));
+    el.classList.add('sel'); $('rps-go').disabled=false; },
+  aiPick(){
+    const P=Game.p(); const h=this.myHist;
+    if(h.length>=2 && Math.random()<P.rpsRead){
+      const cnt=[0,0,0]; h.slice(-6).forEach(m=>cnt[m]++);
+      let mode=0; if(cnt[1]>cnt[mode])mode=1; if(cnt[2]>cnt[mode])mode=2;
+      return (mode+1)%3;          // 최근 최빈수를 받아침
+    }
+    return rand(3);
+  },
+  async go(){
+    if(this.sel===null||this.over) return;
+    $('rps-go').disabled=true;
+    const bet=Math.min(+$('rps-bet').value, this.me);
+    const my=this.sel; const ai=this.aiPick(); this.myHist.push(my);
+    $('rps-myshow').textContent='✊'; $('rps-aishow').textContent='✊';
+    // little shake
+    for(let i=0;i<3;i++){ await sleep(160);
+      $('rps-myshow').textContent=this.emo[i%3]; $('rps-aishow').textContent=this.emo[(i+1)%3]; }
+    $('rps-myshow').textContent=this.emo[my]; $('rps-aishow').textContent=this.emo[ai];
+    this.round++;
+    let res;
+    if(my===ai){ res=`무승부 — ${this.names[my]}. 점수 변동 없음 (베팅 ${bet})`; }
+    else if((my===0&&ai===2)||(my===1&&ai===0)||(my===2&&ai===1)){
+      this.me+=bet; this.ai-=bet; res=`승리! ${this.names[my]} > ${this.names[ai]} — <b>+${bet}</b>`;
+      $('rps-myshow').style.background='#1d3324'; $('rps-aishow').style.background='#33201f';
+    } else {
+      this.me-=bet; this.ai+=bet; res=`패배… ${this.names[ai]} > ${this.names[my]} — <b>-${bet}</b>`;
+      $('rps-myshow').style.background='#33201f'; $('rps-aishow').style.background='#1d3324';
+    }
+    $('rps-log').innerHTML=res;
+    this.sel=null;
+    document.querySelectorAll('#rps .rps-btn').forEach(b=>b.classList.remove('sel'));
+    this.update();
+    await sleep(300);
+    $('rps-myshow').style.background='var(--panel2)'; $('rps-aishow').style.background='var(--panel2)';
+    if(this.me<=0||this.ai<=0||this.round>=10){ this.finish(); }
+  },
+  finish(){
+    this.over=true; $('rps-go').disabled=true;
+    let cls,txt;
+    if(this.me>this.ai){cls='win';txt='🏆 승리';}
+    else if(this.me<this.ai){cls='lose';txt='💀 패배';}
+    else {cls='draw';txt='무승부';}
+    $('rps-result').innerHTML=`<div class="result-banner ${cls}">${txt} · ${this.me} : ${this.ai}</div>
+      <div class="center"><button class="btn gold" onclick="RPS.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 04 — 369 게임 + 같은 숫자 찾기
+   ===================================================================== */
+const React = {
+  init(){ this.tab('369'); },
+  tab(t){
+    $('tab-369').classList.toggle('active', t==='369');
+    $('tab-find').classList.toggle('active', t==='find');
+    $('r369').style.display = t==='369'?'block':'none';
+    $('rfind').style.display = t==='find'?'block':'none';
+  },
+  // ----- 369 -----
+  cur:0, turn:'me', overR:false,
+  claps(n){ return (''+n).split('').filter(c=>c==='3'||c==='6'||c==='9').length; },
+  start369(){
+    this.cur=0; this.turn=Game.coin(); this.overR=false;
+    $('r369-start').style.display='none';
+    $('r369-controls').style.display='flex';
+    $('r369-log').innerHTML = this.turn==='me' ? '🙋 당신이 선(先)!' : '🤖 AI가 선(先)!';
+    this.nextTurn369();
+  },
+  nextTurn369(){
+    if(this.overR) return;
+    this.cur++;
+    $('r369-num').textContent=this.cur;
+    if(this.turn==='me'){
+      $('r369-turn').textContent='당신 차례';
+      $('r369-controls').style.display='flex';
+    } else {
+      $('r369-turn').textContent='AI 차례...';
+      $('r369-controls').style.display='none';
+      setTimeout(()=>this.aiPlay369(),700);
+    }
+  },
+  say369(){ this.play369(false); },
+  clap369(){ this.play369(true); },
+  play369(clapped){
+    if(this.turn!=='me'||this.overR) return;
+    const need=this.claps(this.cur);
+    const correct = need>0 ? clapped : !clapped;
+    if(correct){
+      $('r369-log').innerHTML=`✅ ${this.cur} — 정답!`;
+      this.turn='ai'; this.nextTurn369();
+    } else {
+      $('r369-log').innerHTML= need>0
+        ? `❌ ${this.cur} 에는 3·6·9가 있어 박수쳐야 했습니다.`
+        : `❌ ${this.cur} 는 박수 칠 숫자가 아니었습니다.`;
+      this.finish369(false);
+    }
+  },
+  aiPlay369(){
+    if(this.overR) return;
+    const need=this.claps(this.cur);
+    // AI 오류율은 난이도에 따라 결정 (숫자가 커질수록 증가)
+    const errRate=Game.p().r369(this.cur);
+    const aiCorrect = Math.random()>errRate;
+    if(aiCorrect){
+      $('r369-log').innerHTML=`🤖 AI: ${need>0?('박수 '+need+'회'):this.cur} — 통과`;
+      this.turn='me'; this.nextTurn369();
+    } else {
+      $('r369-log').innerHTML=`🤖 AI가 ${this.cur} 에서 실수했습니다!`;
+      this.finish369(true);
+    }
+  },
+  finish369(win){
+    this.overR=true; $('r369-controls').style.display='none';
+    $('r369-turn').textContent='게임 종료';
+    const cls=win?'win':'lose';
+    const txt=win?`🏆 승리! ${this.cur} 까지 도달, AI가 먼저 실수`:`💀 패배 — ${this.cur} 에서 탈락`;
+    $('r369-log').innerHTML=`<div class="result-banner ${cls}" style="margin-top:10px;">${txt}</div>`;
+    $('r369-start').style.display='inline-block';
+    $('r369-start').textContent='다시 시작';
+  },
+  // ----- 같은 숫자 찾기 -----
+  fTarget:0, fScore:0, fTime:0, fTimer:null, fLeft:0,
+  startFind(){
+    this.fScore=0; this.fTime=30;
+    $('rfind-start').style.display='none';
+    $('rfind-score').textContent='0';
+    this.newFindRound();
+    clearInterval(this.fTimer);
+    this.fTimer=setInterval(()=>{
+      this.fTime--; $('rfind-time').textContent=this.fTime+'초';
+      if(this.fTime<=0) this.finishFind();
+    },1000);
+    $('rfind-time').textContent=this.fTime+'초';
+  },
+  newFindRound(){
+    const size=5; // 5x5
+    const target=rand(10);
+    this.fTarget=target;
+    $('rfind-target').textContent=target;
+    const grid=$('rfind-grid');
+    grid.style.gridTemplateColumns=`repeat(${size},1fr)`;
+    grid.innerHTML='';
+    // place a few targets
+    const total=size*size;
+    const count=2+rand(3); // 2-4 targets
+    const targetPos=new Set();
+    while(targetPos.size<count) targetPos.add(rand(total));
+    this.fRemaining=count;
+    for(let i=0;i<total;i++){
+      const c=document.createElement('div');
+      c.className='find-cell';
+      let val= targetPos.has(i)? target : (()=>{let v;do{v=rand(10);}while(v===target);return v;})();
+      c.textContent=val;
+      c.dataset.val=val;
+      c.onclick=()=>{
+        if(c.classList.contains('hit')) return;
+        if(+c.dataset.val===this.fTarget){
+          c.classList.add('hit'); this.fScore+=10; $('rfind-score').textContent=this.fScore;
+          this.fRemaining--;
+          if(this.fRemaining<=0) setTimeout(()=>this.newFindRound(),250);
+        } else {
+          c.classList.add('miss'); this.fScore=Math.max(0,this.fScore-5);
+          $('rfind-score').textContent=this.fScore;
+          setTimeout(()=>c.classList.remove('miss'),300);
+        }
+      };
+      grid.appendChild(c);
+    }
+  },
+  finishFind(){
+    clearInterval(this.fTimer);
+    $('rfind-grid').innerHTML=`<div class="result-banner win" style="grid-column:1/-1;">⏱ 종료! 점수 ${this.fScore}</div>`;
+    $('rfind-start').style.display='inline-block';
+    $('rfind-start').textContent='다시 시작';
+    $('rfind-time').textContent='0초';
+  }
+};
+
+/* =====================================================================
+   GAME 05 — 즉결심판 (Summary Judgment)
+   피고가 카드(1~6)를 받아 숫자를 "선고"(진실 또는 거짓), 심판이 진위를 판정.
+   심판이 맞히면 피고가 생명 -1, 틀리면 심판이 생명 -1. 역할 교대.
+   ===================================================================== */
+const JP = {
+  meLife:3, aiLife:3, round:0, defendant:'me', over:false, card:0, claim:0,
+  pLie:[], aLie:[], pCallLie:[],          // history: 플레이어/AI 피고 거짓말, 플레이어 심판이 '거짓' 콜한 비율
+  start(){
+    this.meLife=3; this.aiLife=3; this.round=0; this.defendant=Game.coin(); this.over=false;
+    this.pLie=[]; this.aLie=[]; this.pCallLie=[];
+    $('jp-result').innerHTML='';
+    this.update();
+    this.nextRound();
+  },
+  update(){ $('jp-me').textContent=this.meLife; $('jp-ai').textContent=this.aiLife;
+    $('jp-round').textContent=`라운드 ${this.round+1} — 생명이 먼저 0이 되면 패배`; },
+  rate(arr){ if(arr.length===0) return 0.5; return arr.reduce((a,b)=>a+b,0)/arr.length; },
+  nextRound(){
+    if(this.over) return;
+    this.round++; this.update();
+    this.card = 1+rand(6);
+    $('jp-actions').innerHTML='';
+    if(this.defendant==='me'){
+      $('jp-role').innerHTML='👤 당신은 <b>피고</b> — 카드 숫자를 확인하고 선고하세요.';
+      $('jp-stage').innerHTML=`<div class="jp-card">${this.card}</div>
+        <div class="hint">이 숫자를 그대로 선고(진실)하거나, 다른 숫자로 선고(거짓)할 수 있습니다.</div>`;
+      const kp=document.createElement('div'); kp.className='keypad'; kp.style.maxWidth='320px';
+      for(let n=1;n<=6;n++){ const b=document.createElement('button'); b.textContent=n;
+        b.onclick=()=>this.meDeclare(n); kp.appendChild(b); }
+      $('jp-actions').appendChild(kp);
+      $('jp-log').innerHTML='선고할 숫자를 고르세요. AI가 진실/거짓을 판정합니다.';
+    } else {
+      // AI is defendant: 플레이어가 '거짓'을 자주 콜하면 덜 속이고(진실↑), 잘 안 콜하면 더 속임
+      const P=Game.p(); const callRate=this.rate(this.pCallLie);
+      const lieProb=Math.max(0.2, Math.min(0.8, P.jpLie + (0.5-callRate)*0.6));
+      const lie = Math.random() < lieProb;
+      this.aLie.push(lie?1:0);
+      this.claim = lie ? this.lieValue(this.card) : this.card;
+      $('jp-role').innerHTML='🤖 AI가 <b>피고</b> — 당신이 <b>심판</b>입니다.';
+      $('jp-stage').innerHTML=`<div class="jp-card back">?</div>
+        <div style="margin-top:8px;font-size:18px;">AI의 선고: &nbsp;<b style="color:var(--gold2);font-size:24px;">"${this.claim}"</b></div>`;
+      $('jp-actions').innerHTML=`<button class="btn gold" onclick="JP.judge(true)">진실 (무죄)</button>
+        &nbsp;<button class="btn" onclick="JP.judge(false)">거짓 (유죄)</button>`;
+      $('jp-log').innerHTML='AI의 선고가 진실인지 거짓인지 판정하세요.';
+    }
+  },
+  lieValue(real){ let v; do{ v=1+rand(6); }while(v===real); return v; },
+  meDeclare(n){
+    if(this.over||this.defendant!=='me') return;
+    this.claim=n; const lie = (n!==this.card);
+    $('jp-actions').innerHTML='';
+    $('jp-stage').innerHTML=`<div class="jp-card">${this.card}</div>
+      <div style="margin-top:8px;">선고: <b style="color:var(--gold2);font-size:22px;">"${n}"</b> &nbsp;(${lie?'거짓':'진실'})</div>`;
+    // AI judges using player's PAST lie history (이번 라운드 값은 추정에 포함하지 않음 — 정보누수 방지)
+    const P=Game.p(); const estLie=this.rate(this.pLie);
+    this.pLie.push(lie?1:0);
+    const aiCallsLie = Math.random() < ((1-P.jpJudge)*0.5 + P.jpJudge*estLie);
+    setTimeout(()=>{
+      const verdict = aiCallsLie ? '거짓(유죄)' : '진실(무죄)';
+      const correct = aiCallsLie === lie;
+      $('jp-log').innerHTML=`🤖 심판 판정: <b>${verdict}</b> → ${correct?'정확! 당신(피고) 생명 -1':'오판! AI(심판) 생명 -1'}`;
+      if(correct) this.meLife--; else this.aiLife--;
+      this.endRound();
+    },800);
+  },
+  judge(callTruth){
+    if(this.over||this.defendant!=='me'){ /* judge path = AI defendant */ }
+    if(this.over) return;
+    // I am judge, AI defendant. callTruth=true means I say truth(무죄).
+    $('jp-actions').innerHTML='';
+    const wasLie = (this.claim!==this.card);
+    $('jp-stage').innerHTML=`<div class="jp-card">${this.card}</div>
+      <div style="margin-top:8px;">실제 카드 <b>${this.card}</b> · 선고 "${this.claim}" → ${wasLie?'거짓':'진실'}</div>`;
+    const myGuessLie = !callTruth;
+    this.pCallLie.push(myGuessLie?1:0);   // 플레이어 심판의 '거짓' 콜 성향 학습
+    const correct = myGuessLie === wasLie;
+    $('jp-log').innerHTML=`판정 ${correct?'적중! AI(피고) 생명 -1':'오판… 당신(심판) 생명 -1'}`;
+    if(correct) this.aiLife--; else this.meLife--;
+    this.endRound();
+  },
+  endRound(){
+    this.update();
+    if(this.meLife<=0||this.aiLife<=0){ this.finish(); return; }
+    this.defendant = this.defendant==='me'?'ai':'me';
+    setTimeout(()=>{ if(!this.over) this.nextRound(); }, 1200);
+  },
+  finish(){
+    this.over=true; $('jp-actions').innerHTML='';
+    let cls,txt;
+    if(this.meLife>this.aiLife){cls='win';txt='🏆 승리';}
+    else if(this.meLife<this.aiLife){cls='lose';txt='💀 패배';}
+    else {cls='draw';txt='무승부';}
+    $('jp-result').innerHTML=`<div class="result-banner ${cls}">${txt} · 생명 ${Math.max(0,this.meLife)} : ${Math.max(0,this.aiLife)}</div>
+      <div class="center"><button class="btn gold" onclick="JP.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 06 — 오목 (Gomoku)
+   ===================================================================== */
+const OM = {
+  N:15, b:[], over:false, busy:false,
+  inb(r,c){ return r>=0&&r<this.N&&c>=0&&c<this.N; },
+  start(){
+    this.b=Array.from({length:this.N},()=>Array(this.N).fill(0));
+    this.over=false; this.busy=false; this.last=null;
+    $('om-result').innerHTML='';
+    this.render();
+    if(Game.coin()==='ai'){
+      this.busy=true;
+      $('om-status').innerHTML='🤖 AI가 선(先)! AI(백돌)가 먼저 둡니다...';
+      setTimeout(()=>this.ai(),400);
+    } else {
+      $('om-status').innerHTML='🙋 당신이 선(先)! 당신은 <b>흑돌</b>, 먼저 두세요. 다섯 개를 먼저 이으면 승리!';
+    }
+  },
+  render(){
+    const wrap=$('om-board');
+    const grid=document.createElement('div'); grid.className='om-grid';
+    grid.style.width='min(96vw,560px)';
+    grid.style.gridTemplateColumns=`repeat(${this.N},1fr)`;
+    grid.innerHTML='';
+    for(let r=0;r<this.N;r++) for(let c=0;c<this.N;c++){
+      const cell=document.createElement('button'); cell.className='om-cell';
+      cell.style.aspectRatio='1/1';
+      const v=this.b[r][c];
+      if(v){ const s=document.createElement('div');
+        s.className='om-stone '+(v===1?'b':'w')+(this.last&&this.last[0]===r&&this.last[1]===c?' last':'');
+        cell.appendChild(s); }
+      cell.onclick=()=>this.play(r,c);
+      grid.appendChild(cell);
+    }
+    const box=document.createElement('div'); box.className='om-wrap'; box.appendChild(grid);
+    wrap.innerHTML=''; wrap.appendChild(box);
+  },
+  play(r,c){
+    if(this.over||this.busy||this.b[r][c]!==0) return;
+    this.b[r][c]=1; this.last=[r,c]; this.render();
+    if(this.win(r,c,1)){ this.finish('win'); return; }
+    if(this.full()){ this.finish('draw'); return; }
+    this.busy=true; $('om-status').textContent='AI가 수를 두는 중...';
+    setTimeout(()=>this.ai(),350);
+  },
+  ai(){
+    const P=Game.p();
+    const cand=this.candidates();
+    let best=null,bv=-1;
+    if(Math.random()<P.blunder){ best=pick(cand); }   // 약: 무작위 수
+    else for(const [r,c] of cand){
+      const off=this.scoreMove(r,c,2), def=this.scoreMove(r,c,1);
+      const v=off*1.0 + def*P.omDef + Math.random();
+      if(v>bv){bv=v;best=[r,c];}
+    }
+    if(!best){ best=pick(cand); }
+    if(!best){ this.busy=false; return; }
+    const [r,c]=best; this.b[r][c]=2; this.last=[r,c]; this.render();
+    this.busy=false;
+    if(this.win(r,c,2)){ this.finish('lose'); return; }
+    if(this.full()){ this.finish('draw'); return; }
+    $('om-status').innerHTML='당신 차례 (흑돌).';
+  },
+  candidates(){
+    const set=new Set(),out=[];
+    let any=false;
+    for(let r=0;r<this.N;r++) for(let c=0;c<this.N;c++){ if(this.b[r][c]){ any=true;
+      for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++){ const rr=r+dr,cc=c+dc;
+        if(this.inb(rr,cc)&&this.b[rr][cc]===0){ const k=rr+','+cc; if(!set.has(k)){set.add(k);out.push([rr,cc]);} } } } }
+    if(!any) return [[7,7]];
+    return out;
+  },
+  lineInfo(r,c,dr,dc,pl){
+    let cnt=1,open=0,rr=r+dr,cc=c+dc;
+    while(this.inb(rr,cc)&&this.b[rr][cc]===pl){cnt++;rr+=dr;cc+=dc;}
+    if(this.inb(rr,cc)&&this.b[rr][cc]===0) open++;
+    rr=r-dr;cc=c-dc;
+    while(this.inb(rr,cc)&&this.b[rr][cc]===pl){cnt++;rr-=dr;cc-=dc;}
+    if(this.inb(rr,cc)&&this.b[rr][cc]===0) open++;
+    return {cnt,open};
+  },
+  patVal(cnt,open){
+    if(cnt>=5) return 1000000;
+    if(cnt===4) return open===2?100000:open===1?12000:0;
+    if(cnt===3) return open===2?6000:open===1?600:0;
+    if(cnt===2) return open===2?250:open===1?25:0;
+    if(cnt===1) return open===2?6:0;
+    return 0;
+  },
+  scoreMove(r,c,pl){
+    this.b[r][c]=pl; let s=0;
+    [[0,1],[1,0],[1,1],[1,-1]].forEach(([dr,dc])=>{const i=this.lineInfo(r,c,dr,dc,pl); s+=this.patVal(i.cnt,i.open);});
+    this.b[r][c]=0; return s;
+  },
+  win(r,c,pl){
+    return [[0,1],[1,0],[1,1],[1,-1]].some(([dr,dc])=>{
+      let cnt=1,rr=r+dr,cc=c+dc;
+      while(this.inb(rr,cc)&&this.b[rr][cc]===pl){cnt++;rr+=dr;cc+=dc;}
+      rr=r-dr;cc=c-dc;
+      while(this.inb(rr,cc)&&this.b[rr][cc]===pl){cnt++;rr-=dr;cc-=dc;}
+      return cnt>=5;
+    });
+  },
+  full(){ return this.b.every(row=>row.every(v=>v!==0)); },
+  finish(res){
+    this.over=true;
+    const map={win:['win','🏆 승리 — 5목 완성!'],lose:['lose','💀 패배 — AI가 5목 완성'],draw:['draw','무승부 — 판이 가득 찼습니다']};
+    const [cls,txt]=map[res];
+    $('om-status').textContent='게임 종료';
+    $('om-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+      <div class="center"><button class="btn gold" onclick="OM.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 12 — 틱택토 (Tic-Tac-Toe, 3목) · 1대1
+   미니맥스(완전탐색)로 정석을 두되, tttErr 확률로 무작위 수를 둬 빈틈을 만듦.
+   플레이어=✕(1), AI=◯(2). 선공은 Game.coin().
+   ===================================================================== */
+const TTT = (function(){
+  const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const win=(b,p)=>LINES.some(l=>l.every(i=>b[i]===p));
+  const winLine=(b,p)=>LINES.find(l=>l.every(i=>b[i]===p));
+  const full=b=>b.every(x=>x);
+  function score(b,turn,depth){
+    if(win(b,2)) return 10-depth;
+    if(win(b,1)) return depth-10;
+    if(full(b)) return 0;
+    if(turn===2){ let best=-1e9; for(let i=0;i<9;i++) if(!b[i]){ b[i]=2; best=Math.max(best,score(b,1,depth+1)); b[i]=0; } return best; }
+    else { let best=1e9; for(let i=0;i<9;i++) if(!b[i]){ b[i]=1; best=Math.min(best,score(b,2,depth+1)); b[i]=0; } return best; }
+  }
+  function bestMove(b){ let best=-1e9,mv=-1; for(let i=0;i<9;i++) if(!b[i]){ b[i]=2; const s=score(b,1,1); b[i]=0; if(s>best){best=s;mv=i;} } return mv; }
+  function randMove(b){ const e=[]; for(let i=0;i<9;i++) if(!b[i]) e.push(i); return e.length?pick(e):-1; }
+  return {
+    b:[], over:false, busy:false, winCells:null,
+    start(){
+      this.b=Array(9).fill(0); this.over=false; this.busy=false; this.winCells=null;
+      $('ttt-result').innerHTML='';
+      this.render();
+      if(Game.coin()==='ai'){
+        this.busy=true;
+        $('ttt-status').innerHTML='🤖 AI가 선(先) — ◯가 먼저 둡니다...';
+        setTimeout(()=>this.ai(),420);
+      } else {
+        $('ttt-status').innerHTML='🙋 당신이 선(先)! 당신은 <b>✕</b>. 빈 칸을 눌러 한 줄 3개를 먼저 만드세요.';
+      }
+    },
+    render(){
+      const grid=document.createElement('div'); grid.className='ttt-grid';
+      for(let i=0;i<9;i++){
+        const v=this.b[i];
+        const c=document.createElement('div');
+        c.className='ttt-cell'+(v===1?' x':v===2?' o':'')
+          +(this.winCells&&this.winCells.indexOf(i)>=0?' win':'')+(this.over?' full':'');
+        c.textContent=v===1?'✕':v===2?'◯':'';
+        c.onclick=()=>this.play(i);
+        grid.appendChild(c);
+      }
+      const box=document.createElement('div'); box.className='ttt-wrap'; box.appendChild(grid);
+      const wrap=$('ttt-board'); wrap.innerHTML=''; wrap.appendChild(box);
+    },
+    play(i){
+      if(this.over||this.busy||this.b[i]) return;
+      this.b[i]=1; this.render();
+      if(win(this.b,1)){ this.finish('win'); return; }
+      if(full(this.b)){ this.finish('draw'); return; }
+      this.busy=true; $('ttt-status').textContent='AI(◯)가 두는 중...';
+      setTimeout(()=>this.ai(),360);
+    },
+    ai(){
+      if(this.over) return;
+      const P=Game.p();
+      let mv = (Math.random()<P.tttErr)? randMove(this.b) : bestMove(this.b);
+      if(mv<0) mv=randMove(this.b);
+      if(mv>=0) this.b[mv]=2;
+      this.render(); this.busy=false;
+      if(win(this.b,2)){ this.finish('lose'); return; }
+      if(full(this.b)){ this.finish('draw'); return; }
+      $('ttt-status').innerHTML='당신 차례 (✕).';
+    },
+    finish(res){
+      this.over=true; this.busy=false;
+      const w = res==='win'?1: res==='lose'?2: 0;
+      this.winCells = w? (winLine(this.b,w)||null) : null;
+      this.render();
+      const map={win:['win','🏆 승리 — 한 줄 완성!'],lose:['lose','💀 패배 — AI가 한 줄 완성'],draw:['draw','무승부 — 빈틈이 없었습니다']};
+      const [cls,txt]=map[res];
+      $('ttt-status').textContent='게임 종료';
+      $('ttt-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+        <div class="center"><button class="btn gold" onclick="TTT.start()">다시 도전</button></div>`;
+    }
+  };
+})();
+
+/* =====================================================================
+   GAME 07 — 돌 가져가기 (Nim, 마지막 돌 가져가면 승리)
+   ===================================================================== */
+const NIM = {
+  count:21, turn:'me', over:false,
+  start(){
+    this.count=18+rand(7); // 18~24
+    this.over=false;
+    $('nim-result').innerHTML='';
+    $('nim-log').textContent='';
+    this.begin(Game.coin());
+  },
+  begin(who){
+    this.turn=who;
+    if($('nim-setup')) $('nim-setup').style.display='none';
+    $('nim-play').style.display='block';
+    $('nim-log').innerHTML=`${who==='me'?'🙋 당신이 선(先)':'🤖 AI가 선(先)'} — 총 <b>${this.count}</b>개의 돌로 시작합니다.`;
+    this.render();
+    if(this.turn==='ai') setTimeout(()=>this.aiMove(),600);
+  },
+  render(){
+    $('nim-count').textContent=this.count;
+    const wrap=$('nim-stones'); wrap.innerHTML='';
+    for(let i=0;i<this.count;i++){ const s=document.createElement('div'); s.className='nim-stone'; wrap.appendChild(s); }
+    const dis=this.over||this.turn!=='me';
+    document.querySelectorAll('#nim-controls .btn').forEach((b,i)=>{ b.disabled = dis || (i+1)>this.count; });
+    $('nim-turn').textContent = this.over?'게임 종료':(this.turn==='me'?'당신 차례':'AI 차례...');
+  },
+  take(n){
+    if(this.over||this.turn!=='me'||n>this.count) return;
+    this.count-=n;
+    $('nim-log').innerHTML=`당신이 <b>${n}개</b>를 가져갔습니다. 남은 돌 ${this.count}개.`;
+    if(this.count===0){ this.render(); this.finish('win'); return; }
+    this.turn='ai'; this.render(); setTimeout(()=>this.aiMove(),700);
+  },
+  aiMove(){
+    if(this.over) return;
+    const P=Game.p();
+    let n;
+    if(Math.random()<P.nim){ n=1+rand(Math.min(3,this.count)); }   // 약: 무작위로 가져감
+    else { n=this.count%4; if(n===0) n=1; n=Math.min(n,this.count,3); }  // 최적: 4의 배수 남기기
+    this.count-=n;
+    $('nim-log').innerHTML=`🤖 AI가 <b>${n}개</b>를 가져갔습니다. 남은 돌 ${this.count}개.`;
+    if(this.count===0){ this.render(); this.finish('lose'); return; }
+    this.turn='me'; this.render();
+  },
+  finish(res){
+    this.over=true; this.render();
+    const [cls,txt]= res==='win'?['win','🏆 승리 — 마지막 돌을 가져갔습니다!']:['lose','💀 패배 — AI가 마지막 돌을 가져갔습니다'];
+    $('nim-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+      <div class="center"><button class="btn gold" onclick="NIM.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 08 — 장기 (Korean Chess / Janggi)
+   cho(초, 아래, 사용자) vs han(한, 위, AI). 궁을 잡으면 승리.
+   ===================================================================== */
+const JG = (function(){
+  const GLYPH={
+    king:{cho:'楚',han:'漢'}, guard:{cho:'士',han:'士'}, chariot:{cho:'車',han:'車'},
+    cannon:{cho:'包',han:'包'}, horse:{cho:'馬',han:'馬'}, elephant:{cho:'象',han:'象'},
+    soldier:{cho:'卒',han:'兵'}
+  };
+  const VAL={king:1000,chariot:13,cannon:7,horse:5,elephant:3,guard:3,soldier:2};
+  const palaceLines=[ [[0,3],[1,4],[2,5]],[[0,5],[1,4],[2,3]],[[7,3],[8,4],[9,5]],[[7,5],[8,4],[9,3]] ];
+  const palaceDiag={};
+  palaceLines.forEach(line=>{ for(let i=0;i<line.length;i++){ const k=line[i][0]+','+line[i][1];
+    palaceDiag[k]=palaceDiag[k]||[]; if(i>0)palaceDiag[k].push(line[i-1]); if(i<line.length-1)palaceDiag[k].push(line[i+1]); } });
+  const inPalace=(r,c)=> c>=3&&c<=5 && ((r>=0&&r<=2)||(r>=7&&r<=9));
+  const inB=(r,c)=> r>=0&&r<=9&&c>=0&&c<=8;
+
+  function initBoard(){
+    const b=Array.from({length:10},()=>Array(9).fill(null));
+    const back=['chariot','horse','elephant','guard',null,'guard','elephant','horse','chariot'];
+    for(let c=0;c<9;c++){ if(back[c]){ b[0][c]={t:back[c],s:'han'}; b[9][c]={t:back[c],s:'cho'}; } }
+    b[1][4]={t:'king',s:'han'}; b[8][4]={t:'king',s:'cho'};
+    b[2][1]={t:'cannon',s:'han'}; b[2][7]={t:'cannon',s:'han'};
+    b[7][1]={t:'cannon',s:'cho'}; b[7][7]={t:'cannon',s:'cho'};
+    [0,2,4,6,8].forEach(c=>{ b[3][c]={t:'soldier',s:'han'}; b[6][c]={t:'soldier',s:'cho'}; });
+    return b;
+  }
+  function genMoves(b,r,c){
+    const p=b[r][c]; if(!p) return [];
+    const me=p.s, out=[];
+    const add=(tr,tc)=>{ if(!inB(tr,tc))return; const q=b[tr][tc]; if(!q||q.s!==me) out.push([tr,tc]); };
+    const empty=(tr,tc)=> inB(tr,tc)&&!b[tr][tc];
+    if(p.t==='king'||p.t==='guard'){
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ const tr=r+dr,tc=c+dc; if(inPalace(tr,tc)) add(tr,tc); });
+      (palaceDiag[r+','+c]||[]).forEach(([tr,tc])=>add(tr,tc));
+    } else if(p.t==='chariot'){
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ let tr=r+dr,tc=c+dc;
+        while(inB(tr,tc)){ const q=b[tr][tc]; if(!q){out.push([tr,tc]);} else {if(q.s!==me)out.push([tr,tc]); break;} tr+=dr;tc+=dc; } });
+      palaceLines.forEach(line=>{ const idx=line.findIndex(pt=>pt[0]===r&&pt[1]===c); if(idx<0)return;
+        [-1,1].forEach(dir=>{ let i=idx+dir;
+          while(i>=0&&i<line.length){ const [tr,tc]=line[i]; const q=b[tr][tc];
+            if(!q)out.push([tr,tc]); else {if(q.s!==me)out.push([tr,tc]); break;} i+=dir; } }); });
+    } else if(p.t==='cannon'){
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ let tr=r+dr,tc=c+dc,screen=false;
+        while(inB(tr,tc)){ const q=b[tr][tc];
+          if(!screen){ if(q){ if(q.t==='cannon')break; screen=true; } }
+          else { if(!q)out.push([tr,tc]); else {if(q.s!==me&&q.t!=='cannon')out.push([tr,tc]); break;} }
+          tr+=dr;tc+=dc; } });
+      palaceLines.forEach(line=>{ const idx=line.findIndex(pt=>pt[0]===r&&pt[1]===c); if(idx<0)return;
+        [-1,1].forEach(dir=>{ let i=idx+dir,screen=false;
+          while(i>=0&&i<line.length){ const [tr,tc]=line[i]; const q=b[tr][tc];
+            if(!screen){ if(q){ if(q.t==='cannon')break; screen=true; } }
+            else { if(!q){} else {if(q.s!==me&&q.t!=='cannon')out.push([tr,tc]); break;} } i+=dir; } }); });
+    } else if(p.t==='horse'){
+      const steps=[[[-1,0],[-2,-1]],[[-1,0],[-2,1]],[[1,0],[2,-1]],[[1,0],[2,1]],
+        [[0,-1],[-1,-2]],[[0,-1],[1,-2]],[[0,1],[-1,2]],[[0,1],[1,2]]];
+      steps.forEach(([leg,tgt])=>{ if(!empty(r+leg[0],c+leg[1]))return; add(r+tgt[0],c+tgt[1]); });
+    } else if(p.t==='elephant'){
+      const steps=[[[-1,0],[-2,-1],[-3,-2]],[[-1,0],[-2,1],[-3,2]],[[1,0],[2,-1],[3,-2]],[[1,0],[2,1],[3,2]],
+        [[0,-1],[-1,-2],[-2,-3]],[[0,-1],[1,-2],[2,-3]],[[0,1],[-1,2],[-2,3]],[[0,1],[1,2],[2,3]]];
+      steps.forEach(([s1,s2,tgt])=>{ if(!empty(r+s1[0],c+s1[1]))return; if(!empty(r+s2[0],c+s2[1]))return; add(r+tgt[0],c+tgt[1]); });
+    } else if(p.t==='soldier'){
+      const fwd = me==='cho'?-1:1;
+      add(r+fwd,c); add(r,c-1); add(r,c+1);
+      palaceLines.forEach(line=>{ const idx=line.findIndex(pt=>pt[0]===r&&pt[1]===c); if(idx<0)return;
+        [idx-1,idx+1].forEach(i=>{ if(i<0||i>=line.length)return; const [tr,tc]=line[i];
+          if((me==='cho'&&tr<r)||(me==='han'&&tr>r)) add(tr,tc); }); });
+    }
+    return out;
+  }
+  function allMoves(b,side){
+    const out=[];
+    for(let r=0;r<10;r++)for(let c=0;c<9;c++){ const p=b[r][c]; if(p&&p.s===side){
+      genMoves(b,r,c).forEach(([tr,tc])=>out.push({fr:r,fc:c,tr,tc})); } }
+    return out;
+  }
+  function clone(b){ return b.map(row=>row.slice()); }
+  function apply(b,m){ const nb=clone(b); nb[m.tr][m.tc]=nb[m.fr][m.fc]; nb[m.fr][m.fc]=null; return nb; }
+  function hasKing(b,side){ for(let r=0;r<10;r++)for(let c=0;c<9;c++){const p=b[r][c]; if(p&&p.s===side&&p.t==='king')return true;} return false; }
+
+  return {
+    b:null, sel:null, moves:[], over:false, busy:false,
+    start(){
+      this.b=initBoard(); this.sel=null; this.moves=[]; this.over=false; this.busy=false;
+      $('jg-result').innerHTML='';
+      this.render();
+      if(Game.coin()==='ai'){
+        this.busy=true;
+        $('jg-status').innerHTML='🤖 漢(AI)이 선(先) — 먼저 둡니다...';
+        setTimeout(()=>this.ai(),450);
+      } else {
+        $('jg-status').innerHTML='🙋 당신이 선(先)! <b>아래쪽(초·녹색)</b> — 기물을 눌러 이동, 상대 궁(漢)을 잡으면 승리.';
+      }
+    },
+    render(){
+      const inner=document.createElement('div'); inner.className='jg-inner';
+      // 선: 세로 9줄, 가로 10줄 + 양 궁성의 대각선 (교차점 = 셀 중앙)
+      let s='<svg class="jg-svg" viewBox="0 0 9 10" preserveAspectRatio="none">';
+      for(let c=0;c<9;c++) s+='<line x1="'+(c+0.5)+'" y1="0.5" x2="'+(c+0.5)+'" y2="9.5"/>';
+      for(let r=0;r<10;r++) s+='<line x1="0.5" y1="'+(r+0.5)+'" x2="8.5" y2="'+(r+0.5)+'"/>';
+      s+='<line x1="3.5" y1="0.5" x2="5.5" y2="2.5"/><line x1="5.5" y1="0.5" x2="3.5" y2="2.5"/>';
+      s+='<line x1="3.5" y1="7.5" x2="5.5" y2="9.5"/><line x1="5.5" y1="7.5" x2="3.5" y2="9.5"/>';
+      s+='</svg>';
+      inner.innerHTML=s;
+      const grid=document.createElement('div'); grid.className='jg-grid';
+      const moveSet=new Set(this.moves.map(m=>m[0]+','+m[1]));
+      for(let r=0;r<10;r++)for(let c=0;c<9;c++){
+        const cell=document.createElement('div'); cell.className='jg-cell';
+        if(this.sel&&this.sel[0]===r&&this.sel[1]===c) cell.classList.add('sel');
+        const p=this.b[r][c];
+        if(moveSet.has(r+','+c)) cell.classList.add(p?'cap':'move');
+        if(p){ const pc=document.createElement('div'); pc.className='jg-piece '+p.s;
+          pc.textContent=GLYPH[p.t][p.s]; cell.appendChild(pc); }
+        cell.onclick=()=>this.click(r,c);
+        grid.appendChild(cell);
+      }
+      inner.appendChild(grid);
+      const box=document.createElement('div'); box.className='jg-wrap'; box.appendChild(inner);
+      const wrap=$('jg-board'); wrap.innerHTML=''; wrap.appendChild(box);
+    },
+    click(r,c){
+      if(this.over||this.busy) return;
+      const p=this.b[r][c];
+      if(this.sel && this.moves.some(m=>m[0]===r&&m[1]===c)){
+        this.move(this.sel[0],this.sel[1],r,c); return;
+      }
+      if(p && p.s==='cho'){ this.sel=[r,c]; this.moves=genMoves(this.b,r,c); this.render(); }
+      else { this.sel=null; this.moves=[]; this.render(); }
+    },
+    move(fr,fc,tr,tc){
+      const cap=this.b[tr][tc];
+      this.b[tr][tc]=this.b[fr][fc]; this.b[fr][fc]=null;
+      this.sel=null; this.moves=[]; this.render();
+      if(cap&&cap.t==='king'){ this.finish('win'); return; }
+      this.busy=true; $('jg-status').textContent='漢(AI)이 수를 두는 중...';
+      setTimeout(()=>this.ai(),450);
+    },
+    ai(){
+      const P=Game.p();
+      const moves=allMoves(this.b,'han');
+      if(moves.length===0){ this.finish('win'); return; }
+      // immediate king capture
+      for(const m of moves){ const cap=this.b[m.tr][m.tc]; if(cap&&cap.t==='king'){ this.execAI(m); this.finish('lose'); return; } }
+      let best=null,bv=-1e9;
+      if(Math.random()<P.blunder){ best=moves[rand(moves.length)]; }   // 약: 무작위 수
+      else for(const m of moves){
+        const cap=this.b[m.tr][m.tc];
+        let gain=cap?VAL[cap.t]:0;
+        const nb=apply(this.b,m);
+        // opponent best capture reply (1-ply)
+        let reply=0;
+        for(const r2 of allMoves(nb,'cho')){ const cap2=nb[r2.tr][r2.tc]; if(cap2) reply=Math.max(reply,VAL[cap2.t]); }
+        let posi=0;
+        const pc=this.b[m.fr][m.fc];
+        if(pc.t==='soldier' && m.tr>m.fr) posi+=0.4;          // advance (han moves down)
+        posi += (4-Math.abs(m.tc-4))*0.05;                    // central
+        const score=gain - reply*P.jgReply + posi + Math.random()*0.3;
+        if(score>bv){bv=score;best=m;}
+      }
+      this.execAI(best);
+      if(!hasKing(this.b,'cho')){ this.finish('lose'); return; }
+      this.busy=false;
+      $('jg-status').innerHTML='당신 차례 (초·녹색).';
+    },
+    execAI(m){ this.b[m.tr][m.tc]=this.b[m.fr][m.fc]; this.b[m.fr][m.fc]=null; this.render(); },
+    finish(res){
+      this.over=true; this.busy=false;
+      const [cls,txt]= res==='win'?['win','🏆 승리 — 漢의 궁을 잡았습니다!']:['lose','💀 패배 — 楚의 궁이 잡혔습니다'];
+      $('jg-status').textContent='대국 종료';
+      $('jg-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+        <div class="center"><button class="btn gold" onclick="JG.start()">다시 두기</button></div>`;
+    }
+  };
+})();
+
+/* =====================================================================
+   GAME 09 — 십이장기 (동물장기 / Dōbutsu-style, 3x4)
+   글자 말: 호=호랑이(왕,8방향1칸), 곰=직선4방향, 토=토끼(대각4방향),
+   병=병아리(전진1칸, 끝줄에서 닭으로 승급=금장군 이동), 잡은 말 재투입(드롭).
+   호랑이를 잡으면 즉시 승. 트라이: 호랑이가 끝줄 도달 후 상대 턴을 버티면 승(턴 시작 시 판정).
+   cho=아래(사용자), han=위(AI).
+   ===================================================================== */
+const MJ = (function(){
+  const ROWS=4, COLS=3;
+  const EMO={lion:'🐯',giraffe:'🐻',elephant:'🐰',chick:'🐤',hen:'🐔'};
+  const VAL={lion:0,giraffe:5,elephant:5,chick:1,hen:6};
+  const fwd=s=> s==='cho'?-1:1;
+  const goalRow=s=> s==='cho'?0:3;
+  function initState(){
+    const b=Array.from({length:ROWS},()=>Array(COLS).fill(null));
+    b[0]=[{t:'elephant',s:'han'},{t:'lion',s:'han'},{t:'giraffe',s:'han'}];
+    b[1][1]={t:'chick',s:'han'};
+    b[2][1]={t:'chick',s:'cho'};
+    b[3]=[{t:'giraffe',s:'cho'},{t:'lion',s:'cho'},{t:'elephant',s:'cho'}];
+    return {b, hands:{cho:[],han:[]}};
+  }
+  function offsets(p){
+    const f=fwd(p.s);
+    switch(p.t){
+      case 'lion': return [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+      case 'giraffe': return [[-1,0],[1,0],[0,-1],[0,1]];
+      case 'elephant': return [[-1,-1],[-1,1],[1,-1],[1,1]];
+      case 'chick': return [[f,0]];
+      case 'hen': return [[f,0],[-f,0],[0,-1],[0,1],[f,-1],[f,1]];
+    }
+    return [];
+  }
+  function pieceMoves(st,r,c){
+    const p=st.b[r][c]; if(!p) return [];
+    const out=[];
+    offsets(p).forEach(([dr,dc])=>{ const tr=r+dr,tc=c+dc;
+      if(tr<0||tr>=ROWS||tc<0||tc>=COLS) return;
+      const q=st.b[tr][tc]; if(q&&q.s===p.s) return;
+      out.push({type:'move',fr:r,fc:c,tr,tc}); });
+    return out;
+  }
+  function genMoves(st,side){
+    const out=[];
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const p=st.b[r][c]; if(p&&p.s===side) out.push(...pieceMoves(st,r,c)); }
+    const seen=new Set();
+    st.hands[side].forEach(t=>{ if(seen.has(t))return; seen.add(t);
+      for(let r=0;r<ROWS;r++){ if(r===goalRow(side)) continue;   // 상대 진영(맨 끝줄)에는 드롭 불가
+        for(let c=0;c<COLS;c++){ if(!st.b[r][c]) out.push({type:'drop',dt:t,tr:r,tc:c}); } } });
+    return out;
+  }
+  function clone(st){ return {b:st.b.map(row=>row.map(p=>p?{t:p.t,s:p.s}:null)), hands:{cho:[...st.hands.cho],han:[...st.hands.han]}}; }
+  function lionPos(st,side){ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const p=st.b[r][c]; if(p&&p.s===side&&p.t==='lion')return [r,c];} return null; }
+  function onGoal(st,side){ const L=lionPos(st,side); return !!L && L[0]===goalRow(side); }
+  function apply(st,m,side){
+    const ns=clone(st); let winner=null;
+    if(m.type==='move'){
+      const cap=ns.b[m.tr][m.tc]; const p=ns.b[m.fr][m.fc];
+      if(cap&&cap.t==='lion') winner=side;   // 용을 잡으면 즉시 승
+      if(cap&&cap.t!=='lion') ns.hands[side].push(cap.t==='hen'?'chick':cap.t);
+      ns.b[m.tr][m.tc]=p; ns.b[m.fr][m.fc]=null;
+      if(p.t==='chick'&&m.tr===goalRow(side)) p.t='hen';
+      // 트라이: 용이 끝줄에 도달해도 즉시 승리가 아니라, 상대 턴을 버텨야 함(턴 시작 시 판정)
+    } else {
+      ns.b[m.tr][m.tc]={t:m.dt,s:side};
+      const i=ns.hands[side].indexOf(m.dt); if(i>=0) ns.hands[side].splice(i,1);
+    }
+    return {ns,winner};
+  }
+  function evalCho(st){
+    let s=0;
+    for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){ const p=st.b[r][c]; if(!p)continue;
+      const v=VAL[p.t]; s+= p.s==='cho'? v : -v;
+      if(p.t==='lion'){ const adv= p.s==='cho'?(3-r):r; s+= p.s==='cho'? adv*0.12 : -adv*0.12; }
+    }
+    st.hands.cho.forEach(t=>s+=VAL[t]*0.9); st.hands.han.forEach(t=>s-=VAL[t]*0.9);
+    if(onGoal(st,'cho')) s+=900;   // 트라이 임박(거의 승리)
+    if(onGoal(st,'han')) s-=900;
+    return s;
+  }
+  const WIN=100000; let nodes=0;
+  function ord(st,m){ if(m.type==='move'){ const cap=st.b[m.tr][m.tc]; return cap?(VAL[cap.t]+(cap.t==='lion'?999:0)):0; } return 0; }
+  function nega(st,side,depth,alpha,beta){
+    nodes++;
+    if(onGoal(st,side)) return WIN+depth;     // 내 용이 끝줄에서 상대 턴을 버팀 → 승
+    if(!lionPos(st,side)) return -WIN-depth;  // 내 용이 잡힘 → 패
+    const moves=genMoves(st,side);
+    if(moves.length===0) return -WIN-depth;
+    moves.sort((a,b)=>ord(st,b)-ord(st,a));
+    let best=-WIN-depth;
+    for(const m of moves){
+      const {ns,winner}=apply(st,m,side);
+      let val;
+      if(winner) val=WIN+depth;
+      else if(depth<=1) val= side==='cho'? evalCho(ns) : -evalCho(ns);
+      else val=-nega(ns, side==='cho'?'han':'cho', depth-1, -beta, -alpha);
+      if(val>best) best=val;
+      if(best>alpha) alpha=best;
+      if(alpha>=beta) break;
+      if(nodes>150000) break;
+    }
+    return best;
+  }
+  function aiBest(st){
+    const P=Game.p(); nodes=0; const moves=genMoves(st,'han');
+    moves.sort((a,b)=>ord(st,b)-ord(st,a));
+    // 이길 수 있는 수는 항상 둠
+    for(const m of moves){ if(apply(st,m,'han').winner) return m; }
+    if(Math.random()<P.blunder) return moves[Math.floor(Math.random()*moves.length)]; // 약: 무작위 수
+    const depth=P.mjDepth;
+    let best=moves[0],bv=-1e9;
+    for(const m of moves){
+      const {ns,winner}=apply(st,m,'han');
+      let val= winner? (WIN+50) : -nega(ns,'cho',depth,-1e9,1e9);
+      val+=Math.random()*0.15;
+      if(val>bv){bv=val;best=m;}
+    }
+    return best;
+  }
+
+  return {
+    st:null, sel:null, drop:null, moves:[], over:false, busy:false,
+    start(){
+      this.st=initState(); this.sel=null; this.drop=null; this.moves=[]; this.over=false; this.busy=false;
+      $('mj-result').innerHTML='';
+      this.render();
+      if(Game.coin()==='ai'){
+        this.busy=true;
+        $('mj-status').innerHTML='🤖 AI가 선(先) — 먼저 둡니다...';
+        setTimeout(()=>this.ai(),400);
+      } else {
+        $('mj-status').innerHTML='🙋 당신이 선(先)! 당신은 <b>아래쪽</b>. 호랑이(🐯)를 잡거나, 호랑이를 맨 윗줄에 올린 뒤 <b>상대 턴을 한 번 버티면</b> 승리.';
+      }
+    },
+    legalTargets(){ return new Set(this.moves.map(m=>m.tr+','+m.tc)); },
+    render(){
+      // board
+      const grid=document.createElement('div'); grid.className='mj-grid';
+      const tset=this.legalTargets();
+      const dropMode=this.drop!==null;
+      for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
+        const cell=document.createElement('div'); cell.className='mj-cell '+(r===0?'zh':r===3?'zc':'');
+        const p=this.st.b[r][c];
+        if(this.sel&&this.sel[0]===r&&this.sel[1]===c) cell.classList.add('sel');
+        if(!dropMode && tset.has(r+','+c)) cell.classList.add(p?'cap':'move');
+        if(dropMode && !p && r!==goalRow('cho')) cell.classList.add('drop');  // 상대 끝줄 제외
+        if(p){
+          const pc=document.createElement('div'); pc.className='pc '+p.s+(p.t==='lion'?' king':'');
+          pc.textContent=EMO[p.t]; cell.appendChild(pc);
+          // 이동 가능 방향: 그 방향을 가리키는 아주 작은 삼각형
+          offsets(p).forEach(([dr,dc])=>{ const d=document.createElement('div'); d.className='mj-dir '+p.s;
+            const th=Math.atan2(dr,dc)*180/Math.PI;
+            d.style.left=(50+dc*42)+'%'; d.style.top=(50+dr*42)+'%';
+            d.style.transform='translate(-50%,-50%) rotate('+th+'deg)';
+            cell.appendChild(d); });
+        }
+        cell.onclick=()=>this.click(r,c);
+        grid.appendChild(cell);
+      }
+      const box=document.createElement('div'); box.className='mj-wrap'; box.appendChild(grid);
+      const wrap=$('mj-board'); wrap.innerHTML=''; wrap.appendChild(box);
+      // hands
+      this.renderHand('mj-hand-ai','han','AI 포로:',false);
+      this.renderHand('mj-hand-me','cho','내 포로(눌러서 투입):',true);
+    },
+    renderHand(id,side,label,clickable){
+      const wrap=$(id); wrap.innerHTML='<span class="hint">'+label+'</span>';
+      const counts={};
+      this.st.hands[side].forEach(t=>counts[t]=(counts[t]||0)+1);
+      Object.keys(counts).forEach(t=>{
+        const chip=document.createElement('span');
+        chip.className='mj-chip'+(clickable?'':' locked')+(this.drop===t&&clickable?' sel':'');
+        chip.textContent=EMO[t]+(counts[t]>1?('×'+counts[t]):'');
+        if(clickable) chip.onclick=()=>this.pickDrop(t);
+        wrap.appendChild(chip);
+      });
+      if(this.st.hands[side].length===0){ const s=document.createElement('span'); s.className='hint'; s.textContent=' —'; wrap.appendChild(s); }
+    },
+    pickDrop(t){
+      if(this.over||this.busy) return;
+      this.drop = (this.drop===t)? null : t;
+      this.sel=null; this.moves=[];
+      this.render();
+    },
+    click(r,c){
+      if(this.over||this.busy) return;
+      const p=this.st.b[r][c];
+      if(this.drop!==null){
+        if(!p && r!==goalRow('cho')){ this.doMove({type:'drop',dt:this.drop,tr:r,tc:c}); this.drop=null; }
+        return;
+      }
+      if(this.sel && this.moves.some(m=>m.tr===r&&m.tc===c)){
+        this.doMove({type:'move',fr:this.sel[0],fc:this.sel[1],tr:r,tc:c}); return;
+      }
+      if(p && p.s==='cho'){ this.sel=[r,c]; this.moves=pieceMoves(this.st,r,c); this.render(); }
+      else { this.sel=null; this.moves=[]; this.render(); }
+    },
+    doMove(m){
+      const {ns,winner}=apply(this.st,m,'cho');
+      this.st=ns; this.sel=null; this.moves=[]; this.drop=null; this.render();
+      if(winner){ this.finish('win'); return; }          // 상대 용 잡음 → 승
+      this.busy=true;
+      $('mj-status').innerHTML = onGoal(this.st,'cho')
+        ? '🐯 호랑이가 적 끝줄 도달! AI가 못 잡으면 다음 턴 승리…'
+        : 'AI가 생각 중...';
+      setTimeout(()=>this.ai(),350);
+    },
+    ai(){
+      // 한(AI) 용이 끝줄에서 플레이어 턴을 버텼으면 AI 승
+      if(onGoal(this.st,'han')){ this.finish('lose'); return; }
+      const m=aiBest(this.st);
+      if(!m){ this.finish('win'); return; }
+      const {ns,winner}=apply(this.st,m,'han');
+      this.st=ns; this.render(); this.busy=false;
+      if(winner){ this.finish('lose'); return; }          // 내 용 잡힘 → 패
+      if(onGoal(this.st,'cho')){ this.finish('win'); return; } // 내 용이 끝줄에서 버팀 → 승
+      $('mj-status').innerHTML = onGoal(this.st,'han')
+        ? '⚠️ AI 호랑이가 끝줄 도달! 이번 턴에 잡지 못하면 패배'
+        : '당신 차례.';
+    },
+    finish(res){
+      this.over=true; this.busy=false;
+      const [cls,txt]= res==='win'?['win','🏆 승리!']:['lose','💀 패배'];
+      $('mj-status').textContent='게임 종료';
+      $('mj-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div>
+        <div class="center"><button class="btn gold" onclick="MJ.start()">다시 두기</button></div>`;
+    }
+  };
+})();
+
+/* =====================================================================
+   GAME 10 — 인디언 포커 (Indian Poker) · 4인
+   ===================================================================== */
+const IP = {
+  names:['나','AI 진','AI 하','AI 노'],
+  start(){
+    this.chips=[20,20,20,20]; this.alive=[true,true,true,true]; this.over=false; this.round=0;
+    $('ip-result').innerHTML='';
+    $('ip-log').innerHTML='카드는 본인만 못 봅니다. 남의 카드를 보고 베팅하세요.';
+    this.newRound();
+  },
+  aliveIdx(){ return [0,1,2,3].filter(i=>this.alive[i]); },
+  newRound(){
+    if(this.over) return;
+    const al=this.aliveIdx();
+    if(al.length<=1){ this.finish(); return; }
+    this.round++;
+    if(this.round>80){ this.finishByChips(); return; }
+    const ante=1+Math.floor(this.round/4);   // 블라인드 상승 → 칩이 줄어 반드시 종료
+    this.cards=[null,null,null,null]; this.revealAll=false;
+    al.forEach(i=>{ this.cards[i]=1+rand(20); });
+    this.pot=0; this.contrib=[0,0,0,0]; this.folded=[false,false,false,false];
+    al.forEach(i=>{ const a=Math.min(ante,this.chips[i]); this.chips[i]-=a; this.contrib[i]+=a; this.pot+=a; });
+    this.aiActions=[];
+    al.filter(i=>i!==0).forEach(i=>{
+      const dec=this.aiDecide(i);
+      if(dec==='fold'){ this.folded[i]=true; this.aiActions.push(this.names[i]+' 다이'); }
+      else { const b=Math.min(dec,this.chips[i]); this.chips[i]-=b; this.contrib[i]+=b; this.pot+=b;
+             this.aiActions.push(this.names[i]+(b>0?(' 베팅 +'+b):' 콜')); }
+    });
+    $('ip-pot').textContent=this.pot;
+    this.render(); this.renderControls();
+    $('ip-status').textContent=`라운드 ${this.round} · 앤티 ${ante} — 카드는 가려져 있습니다.`;
+    $('ip-log').innerHTML='AI 행동: '+this.aiActions.join(' · ');
+  },
+  aiDecide(i){
+    const others=this.aliveIdx().filter(j=>j!==i);
+    const maxVis=Math.max(0,...others.map(j=>this.cards[j]));
+    const r=Math.random();
+    if(maxVis>=17) return r<0.7?'fold':0;
+    if(maxVis>=13) return r<0.4?'fold':(r<0.8?0:2);
+    if(maxVis>=9)  return r<0.15?'fold':(r<0.6?0:2);
+    return r<0.5?4:(r<0.85?2:0);
+  },
+  renderControls(){
+    const c=$('ip-controls');
+    if(this.over){ c.innerHTML=''; return; }
+    const chips=this.chips[0];
+    let h='<div class="hint" style="margin-bottom:8px;">베팅 선택 (내 카드 비공개)</div>';
+    h+='<button class="btn" onclick="IP.act(\'fold\')">다이</button> ';
+    h+='<button class="btn" onclick="IP.act(0)">콜(0)</button> ';
+    h+=`<button class="btn" onclick="IP.act(2)" ${chips<2?'disabled':''}>베팅 +2</button> `;
+    h+=`<button class="btn gold" onclick="IP.act(4)" ${chips<4?'disabled':''}>베팅 +4</button>`;
+    c.innerHTML=h;
+  },
+  act(d){
+    if(this.over) return;
+    if(d==='fold'){ this.folded[0]=true; }
+    else { const b=Math.min(d,this.chips[0]); this.chips[0]-=b; this.contrib[0]+=b; this.pot+=b; }
+    $('ip-controls').innerHTML='';
+    this.resolve();
+  },
+  resolve(){
+    this.revealAll=true;
+    const al=this.aliveIdx();
+    const stayers=al.filter(i=>!this.folded[i]);
+    let msg;
+    if(stayers.length===0){
+      al.forEach(i=>{ this.chips[i]+=this.contrib[i]; });
+      msg='모두 다이 — 앤티를 돌려받았습니다.';
+    } else {
+      let w=stayers[0]; stayers.forEach(i=>{ if(this.cards[i]>this.cards[w]) w=i; });
+      this.chips[w]+=this.pot;
+      msg=`${this.names[w]} 승리! (카드 ${this.cards[w]}) 팟 ${this.pot}칩 획득.`;
+    }
+    [0,1,2,3].forEach(i=>{ if(this.alive[i] && this.chips[i]<=0) this.alive[i]=false; });
+    $('ip-pot').textContent=this.pot; this.render(); $('ip-log').innerHTML=msg;
+    if(!this.alive[0] || this.aliveIdx().length<=1){ this.finish(); return; }
+    $('ip-controls').innerHTML='<button class="btn gold" onclick="IP.newRound()">다음 라운드</button>';
+  },
+  render(){
+    const wrap=$('ip-seats'); wrap.innerHTML='';
+    [0,1,2,3].forEach(i=>{
+      const s=document.createElement('div');
+      s.className='seat'+(i===0?' me':'')+(!this.alive[i]?' out':'');
+      let card;
+      if(!this.alive[i]) card='<div class="ip-card mini back">-</div>';
+      else if(i===0) card=this.revealAll?`<div class="ip-card mini">${this.cards[0]}</div>`:'<div class="ip-card mini back">나?</div>';
+      else card=this.cards[i]!=null?`<div class="ip-card mini">${this.cards[i]}</div>`:'<div class="ip-card mini back">-</div>';
+      const fold=(this.folded&&this.folded[i])?'<div class="st" style="color:var(--lose)">다이</div>':'';
+      s.innerHTML=`<div class="nm${i===0?' me':''}">${this.names[i]}</div>${card}<div class="st">칩 <b class="chips-ico">${this.chips[i]}</b></div>${fold}`;
+      wrap.appendChild(s);
+    });
+  },
+  finishByChips(){
+    // 장기전 안전장치: 칩이 가장 많은 사람 우승
+    this.over=true; $('ip-controls').innerHTML='';
+    let best=0; for(let i=1;i<4;i++){ if(this.alive[i]&&this.chips[i]>this.chips[best]) best=i; }
+    const cls=best===0?'win':'lose';
+    const txt=best===0?`🏆 칩 우세 승리! (${this.chips[0]}칩)`:`💀 패배 — 최다 칩: ${this.names[best]} (${this.chips[best]}칩)`;
+    $('ip-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="IP.start()">다시 도전</button></div>`;
+  },
+  finish(){
+    this.over=true; $('ip-controls').innerHTML='';
+    const champ=this.aliveIdx();
+    let cls,txt;
+    if(this.alive[0]&&champ.length===1){cls='win';txt='🏆 최후의 1인 — 승리!';}
+    else if(!this.alive[0]){cls='lose';txt='💀 탈락 — 패배';}
+    else {cls='draw';txt='게임 종료';}
+    $('ip-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="IP.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 11 — 콩 게임 (Bean / Morra) · 4인
+   ===================================================================== */
+const BEAN = {
+  names:['나','AI 가','AI 나','AI 다'],
+  start(){
+    this.lives=[3,3,3,3]; this.alive=[true,true,true,true];
+    this.startPos=0; this.over=false; this.reveal=false;
+    $('bean-result').innerHTML='';
+    $('bean-log').innerHTML='주먹에 콩 0~3개를 숨기고, 전체 콩 합을 맞히세요.';
+    this.newRound();
+  },
+  aliveIdx(){ return [0,1,2,3].filter(i=>this.alive[i]); },
+  maxSum(){ return 3*this.aliveIdx().length; },
+  newRound(){
+    if(this.over) return;
+    const al=this.aliveIdx();
+    if(al.length<=1){ this.finish(); return; }
+    this.startPos=(this.startPos||0)+1; this.reveal=false;
+    this.beans=[null,null,null,null];
+    al.forEach(i=>{ if(i!==0) this.beans[i]=rand(4); });
+    this.guesses={}; this.taken=[]; this.phase='beans';
+    this.render();
+    $('bean-status').textContent='주먹에 숨길 콩 개수를 고르세요.';
+    let h='<div class="hint" style="margin-bottom:8px;">숨길 콩 개수</div>';
+    for(let b=0;b<=3;b++) h+=`<button class="btn" onclick="BEAN.setBeans(${b})">${b}개</button> `;
+    $('bean-controls').innerHTML=h;
+  },
+  setBeans(b){
+    if(this.phase!=='beans') return;
+    this.beans[0]=b; this.phase='guess';
+    $('bean-status').textContent='이제 전체 콩 합을 외칠 차례입니다.';
+    const al=this.aliveIdx(), n=al.length, st=(this.startPos||0)%n;
+    this.order=[]; for(let k=0;k<n;k++) this.order.push(al[(st+k)%n]);
+    this.gi=0; this.step();
+  },
+  step(){
+    while(this.gi<this.order.length){
+      const p=this.order[this.gi];
+      if(p===0){ this.renderGuess(); return; }
+      const g=this.aiGuess(p); this.guesses[p]=g; this.taken.push(g); this.gi++; this.render();
+    }
+    this.resolve();
+  },
+  renderGuess(){
+    let h='<div class="hint" style="margin-bottom:8px;">전체 콩 합을 외치세요 (이미 나온 수 제외)</div>';
+    for(let v=0;v<=this.maxSum();v++){
+      const dis=this.taken.indexOf(v)>=0?'disabled':'';
+      h+=`<button class="btn" ${dis} onclick="BEAN.sayGuess(${v})">${v}</button> `;
+    }
+    $('bean-controls').innerHTML=h; this.render();
+  },
+  sayGuess(v){
+    if(this.taken.indexOf(v)>=0) return;
+    this.guesses[0]=v; this.taken.push(v); this.gi++;
+    $('bean-controls').innerHTML=''; this.render(); this.step();
+  },
+  aiGuess(i){
+    const al=this.aliveIdx();
+    const others=al.filter(j=>j!==i).length;
+    let est=this.beans[i]+Math.round(others*1.5)+(rand(3)-1);
+    est=Math.max(0,Math.min(this.maxSum(),est));
+    let t=0; while(this.taken.indexOf(est)>=0 && t<this.maxSum()+2){ est=(est+1)%(this.maxSum()+1); t++; }
+    return est;
+  },
+  resolve(){
+    this.reveal=true;
+    const al=this.aliveIdx();
+    const actual=al.reduce((s,i)=>s+this.beans[i],0);
+    let winner=null;
+    al.forEach(i=>{ if(this.guesses[i]===actual) winner=i; });
+    let msg=`실제 합은 <b>${actual}</b>. `;
+    if(winner!=null){ msg+=`${this.names[winner]} 적중! 나머지 생명 −1.`; al.forEach(i=>{ if(i!==winner) this.lives[i]--; }); }
+    else msg+='아무도 못 맞혔습니다.';
+    al.forEach(i=>{ if(this.lives[i]<=0) this.alive[i]=false; });
+    this.render(); $('bean-log').innerHTML=msg;
+    if(!this.alive[0] || this.aliveIdx().length<=1){ this.finish(); return; }
+    $('bean-controls').innerHTML='<button class="btn gold" onclick="BEAN.newRound()">다음 라운드</button>';
+  },
+  render(){
+    const wrap=$('bean-seats'); wrap.innerHTML='';
+    [0,1,2,3].forEach(i=>{
+      const s=document.createElement('div');
+      s.className='seat'+(i===0?' me':'')+(!this.alive[i]?' out':'');
+      const g=(this.guesses&&this.guesses[i]!=null)?`<div class="pickbadge">"${this.guesses[i]}"</div>`:'';
+      const bn=(this.reveal&&this.alive[i]&&this.beans[i]!=null)?`<div class="st">콩 ${this.beans[i]}</div>`:'';
+      s.innerHTML=`<div class="nm${i===0?' me':''}">${this.names[i]}</div><div class="st">생명 <b class="lives">${'♥'.repeat(Math.max(0,this.lives[i]))||'—'}</b></div>${g}${bn}`;
+      wrap.appendChild(s);
+    });
+  },
+  finish(){
+    this.over=true; $('bean-controls').innerHTML='';
+    const al=this.aliveIdx();
+    let cls,txt;
+    if(this.alive[0]&&al.length===1){cls='win';txt='🏆 최후의 생존 — 승리!';}
+    else if(!this.alive[0]){cls='lose';txt='💀 생명 소진 — 패배';}
+    else {cls='draw';txt='게임 종료';}
+    $('bean-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="BEAN.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 12 — 동전 게임 (Odd/Even) · 1대1
+   ===================================================================== */
+const COIN = {
+  start(){
+    this.me=0; this.ai=0; this.round=1; this.over=false;
+    this.myHideHist=[]; this.myGuessHist=[];
+    this.role=(Math.random()<0.5)?'hide':'guess';
+    $('coin-result').innerHTML='';
+    this.update(); this.setup();
+  },
+  update(){ $('coin-me').textContent=this.me; $('coin-ai').textContent=this.ai; $('coin-round').textContent=`라운드 ${this.round} / 10`; },
+  setup(){
+    if(this.over) return;
+    $('coin-stage').innerHTML=''; $('coin-actions').innerHTML='';
+    if(this.role==='hide'){
+      $('coin-role').innerHTML='🙈 당신은 <b>숨기는 사람</b> — 동전 개수를 고르세요. AI가 홀/짝을 맞힙니다.';
+      let h=''; for(let n=1;n<=4;n++) h+=`<button class="btn" onclick="COIN.hide(${n})">${n}개</button> `;
+      $('coin-actions').innerHTML=h;
+    } else {
+      $('coin-role').innerHTML='🔍 당신은 <b>맞히는 사람</b> — AI가 숨긴 동전이 홀수인지 짝수인지 고르세요.';
+      this.aiHidden=this.aiHide();
+      $('coin-actions').innerHTML='<button class="btn" onclick="COIN.guess(1)">홀(odd)</button> <button class="btn" onclick="COIN.guess(0)">짝(even)</button>';
+    }
+  },
+  coins(n){ let s=''; for(let i=0;i<n;i++) s+='<span class="coin">🪙</span>'; return s; },
+  aiPredict(){
+    if(this.myHideHist.length===0) return rand(2);
+    const ones=this.myHideHist.filter(x=>x===1).length, zeros=this.myHideHist.length-ones;
+    let p=ones>zeros?1:(zeros>ones?0:rand(2));
+    if(Math.random()<0.25) p=1-p;
+    return p;
+  },
+  aiHide(){
+    let cnt=1+rand(4);
+    if(this.myGuessHist.length>=2){
+      const ones=this.myGuessHist.filter(x=>x===1).length, zeros=this.myGuessHist.length-ones;
+      const want=ones>zeros?0:(zeros>ones?1:rand(2));
+      const opts=[1,2,3,4].filter(n=>n%2===want);
+      if(Math.random()<0.7) cnt=pick(opts);
+    }
+    return cnt;
+  },
+  hide(n){
+    const par=n%2; this.myHideHist.push(par);
+    const ag=this.aiPredict();
+    const meWin=(ag!==par);
+    this.resolve(meWin, n, `동전 ${n}개(${par?'홀':'짝'}). AI 추측: ${ag?'홀':'짝'} → ${ag===par?'AI 적중':'AI 빗나감'}`);
+  },
+  guess(p){
+    this.myGuessHist.push(p);
+    const par=this.aiHidden%2; const meWin=(p===par);
+    this.resolve(meWin, this.aiHidden, `AI 동전 ${this.aiHidden}개(${par?'홀':'짝'}). 내 추측 ${p?'홀':'짝'} → ${meWin?'적중!':'빗나감'}`);
+  },
+  resolve(meWin,count,msg){
+    if(meWin) this.me++; else this.ai++;
+    $('coin-stage').innerHTML=this.coins(count);
+    $('coin-log').innerHTML=msg+(meWin?' — <b>내 득점</b>':' — AI 득점');
+    this.update(); this.round++;
+    if(this.round>10){ this.finish(); return; }
+    this.role=(this.role==='hide')?'guess':'hide';
+    $('coin-actions').innerHTML='<button class="btn gold" onclick="COIN.setup()">다음 라운드</button>';
+  },
+  finish(){
+    this.over=true; $('coin-actions').innerHTML='';
+    let cls,txt;
+    if(this.me>this.ai){cls='win';txt='🏆 승리';}
+    else if(this.me<this.ai){cls='lose';txt='💀 패배';}
+    else {cls='draw';txt='무승부';}
+    $('coin-result').innerHTML=`<div class="result-banner ${cls}">${txt} · ${this.me} : ${this.ai}</div><div class="center"><button class="btn gold" onclick="COIN.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 13 — 숫자 야구 (Number Baseball) · 1대1
+   ===================================================================== */
+const BB = {
+  start(){
+    this.mine=this.randSecret(); this.ai=this.randSecret();
+    this.cands=this.allPerms(); this.hist=[]; this.over=false; this.slots=[];
+    $('bb-result').innerHTML='';
+    $('bb-mynum').textContent=this.mine.join(' ');
+    this.renderHist(); this.renderPad();
+    if(Game.coin()==='ai'){
+      $('bb-status').textContent='🤖 AI가 선(先) — AI가 먼저 추측합니다.';
+      this.aiGuess();
+    } else {
+      $('bb-status').textContent='🙋 당신이 선(先) — 세 자리를 입력해 추측하세요. 3 스트라이크면 승리!';
+    }
+  },
+  aiGuess(){
+    if(this.over) return false;
+    const ag=this.cands[rand(this.cands.length)]||this.randSecret();
+    const ar=this.sb(ag,this.mine);
+    this.hist.push({who:'AI',g:ag.join(''),r:`${ar[0]}S ${ar[1]}B`});
+    this.cands=this.cands.filter(c=>{ const x=this.sb(ag,c); return x[0]===ar[0]&&x[1]===ar[1]; });
+    this.renderHist();
+    if(ar[0]===3){ this.renderPad(); this.finish('lose'); return true; }
+    return false;
+  },
+  randSecret(){ let d=[0,1,2,3,4,5,6,7,8,9]; for(let i=d.length-1;i>0;i--){const j=rand(i+1);[d[i],d[j]]=[d[j],d[i]];} return d.slice(0,3); },
+  allPerms(){ let o=[]; for(let a=0;a<10;a++)for(let b=0;b<10;b++)for(let c=0;c<10;c++){ if(a!==b&&b!==c&&a!==c) o.push([a,b,c]); } return o; },
+  sb(g,s){ let st=0,bl=0; for(let i=0;i<3;i++){ if(g[i]===s[i])st++; else if(s.indexOf(g[i])>=0)bl++; } return [st,bl]; },
+  renderPad(){
+    const sl=$('bb-slots'); sl.innerHTML='';
+    for(let i=0;i<3;i++){ const d=document.createElement('div'); d.className='gslot'+(this.slots[i]!=null?' fill':''); d.textContent=this.slots[i]!=null?this.slots[i]:''; sl.appendChild(d); }
+    const pad=$('bb-pad'); pad.innerHTML='';
+    for(let n=0;n<=9;n++){
+      const b=document.createElement('button'); b.textContent=n;
+      b.disabled=this.over||this.slots.indexOf(n)>=0||this.slots.length>=3;
+      b.onclick=()=>{ if(!this.over&&this.slots.length<3&&this.slots.indexOf(n)<0){ this.slots.push(n); this.renderPad(); } };
+      pad.appendChild(b);
+    }
+    const act=$('bb-actions'); act.innerHTML='';
+    const clr=document.createElement('button'); clr.className='btn sm'; clr.textContent='지우기';
+    clr.onclick=()=>{ this.slots=[]; this.renderPad(); };
+    const go=document.createElement('button'); go.className='btn gold'; go.textContent='추측'; go.style.marginLeft='8px';
+    go.disabled=this.over||this.slots.length!==3; go.onclick=()=>this.submit();
+    act.appendChild(clr); act.appendChild(go);
+  },
+  submit(){
+    if(this.over||this.slots.length!==3) return;
+    const g=this.slots.slice(); const r=this.sb(g,this.ai);
+    this.hist.push({who:'나',g:g.join(''),r:`${r[0]}S ${r[1]}B`}); this.slots=[]; this.renderHist();
+    if(r[0]===3){ this.renderPad(); this.finish('win'); return; }
+    if(this.aiGuess()) return;
+    this.renderPad(); $('bb-status').textContent='계속 추측하세요.';
+  },
+  renderHist(){
+    $('bb-hist').innerHTML=this.hist.length? this.hist.map(e=>`<div><span class="who">${e.who}</span> <span class="g">${e.g}</span> → <span class="r">${e.r}</span></div>`).join('') : '<div class="hint">아직 기록이 없습니다.</div>';
+  },
+  finish(res){
+    this.over=true;
+    const [cls,txt]= res==='win'?['win',`🏆 승리! AI 번호는 ${this.ai.join('')}`]:['lose','💀 패배 — AI가 먼저 맞혔습니다'];
+    $('bb-status').textContent='게임 종료';
+    $('bb-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="BB.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 14 — 업·다운 레이스 · 1대1
+   ===================================================================== */
+const UD = {
+  start(){
+    this.mine=1+rand(50); this.ai=1+rand(50);
+    this.lo=1; this.hi=50; this.hist=[]; this.over=false;
+    $('ud-result').innerHTML='';
+    $('ud-range').value=25; this.label(); this.renderHist();
+    $('ud-go').disabled=false;
+    if(Game.coin()==='ai'){
+      $('ud-status').textContent='🤖 AI가 선(先) — AI가 먼저 추측합니다.';
+      this.aiGuess();
+    } else {
+      $('ud-status').textContent='🙋 당신이 선(先) — 1~50 중 AI의 수를 먼저 맞히면 승리!';
+    }
+  },
+  aiGuess(){
+    if(this.over) return false;
+    const ag=Math.floor((this.lo+this.hi)/2);
+    let ar;
+    if(ag===this.mine) ar='정답';
+    else if(this.mine>ag){ ar='🔼 UP'; this.lo=ag+1; }
+    else { ar='🔽 DOWN'; this.hi=ag-1; }
+    this.hist.push({who:'AI',g:ag,r:ar}); this.renderHist();
+    if(ag===this.mine){ this.finish('lose'); return true; }
+    return false;
+  },
+  label(){ $('ud-cur').textContent=$('ud-range').value; },
+  guess(){
+    if(this.over) return;
+    const g=parseInt($('ud-range').value,10);
+    const r = g===this.ai?'정답':(this.ai>g?'🔼 UP':'🔽 DOWN');
+    this.hist.push({who:'나',g,r}); this.renderHist();
+    if(g===this.ai){ this.finish('win'); return; }
+    this.aiGuess();
+  },
+  renderHist(){ $('ud-hist').innerHTML=this.hist.length? this.hist.map(e=>`<div><span class="who">${e.who}</span> <span class="g">${e.g}</span> → <span class="r">${e.r}</span></div>`).join('') : '<div class="hint">아직 기록 없음.</div>'; },
+  finish(res){
+    this.over=true; $('ud-go').disabled=true;
+    const [cls,txt]= res==='win'?['win',`🏆 승리! AI 수는 ${this.ai}`]:['lose',`💀 패배 — AI가 내 수(${this.mine})를 맞혔습니다`];
+    $('ud-status').textContent='게임 종료';
+    $('ud-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="UD.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 15 — 소수결 게임 (Minority) · 7인
+   ===================================================================== */
+const MN = {
+  start(){
+    this.names=['나','A','B','C','D','E','F'];
+    this.alive=Array(7).fill(true); this.round=1; this.over=false; this.lastMaj=null;
+    this.picks=null; this.reveal=false;
+    $('mn-result').innerHTML='';
+    $('mn-log').innerHTML='A 또는 B를 고르세요. 더 적은 쪽만 생존합니다.';
+    $('mn-status').textContent='소수파에 들어야 생존합니다.';
+    this.render(); this.renderControls();
+    $('mn-round').textContent=`라운드 ${this.round} · 생존 ${this.aliveIdx().length}명`;
+  },
+  aliveIdx(){ return this.names.map((_,i)=>i).filter(i=>this.alive[i]); },
+  renderControls(){ $('mn-controls').innerHTML='<div class="choice-row"><button class="choice-btn" onclick="MN.choose(0)">A</button><button class="choice-btn" onclick="MN.choose(1)">B</button></div>'; },
+  aiPick(){ const r=Math.random(); if(this.lastMaj!=null && r<0.6) return 1-this.lastMaj; return rand(2); },
+  choose(side){
+    if(this.over) return;
+    const al=this.aliveIdx();
+    this.picks=Array(7).fill(null); this.picks[0]=side;
+    al.filter(i=>i!==0).forEach(i=>{ this.picks[i]=this.aiPick(); });
+    this.reveal=true;
+    const a=al.filter(i=>this.picks[i]===0).length, b=al.length-a;
+    let msg=`A ${a}명 · B ${b}명 — `; let elim=[];
+    if(al.length===2){
+      if(a===b){ const w=pick(al); this.survSide=this.picks[w]; elim=al.filter(i=>i!==w); msg+='소수 판정! '+this.names[w]+' 생존.'; }
+      else { this.survSide=-1; msg+='둘 다 같은 선택 — 재대결.'; }
+    } else if(a===0||b===0){ this.survSide=-1; msg+='전원 한쪽으로 쏠림 — 소수 없음, 무효(재대결).'; }
+    else if(a===b){ this.survSide=-1; msg+='동수! 전원 생존.'; }
+    else { this.survSide=a<b?0:1; elim=al.filter(i=>this.picks[i]!==this.survSide); msg+=`${this.survSide===0?'A':'B'} 소수 → 생존, 반대편 탈락.`; }
+    elim.forEach(i=>this.alive[i]=false);
+    this.lastMaj=(this.survSide===-1)?null:(1-this.survSide);
+    this.render(); $('mn-log').innerHTML=msg;
+    if(!this.alive[0] || this.aliveIdx().length<=1){ this.finish(); return; }
+    this.round++; $('mn-round').textContent=`라운드 ${this.round} · 생존 ${this.aliveIdx().length}명`;
+    $('mn-controls').innerHTML='<button class="btn gold" onclick="MN.next()">다음 라운드</button>';
+  },
+  next(){ this.reveal=false; this.picks=null; this.render(); this.renderControls(); $('mn-status').textContent='소수파에 들어야 생존합니다.'; },
+  render(){
+    const wrap=$('mn-seats'); wrap.innerHTML='';
+    this.names.forEach((nm,i)=>{
+      const s=document.createElement('div');
+      s.className='seat'+(i===0?' me':'')+(!this.alive[i]?' out':'')+(this.reveal&&this.picks&&this.picks[i]!=null&&this.alive[i]?' safe':'');
+      const badge=(this.reveal&&this.picks&&this.picks[i]!=null)?`<div class="pickbadge">${this.picks[i]===0?'A':'B'}</div>`:'';
+      s.innerHTML=`<div class="nm${i===0?' me':''}">${nm}</div><div class="st">${this.alive[i]?'생존':'탈락'}</div>${badge}`;
+      wrap.appendChild(s);
+    });
+  },
+  finish(){
+    this.over=true; $('mn-controls').innerHTML='';
+    const rem=this.aliveIdx(); let cls,txt;
+    if(this.alive[0]&&rem.length===1){cls='win';txt='🏆 최후의 생존 — 승리!';}
+    else if(!this.alive[0]){cls='lose';txt='💀 다수파에 휩쓸려 탈락';}
+    else {cls='draw';txt=`게임 종료 · 생존 ${rem.length}명`;}
+    $('mn-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="MN.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 16 — 경매 게임 (Auction) · 4인
+   ===================================================================== */
+const AC = {
+  names:['나','AI 갑','AI 을','AI 병'],
+  start(){
+    this.budget=[100,100,100,100]; this.score=[0,0,0,0];
+    this.items=this.makeItems(); this.idx=0; this.over=false;
+    $('ac-result').innerHTML='';
+    $('ac-log').innerHTML='카드를 보고 입찰하세요. 최고가만 낙찰됩니다.';
+    this.render(); this.nextItem();
+  },
+  makeItems(){ let v=[12,10,9,8,7,6,5,4]; for(let i=v.length-1;i>0;i--){const j=rand(i+1);[v[i],v[j]]=[v[j],v[i]];} return v; },
+  render(){
+    const wrap=$('ac-seats'); wrap.innerHTML='';
+    this.names.forEach((nm,i)=>{
+      const s=document.createElement('div'); s.className='seat'+(i===0?' me':'');
+      s.innerHTML=`<div class="nm${i===0?' me':''}">${nm}</div><div class="big">${this.score[i]}</div><div class="st">점수</div><div class="st">예산 <b class="chips-ico">${this.budget[i]}</b></div>`;
+      wrap.appendChild(s);
+    });
+  },
+  nextItem(){
+    if(this.idx>=this.items.length){ this.finish(); return; }
+    const v=this.items[this.idx];
+    $('ac-item').textContent=(v>=0?'+':'')+v;
+    $('ac-progress').textContent=`경매 ${this.idx+1} / ${this.items.length}`;
+    $('ac-status').textContent=`이 카드는 ${v}점입니다. 입찰가를 정하세요.`;
+    const bid=$('ac-bid'); bid.max=this.budget[0]; bid.value=0; this.label();
+    $('ac-go').disabled=false;
+  },
+  label(){ $('ac-bidval').textContent=$('ac-bid').value; },
+  bid(){
+    if(this.over) return;
+    $('ac-go').disabled=true;
+    const v=this.items[this.idx];
+    const bids=[parseInt($('ac-bid').value,10)||0];
+    for(let i=1;i<4;i++) bids.push(this.aiBid(i,v));
+    const max=Math.max(...bids);
+    let winners=[]; bids.forEach((b,i)=>{ if(b===max) winners.push(i); });
+    const w=pick(winners);
+    this.budget[w]-=max; this.score[w]+=v;
+    this.render();
+    $('ac-log').innerHTML=`입찰: ${bids.map((b,i)=>this.names[i]+' '+b).join(' · ')} → 낙찰: <b>${this.names[w]}</b> (${max} 지불, ${v}점)`;
+    this.idx++;
+    if(this.idx>=this.items.length){ this.finish(); return; }
+    setTimeout(()=>this.nextItem(), 400);
+  },
+  aiBid(i,v){
+    if(v<=0) return 0;
+    let b=Math.round(v*(0.6+Math.random()*0.7));
+    return Math.max(0,Math.min(b,this.budget[i]));
+  },
+  finish(){
+    this.over=true; $('ac-go').disabled=true;
+    let best=0; for(let i=1;i<4;i++){ if(this.score[i]>this.score[best] || (this.score[i]===this.score[best]&&this.budget[i]>this.budget[best])) best=i; }
+    const rank=this.names.map((n,i)=>i).sort((a,b)=> this.score[b]-this.score[a] || this.budget[b]-this.budget[a]).indexOf(0)+1;
+    let cls,txt;
+    if(best===0){cls='win';txt=`🏆 승리! 최고 점수 ${this.score[0]}점`;}
+    else {cls='lose';txt=`💀 ${rank}위 — 내 ${this.score[0]}점, 1위 ${this.names[best]} ${this.score[best]}점`;}
+    $('ac-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="AC.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 17 — 중복 회피 (Avoid Duplicate) · 5인
+   ===================================================================== */
+const UQ = {
+  start(){
+    this.names=['나','A','B','C','D']; this.alive=Array(5).fill(true);
+    this.round=1; this.over=false; this.picks=null; this.reveal=false;
+    $('uq-result').innerHTML='';
+    $('uq-status').textContent='남들과 겹치지 않는 수를 고르세요.';
+    $('uq-log').innerHTML='같은 수를 낸 사람끼리 모두 탈락합니다.';
+    this.beginRound();
+  },
+  aliveIdx(){ return this.names.map((_,i)=>i).filter(i=>this.alive[i]); },
+  beginRound(){
+    this.picks=null; this.reveal=false;
+    const n=this.aliveIdx().length;
+    $('uq-round').textContent=`라운드 ${this.round} · 생존 ${n}명 · 선택 범위 1~${n}`;
+    this.render();
+    let h='<div class="hint" style="margin-bottom:8px;">1 ~ '+n+' 중 하나를 고르세요</div><div class="choice-row">';
+    for(let v=1;v<=n;v++) h+=`<button class="choice-btn" onclick="UQ.choose(${v})">${v}</button>`;
+    h+='</div>';
+    $('uq-controls').innerHTML=h;
+  },
+  choose(v){
+    if(this.over) return;
+    const al=this.aliveIdx(), n=al.length;
+    this.picks={}; this.picks[0]=v;
+    al.filter(i=>i!==0).forEach(i=>{ this.picks[i]=1+rand(n); });
+    this.reveal=true;
+    const cnt={}; al.forEach(i=>{ cnt[this.picks[i]]=(cnt[this.picks[i]]||0)+1; });
+    const survivors=al.filter(i=>cnt[this.picks[i]]===1);
+    let msg=al.map(i=>`${this.names[i]}:${this.picks[i]}`).join(' · ')+' — ';
+    if(survivors.length===0){
+      msg+='전원 중복! 무효 라운드, 재대결.';
+      this.render(); $('uq-log').innerHTML=msg;
+      $('uq-controls').innerHTML='<button class="btn gold" onclick="UQ.beginRound()">다시</button>';
+      return;
+    }
+    if(al.length===2 && survivors.length===2){
+      const w=pick(al); al.forEach(i=>{ if(i!==w) this.alive[i]=false; });
+      msg+='둘 다 고유 — 운명의 한 수! '+this.names[w]+' 생존.';
+    } else {
+      al.forEach(i=>{ if(cnt[this.picks[i]]>1) this.alive[i]=false; });
+      msg+=`고유한 ${survivors.length}명 생존, 나머지 탈락.`;
+    }
+    this.render(); $('uq-log').innerHTML=msg;
+    if(!this.alive[0] || this.aliveIdx().length<=1){ this.finish(); return; }
+    this.round++;
+    $('uq-controls').innerHTML='<button class="btn gold" onclick="UQ.beginRound()">다음 라운드</button>';
+  },
+  render(){
+    const wrap=$('uq-seats'); wrap.innerHTML='';
+    this.names.forEach((nm,i)=>{
+      const s=document.createElement('div');
+      s.className='seat'+(i===0?' me':'')+(!this.alive[i]?' out':'')+(this.reveal&&this.picks&&this.picks[i]!=null&&this.alive[i]?' safe':'');
+      const badge=(this.reveal&&this.picks&&this.picks[i]!=null)?`<div class="pickbadge">${this.picks[i]}</div>`:'';
+      s.innerHTML=`<div class="nm${i===0?' me':''}">${nm}</div><div class="st">${this.alive[i]?'생존':'탈락'}</div>${badge}`;
+      wrap.appendChild(s);
+    });
+  },
+  finish(){
+    this.over=true; $('uq-controls').innerHTML='';
+    const rem=this.aliveIdx(); let cls,txt;
+    if(this.alive[0]&&rem.length===1){cls='win';txt='🏆 최후의 생존 — 승리!';}
+    else if(!this.alive[0]){cls='lose';txt='💀 중복 탈락 — 패배';}
+    else {cls='draw';txt=`게임 종료 · 생존 ${rem.length}명`;}
+    $('uq-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="UQ.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 18 — 가위바위보 토너먼트 · 8인
+   ===================================================================== */
+const RT = {
+  start(){
+    this.names=['나','강','민','수','지','현','준','태'];
+    this.bracket=[this.names.slice()]; this.roundIdx=0; this.over=false; this.champion=null;
+    this.myHistRT=[];
+    $('rt-result').innerHTML=''; $('rt-playarea').style.display='none';
+    this.setupRound();
+  },
+  setupRound(){
+    const parts=this.bracket[this.roundIdx];
+    if(parts.length===1){ this.champion=parts[0]; this.finish(); return; }
+    this.pairs=[]; for(let i=0;i<parts.length;i+=2) this.pairs.push([parts[i],parts[i+1]]);
+    this.results=new Array(this.pairs.length).fill(null);
+    this.myPair=this.pairs.findIndex(p=>p.indexOf('나')>=0);
+    if(this.myPair<0){ this.champion=null; this.finish(); return; }
+    this.renderBracket();
+    this.pairs.forEach((p,idx)=>{ if(idx!==this.myPair) this.results[idx]=(Math.random()<0.5?p[0]:p[1]); });
+    this.renderBracket();
+    this.startMyMatch();
+  },
+  startMyMatch(){
+    const p=this.pairs[this.myPair];
+    this.opp=p[0]==='나'?p[1]:p[0];
+    this.myW=0; this.aiW=0;
+    $('rt-playarea').style.display='';
+    $('rt-oppname').textContent=this.opp; $('rt-score').textContent='0 : 0';
+    $('rt-myshow').textContent='❔'; $('rt-aishow').textContent='❔';
+    const labels=['8강','4강','결승'];
+    $('rt-status').textContent=`${labels[this.roundIdx]||('라운드 '+(this.roundIdx+1))} · 나 vs ${this.opp} (3판 2선승)`;
+    $('rt-log').innerHTML='가위바위보를 선택하세요.';
+  },
+  pick(my){
+    if(this.over||this.myW>=2||this.aiW>=2) return;
+    const P=Game.p(); const h=this.myHistRT||[]; let ai=rand(3);
+    if(h.length>=2 && Math.random()<P.rpsRead){
+      const cnt=[0,0,0]; h.slice(-6).forEach(m=>cnt[m]++);
+      let mode=0; if(cnt[1]>cnt[mode])mode=1; if(cnt[2]>cnt[mode])mode=2;
+      ai=(mode+1)%3;
+    }
+    this.myHistRT.push(my);
+    const E=['✊','✋','✌️'];
+    $('rt-myshow').textContent=E[my]; $('rt-aishow').textContent=E[ai];
+    const res=(my-ai+3)%3; let msg;
+    if(res===0) msg='비김.';
+    else if(res===1){ this.myW++; msg='이김!'; }
+    else { this.aiW++; msg='짐.'; }
+    $('rt-score').textContent=`${this.myW} : ${this.aiW}`;
+    if(this.myW>=2){ this.winMatch(true); return; }
+    if(this.aiW>=2){ this.winMatch(false); return; }
+    $('rt-log').innerHTML=msg+' 계속하세요.';
+  },
+  winMatch(meWon){
+    this.results[this.myPair]= meWon?'나':this.opp;
+    this.renderBracket();
+    if(!meWon){ this.over=true; $('rt-playarea').style.display='none'; this.finish(); return; }
+    this.bracket.push(this.results.slice()); this.roundIdx++;
+    $('rt-log').innerHTML='매치 승리! 다음 라운드로.';
+    $('rt-status').textContent='매치 승리!';
+    $('rt-playarea').style.display='none';
+    setTimeout(()=>this.setupRound(), 600);
+  },
+  renderBracket(){
+    const labels=['8강','4강','결승'];
+    const wrap=$('rt-bracket'); wrap.innerHTML='';
+    const lbl=document.createElement('div'); lbl.className='hint';
+    lbl.textContent=(labels[this.roundIdx]||('라운드 '+(this.roundIdx+1)))+' 대진';
+    wrap.appendChild(lbl);
+    this.pairs.forEach((p,idx)=>{
+      const m=document.createElement('div'); m.className='match'+(idx===this.myPair?' now':'');
+      const w=this.results[idx];
+      const pl=nm=>`<span class="pl${nm==='나'?' me':''}${w?(nm===w?' win':' lose'):''}">${nm}</span>`;
+      m.innerHTML=pl(p[0])+'<span class="vs">vs</span>'+pl(p[1]);
+      wrap.appendChild(m);
+    });
+  },
+  finish(){
+    this.over=true;
+    let cls,txt;
+    if(this.champion==='나'){cls='win';txt='🏆 토너먼트 우승!';}
+    else if(this.champion){cls='lose';txt=`💀 패배 — 우승: ${this.champion}`;}
+    else {cls='lose';txt='💀 토너먼트 탈락';}
+    $('rt-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="RT.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 19 — 가라사대 (Simon Says) · 순발력
+   ===================================================================== */
+const SM = {
+  dirs:[['up','위','⬆️'],['down','아래','⬇️'],['left','왼쪽','⬅️'],['right','오른쪽','➡️']],
+  start(){
+    this.over=true;
+    if(this.timer) clearTimeout(this.timer);
+    $('sm-result').innerHTML=''; $('sm-cmd').textContent='—';
+    $('sm-lives').textContent='♥♥♥'; $('sm-score').textContent='0';
+    $('sm-status').textContent='시작을 누르면 명령이 나옵니다.';
+    $('sm-start').style.display='';
+  },
+  begin(){
+    this.lives=3; this.score=0; this.over=false; this.answered=true;
+    $('sm-start').style.display='none'; $('sm-result').innerHTML='';
+    this.update(); this.next();
+  },
+  update(){ $('sm-lives').textContent='♥'.repeat(Math.max(0,this.lives))||'—'; $('sm-score').textContent=this.score; },
+  judge(simon,dir,action){ return simon ? (action===dir) : (action==='wait'); },
+  next(){
+    if(this.over) return;
+    this.simon=Math.random()<0.6; this.dir=pick(this.dirs); this.answered=false;
+    $('sm-cmd').innerHTML=(this.simon?'<span style="color:var(--gold2)">가라사대</span> ':'<span style="color:var(--muted)">(가라사대 없음)</span> ')+this.dir[2]+' '+this.dir[1];
+    $('sm-status').textContent=this.simon?'가라사대 명령! 해당 방향을 누르세요.':'함정! 누르지 말고 대기.';
+    const limit=Math.max(650, 1900 - this.score*60);
+    if(this.timer) clearTimeout(this.timer);
+    this.timer=setTimeout(()=>this.timeout(), limit);
+  },
+  tap(action){
+    if(this.over||this.answered) return;
+    this.answered=true; if(this.timer) clearTimeout(this.timer);
+    if(this.judge(this.simon,this.dir[0],action)){ this.score++; this.update(); $('sm-status').textContent='정답!'; this.cont(); }
+    else this.miss(this.simon?'엉뚱한 방향':'함정에 반응');
+  },
+  timeout(){
+    if(this.over||this.answered) return;
+    this.answered=true;
+    if(!this.simon){ this.score++; this.update(); $('sm-status').textContent='잘 참았습니다!'; this.cont(); }
+    else this.miss('시간초과');
+  },
+  cont(){ if(this.over) return; if(this.timer) clearTimeout(this.timer); this.timer=setTimeout(()=>this.next(), 500); },
+  miss(r){
+    this.lives--; this.update(); $('sm-status').textContent='❌ '+r+' — 생명 −1';
+    if(this.lives<=0){ this.finish(); return; }
+    if(this.timer) clearTimeout(this.timer); this.timer=setTimeout(()=>this.next(), 700);
+  },
+  finish(){
+    this.over=true; if(this.timer) clearTimeout(this.timer);
+    $('sm-cmd').textContent='게임 종료'; $('sm-status').textContent='끝!'; $('sm-start').style.display='';
+    $('sm-result').innerHTML=`<div class="result-banner draw">최종 점수 ${this.score}점</div><div class="center"><button class="btn gold" onclick="SM.begin()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 07 — 신뢰 게임 (반복 죄수의 딜레마 / Trust) · 1대1
+   매 라운드 협력(0)/배신(1) 동시 선택. CC:+3/+3, DD:+1/+1, 단독배신자+5·협력자0.
+   AI: 관대한 팃포탯 + 종반 배신 + 상습 배신자 응징.
+   ===================================================================== */
+const TR = {
+  ROUNDS:10,
+  me:0, ai:0, round:0, over:false, myHist:[], aiHist:[], hist:[],
+  start(){
+    this.me=0; this.ai=0; this.round=0; this.over=false;
+    this.myHist=[]; this.aiHist=[]; this.hist=[];
+    $('tr-result').innerHTML='';
+    $('tr-myshow').textContent='❔'; $('tr-aishow').textContent='❔';
+    $('tr-myshow').style.background='var(--panel2)'; $('tr-aishow').style.background='var(--panel2)';
+    $('tr-log').innerHTML='협력으로 신뢰를 쌓을지, 배신으로 한탕 할지 선택하세요.';
+    this.renderHist(); this.update(); this.enable(true);
+  },
+  update(){
+    $('tr-me').textContent=this.me; $('tr-ai').textContent=this.ai;
+    $('tr-round').textContent=`라운드 ${Math.min(this.round+1,this.ROUNDS)} / ${this.ROUNDS}`;
+  },
+  enable(on){ document.querySelectorAll('#tr-controls .choice-btn').forEach(b=>b.disabled=!on||this.over); },
+  // 이번 라운드 AI 선택: 0=협력, 1=배신
+  aiDecide(){
+    const idx=this.round, N=this.ROUNDS;            // idx: 0-based 현재 라운드
+    const n=this.myHist.length;
+    const betrayRate = n? this.myHist.filter(x=>x===1).length/n : 0;
+    // 상습 배신자: 처음부터 끝까지 무조건 배신 → '올배신'은 절대 이득을 못 봄(무승부가 한계)
+    if(n>0 && betrayRate>0.5) return 1;
+    if(idx===N-1) return Math.random()<0.85?1:0;    // 마지막 라운드 — 종반 배신
+    if(idx===N-2 && Math.random()<0.30) return 1;   // 직전 라운드 — 가끔 선제 배신
+    if(n===0) return 1;                             // 라운드1 — 경계의 탐색(먼저 떠봄)
+    const myLast = this.myHist[n-1];
+    if(myLast===1){                                  // 직전 배신 → 보복, 대체로 협력적이면 가끔 용서
+      if(betrayRate<0.3 && Math.random()<0.25) return 0;
+      return 1;
+    }
+    return 0;                                        // 협력엔 협력
+  },
+  choose(my){
+    if(this.over) return;
+    this.enable(false);
+    const ai=this.aiDecide();
+    this.myHist.push(my); this.aiHist.push(ai);
+    let dm,da;
+    if(my===0&&ai===0){dm=3;da=3;}
+    else if(my===1&&ai===1){dm=1;da=1;}
+    else if(my===1&&ai===0){dm=5;da=0;}
+    else {dm=0;da=5;}
+    this.me+=dm; this.ai+=da; this.round++;
+    const E=m=>m===0?'🤝':'🔪';
+    $('tr-myshow').textContent=E(my); $('tr-aishow').textContent=E(ai);
+    $('tr-myshow').style.background = dm>=da?'#1d3324':'#33201f';
+    $('tr-aishow').style.background = da>=dm?'#1d3324':'#33201f';
+    let verdict;
+    if(my===0&&ai===0) verdict='서로 신뢰 — 둘 다 +3';
+    else if(my===1&&ai===1) verdict='서로 배신 — 둘 다 +1';
+    else if(my===1&&ai===0) verdict='내가 뒤통수! +5 (AI 0)';
+    else verdict='AI에게 당했다… AI +5 (나 0)';
+    $('tr-log').innerHTML=`나 ${E(my)} · AI ${E(ai)} → <b>${verdict}</b>`;
+    this.hist.push({my,ai,dm,da});
+    this.renderHist(); this.update();
+    if(this.round>=this.ROUNDS){ setTimeout(()=>this.finish(),550); return; }
+    setTimeout(()=>{
+      if(this.over) return;
+      $('tr-myshow').style.background='var(--panel2)'; $('tr-aishow').style.background='var(--panel2)';
+      $('tr-myshow').textContent='❔'; $('tr-aishow').textContent='❔';
+      this.enable(true);
+    }, 900);
+  },
+  renderHist(){
+    const E=m=>m===0?'🤝':'🔪';
+    $('tr-hist').innerHTML = this.hist.length
+      ? this.hist.map((h,i)=>`<div><span class="who">R${i+1}</span> 나 ${E(h.my)} · AI ${E(h.ai)} <span class="r">+${h.dm}/+${h.da}</span></div>`).join('')
+      : '<div class="hint">라운드 기록이 여기에 표시됩니다.</div>';
+  },
+  finish(){
+    this.over=true; this.enable(false);
+    let cls,txt;
+    if(this.me>this.ai){cls='win';txt='🏆 승리';}
+    else if(this.me<this.ai){cls='lose';txt='💀 패배';}
+    else {cls='draw';txt='무승부';}
+    $('tr-result').innerHTML=`<div class="result-banner ${cls}">${txt} · ${this.me} : ${this.ai}</div>
+      <div class="center"><button class="btn gold" onclick="TR.start()">다시 도전</button></div>`;
+  }
+};
+</script>
+</body>
+</html>

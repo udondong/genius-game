@@ -7,27 +7,28 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="THE GENIUS">
-<meta name="theme-color" content="#08080b">
+<meta name="theme-color" content="#000000">
 <meta name="format-detection" content="telephone=no">
 <title>THE GENIUS — 두뇌 게임</title>
 <style>
   :root{
-    --bg:#08080b; --bg-glow:#16131e; --panel:#15151c; --panel2:#1e1e29; --panel3:#26262f;
-    --gold:#c9a23f; --gold2:#edcf78; --gold3:#f6e7ad; --goldsoft:#8a7228; --golddeep:#3c3012;
-    --ink:#efe9da; --muted:#928d82; --line:#2c2c37; --line2:#3a3a48;
-    --win:#62b87e; --lose:#cf6464; --tie:#8090a6;
+    /* iOS 다크 베이스 (나라가족 공통 디자인) */
+    --bg:#000; --bg-glow:#0e0e12; --panel:#1c1c1e; --panel2:#2c2c2e; --panel3:#3a3a3c;
+    /* 골드 액센트 (THE GENIUS 브랜드) */
+    --gold:#d6b24a; --gold2:#edcf78; --gold3:#f6e7ad; --goldsoft:#8a7228; --golddeep:#3c3012;
+    --ink:#fff; --muted:rgba(235,235,245,.60); --line:rgba(235,235,245,.16); --line2:rgba(235,235,245,.28);
+    --win:#30d158; --lose:#ff453a; --tie:#8e8e93;
     --black-tile:#191920; --white-tile:#ece7d8;
     --gold-grad:linear-gradient(135deg,var(--gold3),var(--gold2) 42%,var(--gold) 72%,var(--goldsoft));
     --shadow:0 18px 48px rgba(0,0,0,.5);
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;
     touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   html,body{margin:0;padding:0;color:var(--ink);overflow-x:hidden;max-width:100%;
-    font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;}
+    font-family:-apple-system,"SF Pro Display","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;}
   body{min-height:100vh;
     background:
-      radial-gradient(1100px 760px at 50% -8%, var(--bg-glow) 0%, transparent 58%),
-      radial-gradient(820px 560px at 92% 108%, #100f17 0%, transparent 55%),
+      radial-gradient(1100px 720px at 50% -10%, var(--bg-glow) 0%, transparent 60%),
       var(--bg);
     background-repeat:no-repeat;}
   .wrap{max-width:760px;margin:0 auto;
@@ -56,7 +57,7 @@
     background:
       radial-gradient(135% 95% at 50% -25%, rgba(237,207,120,.07), transparent 56%),
       linear-gradient(158deg,var(--panel2),var(--panel) 72%);
-    border:1px solid var(--line);border-radius:16px;padding:20px 18px;cursor:pointer;overflow:hidden;
+    border:1px solid var(--line);border-radius:18px;padding:20px 18px;cursor:pointer;overflow:hidden;
     transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
     box-shadow:0 4px 14px rgba(0,0,0,.28);}
   .card::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;
@@ -75,9 +76,9 @@
   /* ---------- Common game UI ---------- */
   .topbar{display:flex;align-items:center;justify-content:space-between;
     margin-bottom:14px;gap:10px;}
-  .btn{background:linear-gradient(180deg,var(--panel3),var(--panel2));border:1px solid var(--line2);color:var(--ink);
-    padding:9px 14px;border-radius:10px;font-size:14px;cursor:pointer;transition:.15s;
-    font-family:inherit;box-shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 2px 6px rgba(0,0,0,.25);}
+  .btn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:10px 16px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:.15s;
+    font-family:inherit;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
   .btn:hover{border-color:var(--gold);color:var(--gold2);}
   .btn:active{transform:translateY(1px);}
   .btn.gold{background:var(--gold-grad);color:#241b04;
@@ -92,9 +93,9 @@
     flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     background:linear-gradient(180deg,var(--gold3),var(--gold) 70%);
     -webkit-background-clip:text;background-clip:text;color:transparent;}
-  .panel{background:linear-gradient(180deg,var(--panel),#111118);border:1px solid var(--line);border-radius:14px;
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;
     padding:16px;margin-bottom:14px;
-    box-shadow:0 8px 24px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.025);}
+    box-shadow:0 8px 24px rgba(0,0,0,.3);}
   .score-row{display:flex;justify-content:space-around;text-align:center;}
   .score-box{flex:1;}
   .score-box .lbl{font-size:12px;color:var(--muted);letter-spacing:.1em;}
@@ -373,6 +374,57 @@
   .simon-pad button:hover{border-color:var(--gold);}
   .simon-wait{grid-column:1/-1;background:#1a1a22;}
 
+  /* 사목 (Connect Four) */
+  .c4-cols{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%;max-width:420px;margin:0 auto 6px;}
+  .c4-drop{padding:7px 0;border-radius:8px;border:1px solid var(--line);background:var(--panel2);
+    color:var(--gold2);cursor:pointer;font-weight:800;font-size:15px;font-family:inherit;}
+  .c4-drop:hover:not(:disabled){border-color:var(--gold);}
+  .c4-drop:disabled{opacity:.3;cursor:not-allowed;}
+  .c4-wrap{display:block;width:100%;max-width:420px;margin:0 auto;background:#0a3d91;
+    padding:8px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .c4-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;width:100%;}
+  .c4-cell{aspect-ratio:1/1;border-radius:50%;background:#070a12;display:flex;
+    align-items:center;justify-content:center;}
+  .c4-disc{width:84%;height:84%;border-radius:50%;}
+  .c4-disc.p{background:radial-gradient(circle at 35% 30%,#ff8079,#d63b30);}
+  .c4-disc.a{background:radial-gradient(circle at 35% 30%,#ffe488,#e6b800);}
+  .c4-disc.last{box-shadow:0 0 0 3px var(--gold),0 0 10px rgba(214,178,74,.6);}
+
+  /* 오델로 (Reversi) */
+  .oth-wrap{display:block;width:100%;max-width:392px;margin:0 auto;background:#1c7a3c;
+    padding:7px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+  .oth-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;width:100%;}
+  .oth-cell{aspect-ratio:1/1;background:#159540;border-radius:4px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;position:relative;}
+  .oth-disc{width:80%;height:80%;border-radius:50%;}
+  .oth-disc.b{background:radial-gradient(circle at 35% 30%,#5a5a5a,#000);}
+  .oth-disc.w{background:radial-gradient(circle at 35% 30%,#fff,#cfcfcf);}
+  .oth-disc.last{box-shadow:0 0 0 2px var(--gold);}
+  .oth-cell.can::after{content:"";width:24%;height:24%;border-radius:50%;background:rgba(255,255,255,.4);}
+  .oth-score{display:flex;justify-content:center;gap:22px;margin:8px 0;font-weight:800;}
+  .oth-score .b i,.oth-score .w i{display:inline-block;width:15px;height:15px;border-radius:50%;
+    margin-right:6px;vertical-align:middle;}
+  .oth-score .b i{background:radial-gradient(circle at 35% 30%,#5a5a5a,#000);}
+  .oth-score .w i{background:radial-gradient(circle at 35% 30%,#fff,#cfcfcf);}
+
+  /* 라이어 다이스 */
+  .liar-dice{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:6px 0;}
+  .die{width:46px;height:46px;border-radius:10px;background:#f2f2f7;color:#16161c;
+    display:flex;align-items:center;justify-content:center;font-size:34px;line-height:1;
+    box-shadow:0 2px 5px rgba(0,0,0,.35);}
+  .die.hidden{background:repeating-linear-gradient(45deg,#2a2a32,#2a2a32 6px,#1c1c24 6px,#1c1c24 12px);
+    color:var(--gold);font-size:22px;}
+  .die.sm{width:30px;height:30px;font-size:22px;border-radius:7px;}
+  .die.hit{background:#ffe488;box-shadow:0 0 0 2px var(--gold);}
+  .bid-display{font-size:21px;font-weight:800;color:var(--gold2);text-align:center;margin:8px 0;min-height:28px;}
+  .liar-sel{display:flex;gap:18px;justify-content:center;align-items:center;flex-wrap:wrap;margin:10px 0;}
+  .liar-step{display:flex;align-items:center;gap:8px;}
+  .liar-step .lbl{font-size:12px;color:var(--muted);}
+  .liar-step button{width:36px;height:36px;border-radius:9px;border:1px solid var(--line2);
+    background:var(--panel2);color:var(--ink);font-size:20px;cursor:pointer;font-family:inherit;}
+  .liar-step button:active{transform:translateY(1px);}
+  .liar-step .v{min-width:40px;text-align:center;font-size:26px;font-weight:800;color:var(--gold2);}
+
   /* ===== 초소형 화면(≤360px: iPhone mini/SE·구형) 대응 ===== */
   @media(max-width:360px){
     .brand .en{font-size:30px;letter-spacing:.1em;text-indent:.1em;}
@@ -448,26 +500,33 @@
         <h3>신뢰 게임</h3>
         <p>매 라운드 협력·배신을 동시에 선택. 둘 다 협력하면 같이 이득, 혼자 배신하면 크게 한탕. 신뢰를 쌓다 막판 배신 타이밍을 노리는 10라운드 심리전.</p>
       </div>
+      <div class="card" onclick="Game.open('liar')">
+        <div class="badge">다인·블러프</div>
+        <div class="ico">🎲</div>
+        <div class="num">GAME 08</div>
+        <h3>라이어 다이스</h3>
+        <p>각자 주사위 5개를 가리고, 전체 주사위 중 특정 눈의 개수를 부풀려 부릅니다. 허풍이다 싶으면 "거짓말!"을 외쳐 까보기. AI 3명과의 블러핑 서바이벌.</p>
+      </div>
 
       <div class="cat-label">② 추리</div>
       <div class="card" onclick="Game.open('dv')">
         <div class="badge">추리</div>
         <div class="ico">🔢</div>
-        <div class="num">GAME 08</div>
+        <div class="num">GAME 09</div>
         <h3>다빈치코드</h3>
         <p>오름차순으로 숨겨진 상대의 흑백 숫자 타일을 추리해 모두 공개시키면 승리.</p>
       </div>
       <div class="card" onclick="Game.open('baseball')">
         <div class="badge">추리</div>
         <div class="ico">⚾</div>
-        <div class="num">GAME 09</div>
+        <div class="num">GAME 10</div>
         <h3>숫자 야구</h3>
         <p>서로 세 자리 비밀번호(중복 없는 숫자)를 정하고, 스트라이크·볼 힌트로 상대 숫자를 먼저 추리하면 승리.</p>
       </div>
       <div class="card" onclick="Game.open('updown')">
         <div class="badge">추리</div>
         <div class="ico">🔼🔽</div>
-        <div class="num">GAME 10</div>
+        <div class="num">GAME 11</div>
         <h3>업·다운 레이스</h3>
         <p>1~50 사이 서로의 비밀수를 업/다운 힌트만으로 추리. 더 적은 횟수로 상대 수를 먼저 맞히면 승리.</p>
       </div>
@@ -476,65 +535,79 @@
       <div class="card" onclick="Game.open('omok')">
         <div class="badge">전략</div>
         <div class="ico">⬤</div>
-        <div class="num">GAME 11</div>
+        <div class="num">GAME 12</div>
         <h3>오목</h3>
         <p>가로·세로·대각선으로 돌 다섯 개를 먼저 잇는 사람이 승리. 위협을 읽는 AI와의 수읽기 대결.</p>
       </div>
       <div class="card" onclick="Game.open('ttt')">
         <div class="badge">전략</div>
         <div class="ico">❌⭕</div>
-        <div class="num">GAME 12</div>
+        <div class="num">GAME 13</div>
         <h3>틱택토</h3>
         <p>3×3 칸에 번갈아 두어 한 줄(가로·세로·대각선) 3개를 먼저 잇는 게임. 두 방향 동시 위협(더블)으로 AI의 빈틈을 노리세요.</p>
       </div>
       <div class="card" onclick="Game.open('nim')">
         <div class="badge">수학전략</div>
         <div class="ico">🪨</div>
-        <div class="num">GAME 13</div>
+        <div class="num">GAME 14</div>
         <h3>돌 가져가기</h3>
         <p>한 번에 1~3개씩 돌을 가져가고, 마지막 돌을 가져가면 승리. 최적 전략으로 두는 AI를 이겨보세요.</p>
       </div>
       <div class="card" onclick="Game.open('jg')">
         <div class="badge">보드</div>
         <div class="ico">將</div>
-        <div class="num">GAME 14</div>
+        <div class="num">GAME 15</div>
         <h3>장기</h3>
         <p>한국 장기 한 판. 차·포·마·상·사·졸을 움직여 상대 궁(왕)을 잡으면 승리. AI 대국.</p>
       </div>
       <div class="card" onclick="Game.open('mj')">
         <div class="badge">미니보드</div>
         <div class="ico">🐯</div>
-        <div class="num">GAME 15</div>
+        <div class="num">GAME 16</div>
         <h3>십이장기</h3>
         <p>3×4 동물 장기. 호랑이·곰·토끼·병아리를 움직이고 잡은 말을 다시 둔다. 호랑이를 잡거나, 끝줄에 올려 한 턴 버티면 승리.</p>
+      </div>
+      <div class="card" onclick="Game.open('c4')">
+        <div class="badge">전략</div>
+        <div class="ico">🔴🟡</div>
+        <div class="num">GAME 17</div>
+        <h3>사목</h3>
+        <p>일곱 칸 보드에 번갈아 칩을 떨어뜨려 가로·세로·대각선으로 <b>4개</b>를 먼저 잇는 사람이 승리. 수읽기 AI와의 한 수 싸움.</p>
+      </div>
+      <div class="card" onclick="Game.open('oth')">
+        <div class="badge">보드</div>
+        <div class="ico">⚪⚫</div>
+        <div class="num">GAME 18</div>
+        <h3>오델로</h3>
+        <p>8×8 판에서 상대 돌을 양쪽으로 감싸 뒤집기. 모서리를 노리는 AI와 겨뤄, 끝에 더 많은 돌을 차지하면 승리.</p>
       </div>
 
       <div class="cat-label">④ 전략 · 다인전</div>
       <div class="card" onclick="Game.open('minor')">
         <div class="badge">다인·생존</div>
         <div class="ico">⚖️</div>
-        <div class="num">GAME 16</div>
+        <div class="num">GAME 19</div>
         <h3>소수결 게임</h3>
         <p>모두가 A·B 중 하나를 고르면, 사람이 더 적은 쪽만 생존. 군중 심리를 거슬러야 사는 7인 서바이벌.</p>
       </div>
       <div class="card" onclick="Game.open('auction')">
         <div class="badge">다인·전략</div>
         <div class="ico">🔨</div>
-        <div class="num">GAME 17</div>
+        <div class="num">GAME 20</div>
         <h3>경매 게임</h3>
         <p>한정된 예산으로 점수 카드를 입찰. 최고가만 낙찰되고 예산은 소모됩니다. 가장 많은 점수를 모으세요.</p>
       </div>
       <div class="card" onclick="Game.open('uniq')">
         <div class="badge">다인·생존</div>
         <div class="ico">🎯</div>
-        <div class="num">GAME 18</div>
+        <div class="num">GAME 21</div>
         <h3>중복 회피</h3>
         <p>각자 숫자를 하나 고르고, 같은 숫자를 낸 사람끼리 동반 탈락. 나만의 숫자를 골라 끝까지 살아남기.</p>
       </div>
       <div class="card" onclick="Game.open('rpst')">
         <div class="badge">다인·토너먼트</div>
         <div class="ico">🏆</div>
-        <div class="num">GAME 19</div>
+        <div class="num">GAME 22</div>
         <h3>가위바위보 토너먼트</h3>
         <p>8인 단판 토너먼트(피의게임식). 3판 2선승으로 매치를 이겨 올라가 최종 우승을 차지하세요.</p>
       </div>
@@ -543,14 +616,14 @@
       <div class="card" onclick="Game.open('react')">
         <div class="badge">순발력</div>
         <div class="ico">⚡</div>
-        <div class="num">GAME 20</div>
+        <div class="num">GAME 23</div>
         <h3>369 · 같은 숫자</h3>
         <p>3·6·9에서 박수치는 369 게임과, 같은 숫자를 빠르게 찾는 순발력 게임 모음.</p>
       </div>
       <div class="card" onclick="Game.open('simon')">
         <div class="badge">순발력</div>
         <div class="ico">🙊</div>
-        <div class="num">GAME 21</div>
+        <div class="num">GAME 24</div>
         <h3>가라사대</h3>
         <p>"가라사대"가 붙은 명령만 따르기. 안 붙은 명령에 반응하면 실수. 함정 명령을 피해 끝까지 버티세요.</p>
       </div>
@@ -1395,6 +1468,83 @@
     <div id="sm-result"></div>
   </section>
 
+  <!-- ============ 라이어 다이스 ============ -->
+  <section id="liar" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">라이어 다이스</div>
+      <button class="btn sm" onclick="LIAR.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <span class="goal">목표</span> — 모두가 주사위 5개를 가린 채, <b>전체 주사위 중 ○○눈이 △개 이상 있다</b>고 베팅합니다. 거짓 같으면 "거짓말!"로 까보기. 주사위를 모두 잃으면 탈락, 최후의 1인이 승리.
+        <ul>
+          <li><span class="k">베팅</span> 앞사람보다 <b>개수를 올리거나</b>, 같은 개수면 <b>더 높은 눈</b>으로 올려 부릅니다.</li>
+          <li><span class="k">거짓말</span> 외치면 모든 주사위를 공개해 그 눈의 실제 개수를 셉니다. 베팅이 사실이면 외친 사람이, 거짓이면 베팅한 사람이 주사위 1개를 잃습니다.</li>
+          <li><span class="k">팁</span> 내 주사위 + 남은 주사위 평균(1/6)으로 확률을 가늠하세요. 가끔은 허풍도 무기입니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="hint center" id="liar-status">새 게임을 시작하세요.</div>
+      <div id="liar-seats" class="seats"></div>
+      <div class="bid-display" id="liar-bid">현재 베팅: 없음</div>
+      <div class="center"><div class="slot-label">내 주사위</div><div class="liar-dice" id="liar-mydice"></div></div>
+      <div id="liar-controls" class="center" style="margin-top:8px;"></div>
+    </div>
+    <div id="liar-result"></div>
+  </section>
+
+  <!-- ============ 사목 (Connect Four) ============ -->
+  <section id="c4" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">사목</div>
+      <button class="btn sm" onclick="C4.start()">↻ 새 판</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <span class="goal">목표</span> — 7칸 보드의 열에 칩을 떨어뜨려 <b>가로·세로·대각선 4개</b>를 먼저 잇기. 당신은 <b style="color:#e8504e">빨강</b>, AI는 <b style="color:#e6b800">노랑</b>.
+        <ul>
+          <li><span class="k">진행</span> 열 위의 <b>▼</b> 버튼을 누르면 칩이 바닥부터 쌓입니다. 선공은 무작위.</li>
+          <li><span class="k">전략</span> 한 수로 두 방향을 동시에 노리는 '더블 위협'을 만들면 AI가 한 곳밖에 못 막습니다.</li>
+          <li><span class="k">AI</span> 여러 수 앞을 읽어 즉승·방어를 챙깁니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="c4-status">새 판을 시작하세요.</div>
+      <div id="c4-cols" class="c4-cols" style="margin-top:12px;"></div>
+      <div id="c4-board"></div>
+    </div>
+    <div id="c4-result"></div>
+  </section>
+
+  <!-- ============ 오델로 (Reversi) ============ -->
+  <section id="oth" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">오델로</div>
+      <button class="btn sm" onclick="OTH.start()">↻ 새 판</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <span class="goal">목표</span> — 상대 돌을 내 돌 두 개로 <b>양 끝에서 감싸면</b> 그 사이 돌이 모두 내 색으로 뒤집힙니다. 마지막에 돌이 더 많은 쪽이 승리.
+        <ul>
+          <li><span class="k">놓기</span> 한 개 이상 뒤집을 수 있는 칸(흐린 점 표시)에만 둘 수 있습니다.</li>
+          <li><span class="k">패스</span> 둘 곳이 없으면 자동으로 넘어갑니다.</li>
+          <li><span class="k">전략</span> <b>모서리</b>는 뒤집히지 않아 가장 강력합니다. 모서리 바로 옆 칸은 피하세요.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel center">
+      <div class="hint" id="oth-status">새 판을 시작하세요.</div>
+      <div class="oth-score" id="oth-score"></div>
+      <div id="oth-board" style="margin-top:6px;"></div>
+    </div>
+    <div id="oth-result"></div>
+  </section>
+
 </div>
 
 <script>
@@ -1429,6 +1579,9 @@ const Game = {
     if(id==='uniq') UQ.start();
     if(id==='rpst') RT.start();
     if(id==='simon') SM.start();
+    if(id==='liar') LIAR.start();
+    if(id==='c4') C4.start();
+    if(id==='oth') OTH.start();
   },
   show(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -1740,7 +1893,7 @@ const RPS = {
   async go(){
     if(this.sel===null||this.over) return;
     $('rps-go').disabled=true;
-    const bet=Math.min(+$('rps-bet').value, this.me);
+    const bet=Math.max(1, Math.min(+$('rps-bet').value||1, this.me));
     const my=this.sel; const ai=this.aiPick(); this.myHist.push(my);
     $('rps-myshow').textContent='✊'; $('rps-aishow').textContent='✊';
     // little shake
@@ -2178,8 +2331,14 @@ const TTT = (function(){
     ai(){
       if(this.over) return;
       const P=Game.p();
-      let mv = (Math.random()<P.tttErr)? randMove(this.b) : bestMove(this.b);
-      if(mv<0) mv=randMove(this.b);
+      const empties=[]; for(let i=0;i<9;i++) if(this.b[i]===0) empties.push(i);
+      // 즉시 이기는 수는 항상 둔다
+      let mv=empties.find(i=>{ this.b[i]=2; const w=win(this.b,2); this.b[i]=0; return w; });
+      // 상대의 즉시 승리는 항상 막는다
+      if(mv==null) mv=empties.find(i=>{ this.b[i]=1; const w=win(this.b,1); this.b[i]=0; return w; });
+      // 그 외에서만 가끔 실수, 평소엔 최적수
+      if(mv==null) mv = (Math.random()<P.tttErr)? randMove(this.b) : bestMove(this.b);
+      if(mv==null||mv<0) mv=randMove(this.b);
       if(mv>=0) this.b[mv]=2;
       this.render(); this.busy=false;
       if(win(this.b,2)){ this.finish('lose'); return; }
@@ -2730,9 +2889,14 @@ const IP = {
       al.forEach(i=>{ this.chips[i]+=this.contrib[i]; });
       msg='모두 다이 — 앤티를 돌려받았습니다.';
     } else {
-      let w=stayers[0]; stayers.forEach(i=>{ if(this.cards[i]>this.cards[w]) w=i; });
-      this.chips[w]+=this.pot;
-      msg=`${this.names[w]} 승리! (카드 ${this.cards[w]}) 팟 ${this.pot}칩 획득.`;
+      const top=Math.max(...stayers.map(i=>this.cards[i]));
+      const winners=stayers.filter(i=>this.cards[i]===top);
+      const share=Math.floor(this.pot/winners.length);
+      winners.forEach(i=>{ this.chips[i]+=share; });
+      this.chips[winners[rand(winners.length)]] += this.pot - share*winners.length;  // 나머지 칩 보정
+      msg = winners.length>1
+        ? `동점 분할! ${winners.map(i=>this.names[i]).join(', ')} (카드 ${top}) — 각 ${share}칩`
+        : `${this.names[winners[0]]} 승리! (카드 ${top}) 팟 ${this.pot}칩 획득.`;
     }
     [0,1,2,3].forEach(i=>{ if(this.alive[i] && this.chips[i]<=0) this.alive[i]=false; });
     $('ip-pot').textContent=this.pot; this.render(); $('ip-log').innerHTML=msg;
@@ -2779,7 +2943,7 @@ const BEAN = {
   names:['나','AI 가','AI 나','AI 다'],
   start(){
     this.lives=[3,3,3,3]; this.alive=[true,true,true,true];
-    this.startPos=0; this.over=false; this.reveal=false;
+    this.startPos=rand(4); this.over=false; this.reveal=false;   // 첫 발언자 무작위(선 무작위)
     $('bean-result').innerHTML='';
     $('bean-log').innerHTML='주먹에 콩 0~3개를 숨기고, 전체 콩 합을 맞히세요.';
     this.newRound();
@@ -3166,7 +3330,7 @@ const AC = {
   },
   aiBid(i,v){
     if(v<=0) return 0;
-    let b=Math.round(v*(0.6+Math.random()*0.7));
+    let b=Math.round(v*(0.6+Math.random()*0.5));
     return Math.max(0,Math.min(b,this.budget[i]));
   },
   finish(){
@@ -3478,6 +3642,340 @@ const TR = {
       <div class="center"><button class="btn gold" onclick="TR.start()">다시 도전</button></div>`;
   }
 };
+
+/* =====================================================================
+   GAME 08 — 라이어 다이스 (Liar's Dice) · 4인 블러핑
+   각 주사위 5개를 가리고 "전체 ○눈 △개 이상" 베팅. 못 믿으면 거짓말 콜.
+   ===================================================================== */
+const LIAR = (function(){
+  const FACE=['','⚀','⚁','⚂','⚃','⚄','⚅'];
+  function choose(n,k){ if(k<0||k>n) return 0; let r=1; for(let i=0;i<k;i++) r=r*(n-i)/(i+1); return r; }
+  function atLeast(k,n,p){ if(k<=0) return 1; let s=0; for(let i=k;i<=n;i++) s+=choose(n,i)*Math.pow(p,i)*Math.pow(1-p,n-i); return s; }
+  return {
+    names:['나','AI 갑','AI 을','AI 병'],
+    dice:[], alive:[], bid:null, turn:0, reveal:false, over:false, lastBidder:-1, starter:0, _q:null, _f:null,
+    start(){
+      this.dice=[[],[],[],[]]; this.alive=[true,true,true,true]; this.over=false;
+      $('liar-result').innerHTML='';
+      this.starter=rand(4);
+      this.newRound();
+    },
+    aliveIdx(){ return [0,1,2,3].filter(i=>this.alive[i]); },
+    totalDice(){ return this.aliveIdx().reduce((s,i)=>s+this.dice[i].length,0); },
+    nextAlive(i){ let j=i; do{ j=(j+1)%4; }while(!this.alive[j]); return j; },
+    newRound(){
+      if(this.over) return;
+      if(this.aliveIdx().length<=1){ this.finish(); return; }
+      [0,1,2,3].forEach(i=>{ if(!this.alive[i]){ this.dice[i]=[]; return; }
+        const cnt=this.dice[i].length||5; const d=[]; for(let k=0;k<cnt;k++) d.push(1+rand(6)); this.dice[i]=d; });
+      this.bid=null; this.reveal=false; this.lastBidder=-1; this._q=null; this._f=null;
+      if(!this.alive[this.starter]) this.starter=this.nextAlive(this.starter);
+      this.turn=this.starter;
+      $('liar-bid').textContent='현재 베팅: 없음';
+      this.render(); this.step();
+    },
+    step(){
+      if(this.over) return;
+      if(this.turn===0){ this._q=null; this._f=null; this.renderControls();
+        $('liar-status').innerHTML=this.bid?'당신 차례 — 더 높게 베팅하거나 "거짓말!"을 외치세요.':'당신 차례 — 첫 베팅을 하세요.'; }
+      else { $('liar-controls').innerHTML=''; $('liar-status').innerHTML=`${this.names[this.turn]}의 차례...`;
+        setTimeout(()=>this.aiTurn(),900); }
+      this.render();
+    },
+    beats(nb,cur){ if(nb.f<1||nb.f>6||nb.q<1) return false; if(!cur) return true; return nb.q>cur.q||(nb.q===cur.q&&nb.f>cur.f); },
+    placeBid(q,f){
+      this.bid={q,f}; this.lastBidder=this.turn;
+      $('liar-bid').innerHTML=`현재 베팅: <b>${this.names[this.turn]}</b> — ${FACE[f]} ${q}개 이상`;
+      this.turn=this.nextAlive(this.turn);
+      this.step();
+    },
+    myBid(){
+      const q=this._q,f=this._f;
+      if(!this.beats({q,f},this.bid)){ $('liar-status').innerHTML='⚠️ 앞 베팅보다 높게(개수↑ 또는 같은 개수면 눈↑) 불러야 합니다.'; return; }
+      if(q>this.totalDice()){ $('liar-status').innerHTML='⚠️ 전체 주사위 수보다 많이 부를 수 없습니다.'; return; }
+      $('liar-controls').innerHTML=''; this.placeBid(q,f);
+    },
+    callLiar(){ if(!this.bid) return; $('liar-controls').innerHTML=''; this.resolve(0); },
+    aiTurn(){
+      if(this.over) return;
+      const me=this.turn, myd=this.dice[me], total=this.totalDice(), unknown=total-myd.length;
+      if(this.bid){
+        const own=myd.filter(x=>x===this.bid.f).length;
+        const pTrue=atLeast(this.bid.q-own,unknown,1/6);
+        let cP = pTrue<0.18?0.92 : pTrue<0.34?0.55 : pTrue<0.5?0.18 : 0.04;
+        if(this.bid.q>=total) cP=0.97;
+        if(Math.random()<cP){ this.resolve(me); return; }
+      }
+      const cnt=[0,0,0,0,0,0,0]; myd.forEach(x=>cnt[x]++);
+      let bf=1; for(let f=2;f<=6;f++) if(cnt[f]>cnt[bf]||(cnt[f]===cnt[bf]&&Math.random()<0.3)) bf=f;
+      let estQ=cnt[bf]+Math.round(unknown/6);
+      if(Math.random()<0.22) estQ+=1;
+      let nb;
+      if(!this.bid) nb={q:Math.max(1,estQ),f:bf};
+      else if(bf>this.bid.f && estQ>=this.bid.q) nb={q:Math.max(estQ,this.bid.q),f:bf};
+      else if(estQ>this.bid.q) nb={q:estQ,f:bf};
+      else nb={q:this.bid.q+1,f:bf};
+      if(nb.q>total){ if(this.bid){ this.resolve(me); return; } nb.q=total; }
+      this.placeBid(nb.q,nb.f);
+    },
+    resolve(challenger){
+      this.reveal=true;
+      const bidder=this.lastBidder, f=this.bid.f, q=this.bid.q;
+      let actual=0; this.aliveIdx().forEach(i=>{ actual+=this.dice[i].filter(x=>x===f).length; });
+      const bidTrue=actual>=q, loser=bidTrue?challenger:bidder;
+      let msg=`"거짓말!" — ${FACE[f]} 실제 <b>${actual}개</b> (베팅 ${q}개). `;
+      msg += bidTrue ? `베팅 적중 → 도전한 ${this.names[challenger]}가 주사위 1개를 잃습니다.`
+                     : `허풍! → ${this.names[bidder]}가 주사위 1개를 잃습니다.`;
+      this.dice[loser].pop();
+      if(this.dice[loser].length===0){ this.alive[loser]=false; msg+=` ${this.names[loser]} 탈락!`; }
+      $('liar-status').innerHTML=msg; $('liar-bid').textContent='';
+      this.render();
+      if(!this.alive[0] || this.aliveIdx().length<=1){ this.finish(); return; }
+      this.starter = this.alive[loser]?loser:this.nextAlive(loser);
+      $('liar-controls').innerHTML='<button class="btn gold" onclick="LIAR.newRound()">다음 라운드</button>';
+    },
+    renderControls(){
+      if(this._q==null||this._f==null){
+        if(!this.bid){ this._q=1; this._f=1; }
+        else if(this.bid.f<6){ this._q=this.bid.q; this._f=this.bid.f+1; }
+        else { this._q=this.bid.q+1; this._f=1; }
+      }
+      const maxq=this.totalDice();
+      if(this._q>maxq) this._q=maxq; if(this._q<1) this._q=1;
+      let h='<div class="liar-sel">';
+      h+=`<div class="liar-step"><span class="lbl">개수</span><button onclick="LIAR.adj('q',-1)">−</button><span class="v">${this._q}</span><button onclick="LIAR.adj('q',1)">+</button></div>`;
+      h+=`<div class="liar-step"><span class="lbl">눈</span><button onclick="LIAR.adj('f',-1)">−</button><span class="v" style="font-size:30px;">${FACE[this._f]}</span><button onclick="LIAR.adj('f',1)">+</button></div>`;
+      h+='</div><div class="center">';
+      h+='<button class="btn gold" onclick="LIAR.myBid()">베팅</button> ';
+      h+=`<button class="btn" onclick="LIAR.callLiar()" ${this.bid?'':'disabled'}>거짓말!</button></div>`;
+      $('liar-controls').innerHTML=h;
+    },
+    adj(k,d){
+      if(k==='q') this._q=Math.max(1,Math.min(this.totalDice(),(this._q||1)+d));
+      else { let f=(this._f||1)+d; if(f<1)f=6; if(f>6)f=1; this._f=f; }
+      this.renderControls();
+    },
+    render(){
+      const wrap=$('liar-seats'); wrap.innerHTML='';
+      [0,1,2,3].forEach(i=>{
+        const s=document.createElement('div');
+        s.className='seat'+(i===0?' me':'')+(!this.alive[i]?' out':'')+(this.turn===i&&!this.over&&this.alive[i]?' turn':'');
+        let body;
+        if(!this.alive[i]) body='<div class="st">탈락</div>';
+        else if(this.reveal) body='<div class="liar-dice">'+this.dice[i].map(x=>`<div class="die sm${this.bid&&x===this.bid.f?' hit':''}">${FACE[x]}</div>`).join('')+'</div>';
+        else body=`<div class="st">🎲 ${this.dice[i].length}개</div>`;
+        s.innerHTML=`<div class="nm${i===0?' me':''}">${this.names[i]}</div>${body}`;
+        wrap.appendChild(s);
+      });
+      const md=$('liar-mydice');
+      if(this.alive[0]) md.innerHTML=this.dice[0].map(x=>`<div class="die${this.reveal&&this.bid&&x===this.bid.f?' hit':''}">${FACE[x]}</div>`).join('');
+      else md.innerHTML='<span class="hint">탈락했습니다</span>';
+    },
+    finish(){
+      this.over=true; this.reveal=true; this.render(); $('liar-controls').innerHTML='';
+      const al=this.aliveIdx(); let cls,txt;
+      if(this.alive[0]&&al.length===1){cls='win';txt='🏆 최후의 1인 — 승리!';}
+      else if(!this.alive[0]){cls='lose';txt='💀 주사위를 모두 잃었습니다 — 패배';}
+      else {cls='draw';txt='게임 종료';}
+      $('liar-status').textContent='게임 종료';
+      $('liar-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="LIAR.start()">다시 도전</button></div>`;
+    }
+  };
+})();
+
+/* =====================================================================
+   GAME 17 — 사목 (Connect Four, 가로·세로·대각 4목) · 1대1
+   negamax + 알파베타(깊이 5) + 즉승·방어 우선. 사람=빨강(1), AI=노랑(2).
+   ===================================================================== */
+const C4 = (function(){
+  const COLS=7, ROWS=6, DEPTH=5;
+  const ix=(r,c)=>r*COLS+c;
+  const DIRS=[[0,1],[1,0],[1,1],[1,-1]];
+  function dropRow(b,c){ for(let r=ROWS-1;r>=0;r--) if(!b[ix(r,c)]) return r; return -1; }
+  function place(b,c,p){ const r=dropRow(b,c); if(r<0) return -1; b[ix(r,c)]=p; return r; }
+  function winAt(b,r,c){ const p=b[ix(r,c)]; if(!p) return false;
+    for(const [dr,dc] of DIRS){ let cnt=1;
+      for(let s=1;s<4;s++){ const nr=r+dr*s,nc=c+dc*s; if(nr<0||nr>=ROWS||nc<0||nc>=COLS||b[ix(nr,nc)]!==p) break; cnt++; }
+      for(let s=1;s<4;s++){ const nr=r-dr*s,nc=c-dc*s; if(nr<0||nr>=ROWS||nc<0||nc>=COLS||b[ix(nr,nc)]!==p) break; cnt++; }
+      if(cnt>=4) return true; }
+    return false; }
+  function anyWin(b,p){ for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) if(b[ix(r,c)]===p&&winAt(b,r,c)) return true; return false; }
+  function validCols(b){ const v=[]; for(let c=0;c<COLS;c++) if(dropRow(b,c)>=0) v.push(c); return v; }
+  function winLineCells(b,p){ for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ if(b[ix(r,c)]!==p) continue;
+    for(const [dr,dc] of DIRS){ const cells=[ix(r,c)]; let ok=true;
+      for(let s=1;s<4;s++){ const nr=r+dr*s,nc=c+dc*s; if(nr<0||nr>=ROWS||nc<0||nc>=COLS||b[ix(nr,nc)]!==p){ok=false;break;} cells.push(ix(nr,nc)); }
+      if(ok) return cells; } } return null; }
+  function windowScore(cells,p){ const o=p===1?2:1; let me=0,op=0,em=0;
+    for(const v of cells){ if(v===p)me++; else if(v===o)op++; else em++; }
+    if(me&&op) return 0;
+    if(me===4) return 100000; if(me===3&&em===1) return 80; if(me===2&&em===2) return 6;
+    if(op===4) return -100000; if(op===3&&em===1) return -100; if(op===2&&em===2) return -6;
+    return 0; }
+  function evaluate(b,p){ let s=0;
+    for(let r=0;r<ROWS;r++){ if(b[ix(r,3)]===p) s+=6; else if(b[ix(r,3)]) s-=6; }
+    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++) for(const [dr,dc] of DIRS){
+      const cells=[]; let ok=true;
+      for(let k=0;k<4;k++){ const nr=r+dr*k,nc=c+dc*k; if(nr<0||nr>=ROWS||nc<0||nc>=COLS){ok=false;break;} cells.push(b[ix(nr,nc)]); }
+      if(ok) s+=windowScore(cells,p); }
+    return s; }
+  function negamax(b,depth,alpha,beta,p){ const o=p===1?2:1;
+    if(anyWin(b,o)) return -100000-depth;
+    const cols=validCols(b);
+    if(!cols.length) return 0;
+    if(depth===0) return evaluate(b,p);
+    cols.sort((x,y)=>Math.abs(3-x)-Math.abs(3-y));
+    let best=-1e9;
+    for(const c of cols){ const nb=b.slice(); place(nb,c,p);
+      const sc=-negamax(nb,depth-1,-beta,-alpha,o);
+      if(sc>best) best=sc; if(best>alpha) alpha=best; if(alpha>=beta) break; }
+    return best; }
+  function aiCol(b){ const cols=validCols(b);
+    for(const c of cols){ const nb=b.slice(); place(nb,c,2); if(anyWin(nb,2)) return c; }
+    for(const c of cols){ const nb=b.slice(); place(nb,c,1); if(anyWin(nb,1)) return c; }
+    const ord=cols.slice().sort((x,y)=>Math.abs(3-x)-Math.abs(3-y));
+    let best=ord[0],bv=-1e9;
+    for(const c of ord){ const nb=b.slice(); place(nb,c,2);
+      const sc=-negamax(nb,DEPTH-1,-1e9,1e9,1);
+      if(sc>bv){bv=sc;best=c;} }
+    return best; }
+  return {
+    b:[], over:false, busy:false, last:-1, winCells:null,
+    start(){
+      this.b=Array(ROWS*COLS).fill(0); this.over=false; this.busy=false; this.last=-1; this.winCells=null;
+      $('c4-result').innerHTML=''; this.render();
+      if(Game.coin()==='ai'){ this.busy=true; $('c4-status').innerHTML='🤖 AI가 선(先) — 노랑이 먼저 둡니다...'; this.render(); setTimeout(()=>this.ai(),420); }
+      else $('c4-status').innerHTML='🙋 당신이 선(先)! 당신은 <b style="color:#e8504e">빨강</b>. 열을 눌러 칩을 떨어뜨리세요.';
+    },
+    render(){
+      const colbar=$('c4-cols'); colbar.innerHTML='';
+      for(let c=0;c<COLS;c++){ const btn=document.createElement('button'); btn.className='c4-drop'; btn.textContent='▼';
+        btn.disabled=this.over||this.busy||dropRow(this.b,c)<0; btn.onclick=()=>this.play(c); colbar.appendChild(btn); }
+      const grid=document.createElement('div'); grid.className='c4-grid';
+      for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){ const v=this.b[ix(r,c)];
+        const cell=document.createElement('div'); cell.className='c4-cell';
+        if(v){ const d=document.createElement('div');
+          d.className='c4-disc '+(v===1?'p':'a')+((ix(r,c)===this.last||(this.winCells&&this.winCells.indexOf(ix(r,c))>=0))?' last':''); cell.appendChild(d); }
+        grid.appendChild(cell); }
+      const box=document.createElement('div'); box.className='c4-wrap'; box.appendChild(grid);
+      const wrap=$('c4-board'); wrap.innerHTML=''; wrap.appendChild(box);
+    },
+    play(c){
+      if(this.over||this.busy||dropRow(this.b,c)<0) return;
+      const r=place(this.b,c,1); this.last=ix(r,c); this.render();
+      if(anyWin(this.b,1)){ this.finish('win'); return; }
+      if(!validCols(this.b).length){ this.finish('draw'); return; }
+      this.busy=true; $('c4-status').textContent='AI(노랑)가 수를 읽는 중...'; this.render();
+      setTimeout(()=>this.ai(),340);
+    },
+    ai(){
+      if(this.over) return;
+      const c=aiCol(this.b); const r=place(this.b,c,2); this.last=ix(r,c); this.busy=false;
+      if(anyWin(this.b,2)){ this.finish('lose'); return; }
+      if(!validCols(this.b).length){ this.finish('draw'); return; }
+      $('c4-status').innerHTML='당신 차례 (<b style="color:#e8504e">빨강</b>).'; this.render();
+    },
+    finish(res){
+      this.over=true; this.busy=false;
+      const w= res==='win'?1: res==='lose'?2: 0;
+      this.winCells = w? winLineCells(this.b,w) : null; this.render();
+      const map={win:['win','🏆 승리 — 4개 완성!'],lose:['lose','💀 패배 — AI가 4개 완성'],draw:['draw','무승부 — 판이 가득 찼습니다']};
+      const [cls,txt]=map[res];
+      $('c4-status').textContent='게임 종료';
+      $('c4-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="C4.start()">다시 도전</button></div>`;
+    }
+  };
+})();
+
+/* =====================================================================
+   GAME 18 — 오델로 (Reversi) · 1대1
+   negamax + 알파베타(깊이 4) + 위치가중치·기동력. 선(先)=흑은 coin으로 배정.
+   ===================================================================== */
+const OTH = (function(){
+  const N=8, DEPTH=4;
+  const ix=(r,c)=>r*N+c; const inb=(r,c)=>r>=0&&r<N&&c>=0&&c<N;
+  const DIRS=[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  function flips(b,mv,p){ if(b[mv]) return []; const r=(mv/N)|0,c=mv%N,o=p===1?2:1; let res=[];
+    for(const [dr,dc] of DIRS){ const line=[]; let nr=r+dr,nc=c+dc;
+      while(inb(nr,nc)&&b[ix(nr,nc)]===o){ line.push(ix(nr,nc)); nr+=dr;nc+=dc; }
+      if(line.length&&inb(nr,nc)&&b[ix(nr,nc)]===p) for(const i of line) res.push(i); }
+    return res; }
+  function legal(b,p){ const m=[]; for(let i=0;i<64;i++) if(!b[i]&&flips(b,i,p).length) m.push(i); return m; }
+  function apply(b,mv,p){ const nb=b.slice(); const fl=flips(b,mv,p); nb[mv]=p; for(const i of fl) nb[i]=p; return nb; }
+  function count(b,p){ let n=0; for(const x of b) if(x===p) n++; return n; }
+  const W=[120,-20,20,5,5,20,-20,120, -20,-40,-5,-5,-5,-5,-40,-20, 20,-5,15,3,3,15,-5,20, 5,-5,3,3,3,3,-5,5, 5,-5,3,3,3,3,-5,5, 20,-5,15,3,3,15,-5,20, -20,-40,-5,-5,-5,-5,-40,-20, 120,-20,20,5,5,20,-20,120];
+  function evalB(b,p){ const o=p===1?2:1; let s=0; for(let i=0;i<64;i++){ if(b[i]===p)s+=W[i]; else if(b[i]===o)s-=W[i]; }
+    s += (legal(b,p).length-legal(b,o).length)*4; return s; }
+  function negamax(b,depth,alpha,beta,p){ const o=p===1?2:1; const my=legal(b,p);
+    if(depth===0) return evalB(b,p);
+    if(!my.length){ if(!legal(b,o).length) return (count(b,p)-count(b,o))*2000;
+      return -negamax(b,depth-1,-beta,-alpha,o); }
+    let best=-1e9;
+    for(const mv of my){ const sc=-negamax(apply(b,mv,p),depth-1,-beta,-alpha,o);
+      if(sc>best)best=sc; if(best>alpha)alpha=best; if(alpha>=beta)break; }
+    return best; }
+  function aiMove(b,p){ const my=legal(b,p); if(!my.length) return -1; const o=p===1?2:1;
+    let best=my[0],bv=-1e9;
+    for(const mv of my){ const sc=-negamax(apply(b,mv,p),DEPTH-1,-1e9,1e9,o);
+      if(sc>bv){bv=sc;best=mv;} } return best; }
+  return {
+    b:[], human:1, ai:2, cur:1, over:false, busy:false, last:-1,
+    start(){
+      this.b=Array(64).fill(0);
+      this.b[ix(3,3)]=2; this.b[ix(3,4)]=1; this.b[ix(4,3)]=1; this.b[ix(4,4)]=2;
+      this.cur=1; this.over=false; this.busy=false; this.last=-1;
+      if(Game.coin()==='me'){ this.human=1; this.ai=2; } else { this.human=2; this.ai=1; }
+      $('oth-result').innerHTML='';
+      $('oth-status').innerHTML = this.human===1?'🙋 당신이 흑(先) — 먼저 둡니다.':'🤖 AI가 흑(先) — AI 먼저. 당신은 백.';
+      this.render(); this.tick();
+    },
+    tick(){
+      if(this.over) return;
+      const my=legal(this.b,this.cur);
+      if(!my.length){
+        if(!legal(this.b,this.cur===1?2:1).length){ this.finish(); return; }
+        const passer=this.cur===this.human?'당신':'AI'; this.cur=this.cur===1?2:1;
+        $('oth-status').innerHTML=`${passer}은 둘 곳이 없어 패스. `+(this.cur===this.human?'당신 차례.':'AI 차례...');
+        this.render(); this.tick(); return;
+      }
+      if(this.cur===this.ai){ this.busy=true; this.render(); setTimeout(()=>this.aiPlay(),500); }
+      else { this.busy=false; $('oth-status').innerHTML=`당신 차례 (${this.human===1?'흑':'백'}) — 흐린 점 칸에 둘 수 있습니다.`; this.render(); }
+    },
+    aiPlay(){
+      if(this.over) return;
+      const mv=aiMove(this.b,this.ai);
+      if(mv<0){ this.busy=false; this.cur=this.human; this.tick(); return; }
+      this.b=apply(this.b,mv,this.ai); this.last=mv; this.busy=false; this.cur=this.human;
+      this.render(); this.tick();
+    },
+    play(mv){
+      if(this.over||this.busy||this.cur!==this.human) return;
+      if(!flips(this.b,mv,this.human).length) return;
+      this.b=apply(this.b,mv,this.human); this.last=mv; this.cur=this.ai;
+      this.render(); this.tick();
+    },
+    render(){
+      const hints=(!this.over&&!this.busy&&this.cur===this.human)?legal(this.b,this.human):[];
+      const grid=document.createElement('div'); grid.className='oth-grid';
+      for(let i=0;i<64;i++){ const v=this.b[i];
+        const cell=document.createElement('div'); cell.className='oth-cell'+(hints.indexOf(i)>=0?' can':'');
+        if(v){ const d=document.createElement('div'); d.className='oth-disc '+(v===1?'b':'w')+(i===this.last?' last':''); cell.appendChild(d); }
+        else if(hints.indexOf(i)>=0) cell.onclick=()=>this.play(i);
+        grid.appendChild(cell); }
+      const box=document.createElement('div'); box.className='oth-wrap'; box.appendChild(grid);
+      const wrap=$('oth-board'); wrap.innerHTML=''; wrap.appendChild(box);
+      $('oth-score').innerHTML=`<span class="b"><i></i>흑 ${count(this.b,1)}</span><span class="w"><i></i>백 ${count(this.b,2)}</span>`;
+    },
+    finish(){
+      this.over=true; this.busy=false; this.render();
+      const me=count(this.b,this.human), op=count(this.b,this.ai); let cls,txt;
+      if(me>op){cls='win';txt=`🏆 승리! ${me} : ${op}`;}
+      else if(me<op){cls='lose';txt=`💀 패배 ${me} : ${op}`;}
+      else {cls='draw';txt=`무승부 ${me} : ${op}`;}
+      $('oth-status').textContent='게임 종료';
+      $('oth-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="OTH.start()">다시 도전</button></div>`;
+    }
+  };
+})();
 </script>
 </body>
 </html>

@@ -13,16 +13,16 @@
 <title>THE GENIUS — 두뇌 게임</title>
 <style>
   :root{
-    /* 나라가족 다크 베이스 */
-    --bg:#0E0F12; --bg-glow:#181B24; --panel:#1C1F26; --panel2:#252830; --panel3:#2E3240;
+    /* 나라가족 다크 베이스 — Theme.swift 정본 */
+    --bg:#0E0F12; --bg-glow:#181B24; --panel:#191B20; --panel2:#24272E; --panel3:#2E3240;
     /* THE GENIUS 골드 브랜드 */
     --gold:#d6b24a; --gold2:#edcf78; --gold3:#f6e7ad; --goldsoft:#8a7228; --golddeep:#3c3012;
-    --blue:#2E8DEE;
-    --ink:#fff; --muted:rgba(235,235,245,.60); --line:rgba(235,235,245,.16); --line2:rgba(235,235,245,.28);
-    --win:#30d158; --lose:#ff453a; --tie:#8e8e93;
+    --blue:#4C9DF5;
+    --ink:#ECEDEF; --muted:#9AA0A8; --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.22);
+    --win:#36C07B; --lose:#FF5B52; --tie:#8e8e93;
     --black-tile:#191920; --white-tile:#ece7d8;
     --gold-grad:linear-gradient(135deg,var(--gold3),var(--gold2) 42%,var(--gold) 72%,var(--goldsoft));
-    --shadow:0 8px 32px rgba(0,0,0,.32);
+    --shadow:0 4px 10px rgba(0,0,0,.28);
     /* 상태별 배경 (다크) */
     --log-bg:#0A0C10; --howto-bg:#0D1018; --sel-bg:#241f0d; --tab-active-bg:#1d1a0e;
     --ttt-cell-bg:linear-gradient(160deg,#23232e,#191920);
@@ -33,9 +33,11 @@
     --res-draw-bg:linear-gradient(180deg,#20202b,#16161f);
   }
   @media(prefers-color-scheme:light){:root{
-    --bg:#EFF1F4; --bg-glow:#DDE4EE; --panel:#FFFFFF; --panel2:#F5F6F8; --panel3:#EAECF0;
-    --ink:#1D1D1F; --muted:rgba(0,0,0,.50); --line:rgba(0,0,0,.10); --line2:rgba(0,0,0,.18);
-    --win:#25A244; --lose:#D93025; --tie:#636366;
+    --bg:#EFF1F4; --bg-glow:#DDE4EE; --panel:#FFFFFF; --panel2:#F1F3F6; --panel3:#E4E6EB;
+    --blue:#2E8DEE;
+    --ink:#1A1C1E; --muted:#8B9097; --line:#E4E6EB; --line2:rgba(0,0,0,.18);
+    --win:#1FAE64; --lose:#E8453C; --tie:#636366;
+    --shadow:0 4px 10px rgba(0,0,0,.08);
     --black-tile:#2A2A35; --white-tile:#F7F3E8;
     --shadow:0 4px 20px rgba(0,0,0,.10);
     --log-bg:#E8EAF0; --howto-bg:#F0F2F6; --sel-bg:#fdf0c8; --tab-active-bg:#fdf3d8;

@@ -66,7 +66,9 @@
   @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
 
   /* ---------- Header / branding ---------- */
-  .brand{text-align:center;padding:18px 0 6px;}
+  .brand{display:flex;align-items:center;gap:12px;padding:18px 0 6px;}
+  .logo-mascot{height:44px;width:auto;flex:none;display:block;}
+  .brand .htxt{display:flex;flex-direction:column;align-items:flex-start;}
   .brand .kr{font-size:13px;letter-spacing:.62em;color:var(--gold);margin-bottom:8px;
     text-indent:.62em;}
   .brand .en{font-size:37px;font-weight:800;letter-spacing:.2em;text-indent:.2em;line-height:1.05;
@@ -471,9 +473,12 @@
   <!-- ============ MAIN MENU ============ -->
   <section id="menu" class="screen active">
     <div class="brand">
-      <div class="kr">두 뇌 게 임</div>
-      <div class="en">THE GENIUS</div>
-      <div class="sub">생존을 위한 심리전 · AI 대전</div>
+      <img class="logo-mascot" src="mascot.gif" alt="">
+      <div class="htxt">
+        <div class="kr">두 뇌 게 임</div>
+        <div class="en">THE GENIUS</div>
+        <div class="sub">생존을 위한 심리전 · AI 대전</div>
+      </div>
     </div>
     <div class="rule-divider"></div>
     <div class="menu-grid">

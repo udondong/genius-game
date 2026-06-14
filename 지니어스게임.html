@@ -18,6 +18,8 @@
     /* THE GENIUS 골드 브랜드 */
     --gold:#d6b24a; --gold2:#edcf78; --gold3:#f6e7ad; --goldsoft:#8a7228; --golddeep:#3c3012;
     --blue:#4C9DF5;
+    /* 나라가족 뱀부 그린 */
+    --green:#00AE42; --green2:#2DC96A; --green-bg:rgba(0,80,30,.55); --green-border:#006828;
     --ink:#ECEDEF; --muted:#9AA0A8; --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.22);
     --win:#36C07B; --lose:#FF5B52; --tie:#8e8e93;
     --black-tile:#191920; --white-tile:#ece7d8;
@@ -42,6 +44,7 @@
     --shadow:0 4px 20px rgba(0,0,0,.10);
     --log-bg:#E8EAF0; --howto-bg:#F0F2F6; --sel-bg:#fdf0c8; --tab-active-bg:#fdf3d8;
     --ttt-cell-bg:var(--panel2); --card-dark-bg:var(--panel2);
+    --green:#009838; --green2:#007a30; --green-bg:rgba(0,174,66,.12); --green-border:#00AE42;
     --hit-bg:#d4edda; --miss-bg:#f5c6cb; --match-win-bg:#d4edda;
     --res-win-bg:linear-gradient(180deg,#d4edda,#c3e6cb);
     --res-lose-bg:linear-gradient(180deg,#f5c6cb,#f1b0b7);
@@ -91,12 +94,12 @@
     box-shadow:0 16px 40px rgba(0,0,0,.46),0 6px 18px rgba(201,162,63,.16);}
   .card:active{transform:translateY(-1px);}
   .card .num{font-size:12px;color:var(--gold);letter-spacing:.3em;}
-  .card h3{margin:8px 0 6px;font-size:21px;color:var(--ink);letter-spacing:.01em;}
-  .card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.62;}
-  .card .badge{position:absolute;top:14px;right:14px;font-size:10px;border:1px solid var(--goldsoft);
-    color:var(--gold);padding:3px 8px;border-radius:20px;letter-spacing:.1em;
-    background:rgba(60,48,18,.55);}
-  .card .ico{font-size:26px;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
+  .card h3{margin:8px 0 6px;font-size:21px;color:var(--ink);letter-spacing:.01em;font-weight:800;}
+  .card p{margin:0;font-size:13px;color:var(--ink);opacity:.62;line-height:1.65;}
+  .card .badge{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:700;
+    border:1px solid var(--green-border);color:var(--green2);padding:3px 9px;border-radius:20px;
+    letter-spacing:.08em;background:var(--green-bg);}
+  .card .ico{font-size:28px;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.4));}
 
   /* ---------- Common game UI ---------- */
   .topbar{display:flex;align-items:center;justify-content:space-between;
@@ -133,8 +136,8 @@
   .log b{color:var(--gold2);}
   .center{text-align:center;}
   .hint{font-size:12.5px;color:var(--muted);line-height:1.7;}
-  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;
-    border:1px solid var(--line);margin:2px;}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;
+    border:1px solid var(--green-border);color:var(--green2);background:var(--green-bg);margin:2px;}
 
   /* tiles */
   .tile{width:54px;height:70px;border-radius:9px;display:flex;align-items:center;
@@ -197,7 +200,7 @@
   .tabs{display:flex;gap:8px;margin-bottom:12px;}
   .tabs .tab{flex:1;text-align:center;padding:9px;border-radius:10px;border:1px solid var(--line);
     cursor:pointer;font-size:13.5px;color:var(--muted);}
-  .tabs .tab.active{border-color:var(--gold);color:var(--gold2);background:var(--tab-active-bg);}
+  .tabs .tab.active{border-color:var(--green-border);color:var(--green2);background:var(--green-bg);font-weight:700;}
   .footer-note{text-align:center;color:#5a5750;font-size:11px;margin-top:30px;letter-spacing:.1em;}
   .slot-label{font-size:11px;color:var(--muted);margin-top:4px;}
   .flash{animation:flash .5s ease;}

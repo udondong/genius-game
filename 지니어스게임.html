@@ -1963,6 +1963,72 @@
     <div id="thief-result"></div>
   </section>
 
+  <section id="speed" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">스피드 (Speed)</div>
+      <button class="btn sm" onclick="SPD.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="pc-card mini">7</span>
+          <span class="darrow">→</span>
+          <span class="pc-card mini red">6</span><span class="pc-card mini">8</span>
+          <span class="dnote">±1 (A·K 순환)</span>
+          <div class="dcap">중앙 두 더미 맨 위 카드와 ±1로 이어지는(A-2, K-A 순환) 카드를 손패에서 그 위에 놓습니다. 무늬는 상관없습니다.</div>
+        </div>
+        <span class="goal">목표</span> — AI 1명과 실시간 1대1. 손패 + 보충더미를 먼저 모두 비우면 승리.
+        <ul>
+          <li><span class="k">내기</span> 손패 카드를 클릭하면 낼 수 있는 중앙 더미 위에 자동으로 놓입니다. 무늬는 무관, 랭크가 ±1이면 됩니다.</li>
+          <li><span class="k">실시간</span> 나와 AI가 동시에 진행합니다. 빨리 내는 쪽이 유리합니다. 낸 만큼 손패는 보충더미에서 5장까지 자동 보충.</li>
+          <li><span class="k">교착</span> 양쪽 다 낼 카드가 없으면 「동시 뒤집기」로 사이드더미에서 1장씩 까서 중앙을 새로 덮습니다.</li>
+          <li><span class="k">승리</span> 손패와 보충더미를 모두 비운 사람이 승리.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="speed-status">새 게임을 시작하세요.</div>
+      <div class="score-box-row" style="display:flex;gap:14px;margin-top:8px;">
+        <div class="score-box me"><div class="lbl">내 남은 카드</div><div class="val" id="speed-me">26</div></div>
+        <div class="score-box ai"><div class="lbl">AI 남은 카드</div><div class="val" id="speed-ai">26</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="hint center" style="margin-bottom:4px;" id="speed-mid-label">중앙 더미</div>
+      <div class="pc-pile" id="speed-piles" style="justify-content:center;gap:24px;"></div>
+      <div class="center" id="speed-controls" style="margin-top:10px;"></div>
+      <div class="hint" style="margin:10px 0 4px;">내 패 <span id="speed-mine" style="color:var(--gold2);"></span></div>
+      <div class="pc-hand" id="speed-hand"></div>
+      <div class="log" id="speed-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="speed-result"></div>
+  </section>
+
+  <section id="mem" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">메모리 (짝 맞추기)</div>
+      <button class="btn sm" onclick="MEM.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto"><summary>게임 방법</summary>
+      <p class="hint">16장(8쌍)이 뒤집혀 있습니다. 차례마다 카드 2장을 뒤집어 같은 숫자면 획득(한 번 더). 다르면 다시 덮고 상대 차례. 더 많은 쌍을 가진 쪽이 승리.</p>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 획득</div><div class="val" id="mem-me-score">0</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 획득</div><div class="val" id="mem-ai-score">0</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="turn-ind" id="mem-turn-ind"></div>
+      <div id="mem-board" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:340px;margin:0 auto;"></div>
+      <div class="log" id="mem-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="mem-result"></div>
+  </section>
+
 </div>
 
 <script>
@@ -2091,6 +2157,8 @@ const Game = {
     if(id==='onecard') OC.start();
     if(id==='uno') UNO.start();
     if(id==='thief') TF.start();
+    if(id==='speed') SPD.start();
+    if(id==='mem') MEM.start();
   },
   show(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -6393,6 +6461,435 @@ const TF = {
       return true;
     }
     return false;
+  }
+};
+
+/* =====================================================================
+   GAME — 스피드 (Speed) · 실시간 1대1
+   카드 객체 {r,s}. 랭크 r(0=A..12=K). ±1 연속(0-1, 12-0 순환) 위에 낼 수 있음.
+   각자: 손패(hand, 공개 최대 5장) + 보충더미(stock) + 사이드더미(side).
+   중앙 두 더미(piles[0],piles[1]) 맨 위에 낸다.
+   ===================================================================== */
+const SPD = {
+  myHand:[], myStock:[], mySide:[],
+  aiHand:[], aiStock:[], aiSide:[],
+  piles:[[],[]], over:false, started:false,
+  tick:null, aiNext:0, flipBtnShown:false,
+
+  start(){
+    this.stop();
+    this.over=false; this.started=false; this.flipBtnShown=false;
+    const d=Deck.fresh();
+    const mine=d.slice(0,26), theirs=d.slice(26,52);
+    // 손패 5장 + 사이드 1장(중앙 초기) + 나머지 보충더미
+    this.myHand=mine.slice(0,5);
+    this.mySide=[mine[5]];
+    this.myStock=mine.slice(6);
+    this.aiHand=theirs.slice(0,5);
+    this.aiSide=[theirs[5]];
+    this.aiStock=theirs.slice(6);
+    // 중앙 두 더미: 각 사이드에서 1장씩
+    this.piles=[[this.mySide.pop()],[this.aiSide.pop()]];
+    $('speed-result').innerHTML='';
+    $('speed-controls').innerHTML='';
+    $('speed-status').textContent='준비…';
+    this.log('중앙 더미와 ±1로 이어지는 카드를 손패에서 클릭해 내세요.');
+    this.render();
+    this.countdown(3);
+  },
+
+  // 화면을 벗어나거나 새 게임 시 인터벌 정리
+  stop(){ if(this.tick){ clearInterval(this.tick); this.tick=null; } },
+
+  log(msg){ $('speed-log').innerHTML=msg; },
+
+  countdown(n){
+    if(n>0){
+      $('speed-status').innerHTML=`<b style="font-size:30px;color:var(--gold2);">${n}</b>`;
+      setTimeout(()=>this.countdown(n-1), 700);
+      return;
+    }
+    $('speed-status').innerHTML='<b style="font-size:24px;color:var(--win);">시작!</b>';
+    setTimeout(()=>{
+      if(this.over) return;
+      this.started=true;
+      $('speed-status').textContent='실시간 진행 중 — 낼 수 있는 카드를 빠르게!';
+      this.aiNext=performance.now()+this.aiInterval();
+      this.render();
+      this.runLoop();
+    }, 500);
+  },
+
+  aiInterval(){
+    // Game.p()로 조절(빠를수록 강함). 700~1400ms 범위.
+    const p=Game.p();
+    const base = p && p.blunder ? 1100 : 1000;
+    return 700 + Math.random()*700;
+  },
+
+  topR(i){ const pl=this.piles[i]; return pl.length? pl[pl.length-1].r : null; },
+  // ±1 순환(13 랭크)
+  fits(card, topr){ if(topr===null) return false; const d=(card.r-topr+13)%13; return d===1 || d===12; },
+  // card를 놓을 수 있는 더미 인덱스(없으면 -1). 0,1 중 적합한 곳.
+  targetPile(card){
+    for(let i=0;i<2;i++){ if(this.fits(card,this.topR(i))) return i; }
+    return -1;
+  },
+  hasMove(hand){ return hand.some(c=>this.targetPile(c)>=0); },
+  remain(who){
+    return who==='me' ? this.myHand.length+this.myStock.length
+                      : this.aiHand.length+this.aiStock.length;
+  },
+  refillHand(hand, stock){
+    while(hand.length<5 && stock.length>0) hand.push(stock.pop());
+  },
+
+  /* ---------- 메인 실시간 루프 ---------- */
+  runLoop(){
+    this.stop();
+    this.tick=setInterval(()=>{
+      // 화면을 벗어나면 자동 정리
+      if(!$('speed').classList.contains('active')){ this.stop(); return; }
+      if(this.over){ this.stop(); return; }
+      // AI 행동 타이밍
+      if(performance.now()>=this.aiNext){
+        this.aiAct();
+        this.aiNext=performance.now()+this.aiInterval();
+      }
+      // 교착 검사
+      this.checkDeadlock();
+    }, 100);
+  },
+
+  aiAct(){
+    if(this.over || !this.started) return;
+    this.refillHand(this.aiHand, this.aiStock);
+    const idx=this.aiHand.findIndex(c=>this.targetPile(c)>=0);
+    if(idx<0) return; // 낼 카드 없음
+    const card=this.aiHand[idx];
+    const pi=this.targetPile(card);
+    this.aiHand.splice(idx,1);
+    this.piles[pi].push(card);
+    this.refillHand(this.aiHand, this.aiStock);
+    this.flipBtnShown=false;
+    this.render();
+    if(this.remain('ai')===0){ this.finish('ai'); return; }
+  },
+
+  /* ---------- 내 플레이 ---------- */
+  playMine(i){
+    if(this.over || !this.started) return;
+    const card=this.myHand[i];
+    if(!card) return;
+    const pi=this.targetPile(card);
+    if(pi<0) return;
+    this.myHand.splice(i,1);
+    this.piles[pi].push(card);
+    this.refillHand(this.myHand, this.myStock);
+    this.flipBtnShown=false;
+    this.render();
+    if(this.remain('me')===0){ this.finish('me'); return; }
+  },
+
+  /* ---------- 교착: 동시 뒤집기 ---------- */
+  checkDeadlock(){
+    if(this.over || !this.started) return;
+    this.refillHand(this.myHand, this.myStock);
+    this.refillHand(this.aiHand, this.aiStock);
+    const meStuck=!this.hasMove(this.myHand);
+    const aiStuck=!this.hasMove(this.aiHand);
+    if(meStuck && aiStuck){
+      if(!this.flipBtnShown){
+        this.flipBtnShown=true;
+        $('speed-controls').innerHTML='<button class="btn gold" onclick="SPD.flip()">⟳ 동시 뒤집기</button>';
+        this.log('양쪽 다 낼 카드가 없습니다 — 「동시 뒤집기」를 누르세요.');
+        // AI가 빠르면 자동으로 뒤집기도 진행
+        setTimeout(()=>{ if(this.flipBtnShown && !this.over) this.flip(); }, 1200);
+      }
+    }
+  },
+
+  // 양쪽 사이드더미(없으면 손패)에서 1장씩 까서 중앙 두 더미를 새로 덮음
+  flip(){
+    if(this.over || !this.flipBtnShown) return;
+    this.flipBtnShown=false;
+    $('speed-controls').innerHTML='';
+    const draw=(side, hand)=>{
+      if(side.length>0) return side.pop();
+      if(hand.length>0) return hand.shift();
+      return null;
+    };
+    const a=draw(this.mySide, this.myHand);
+    const b=draw(this.aiSide, this.aiHand);
+    if(a) this.piles[0].push(a);
+    if(b) this.piles[1].push(b);
+    this.refillHand(this.myHand, this.myStock);
+    this.refillHand(this.aiHand, this.aiStock);
+    this.log('동시 뒤집기! 중앙 더미가 새로 덮였습니다.');
+    this.render();
+  },
+
+  /* ---------- 렌더 ---------- */
+  render(){
+    $('speed-me').textContent=this.remain('me');
+    $('speed-ai').textContent=this.remain('ai');
+    $('speed-mine').textContent = this.myHand.length+'장 · 보충 '+this.myStock.length;
+    // 중앙 두 더미
+    const pl=$('speed-piles'); pl.innerHTML='';
+    for(let i=0;i<2;i++){
+      const top=this.piles[i].length? this.piles[i][this.piles[i].length-1] : null;
+      if(top) pl.appendChild(Deck.el(top));
+      else { const s=document.createElement('div'); s.className='pc-slot'; pl.appendChild(s); }
+    }
+    // 내 손패
+    const hand=$('speed-hand'); hand.innerHTML='';
+    const live=this.started && !this.over;
+    this.myHand.forEach((c,i)=>{
+      const ok=live && this.targetPile(c)>=0;
+      hand.appendChild(Deck.el(c,{clickable:ok, dim:live&&!ok, onClick:()=>this.playMine(i)}));
+    });
+  },
+
+  finish(winner){
+    if(this.over) return;
+    this.over=true; this.stop();
+    $('speed-controls').innerHTML='';
+    this.render();
+    const win = winner==='me';
+    const cls = win?'win':'lose';
+    const txt = win?'🎉 승리! 손패를 모두 비웠습니다.':'😵 패배 — AI가 먼저 비웠습니다.';
+    $('speed-status').textContent = win?'승리!':'패배';
+    $('speed-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="SPD.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 33 — 메모리 (짝 맞추기)
+   16장(8쌍) 4×4 격자. 같은 rank 2장이 한 짝. 나 vs AI 번갈아.
+   AI는 dvAcc 확률로 이전에 공개됐던 카드 위치를 기억해 활용.
+   ===================================================================== */
+const MEM = {
+  // 보드: 16개 슬롯. 각 슬롯={card:{r,s}, revealed:bool, removed:bool}
+  board: [],
+  meScore: 0, aiScore: 0,
+  turn: 'me',         // 'me' | 'ai'
+  flipped: [],        // 이번 차례 뒤집은 슬롯 인덱스 배열 (최대 2개)
+  busy: false,        // 애니/AI 진행 중 클릭 잠금
+  over: false,
+  // AI 기억: index -> card (이전에 공개된 카드를 dvAcc 확률로 기억)
+  aiMem: {},
+
+  start(){
+    this.meScore=0; this.aiScore=0;
+    this.flipped=[]; this.busy=false; this.over=false;
+    this.aiMem={};
+    $('mem-result').innerHTML='';
+    $('mem-me-score').textContent='0';
+    $('mem-ai-score').textContent='0';
+
+    // 8개 rank 선택 (0..12 중 8개 무작위)
+    const allRanks=Array.from({length:13},(_,i)=>i);
+    for(let i=allRanks.length-1;i>0;i--){ const j=rand(i+1); [allRanks[i],allRanks[j]]=[allRanks[j],allRanks[i]]; }
+    const ranks=allRanks.slice(0,8);
+
+    // 각 rank당 서로 다른 무늬 2장씩 → 16장
+    const cards=[];
+    ranks.forEach(r=>{
+      // 무늬 0,1,2,3 중 2개 무작위 선택
+      const suits=[0,1,2,3];
+      for(let i=suits.length-1;i>0;i--){ const j=rand(i+1); [suits[i],suits[j]]=[suits[j],suits[i]]; }
+      cards.push({r,s:suits[0]});
+      cards.push({r,s:suits[1]});
+    });
+    // 섞기
+    for(let i=cards.length-1;i>0;i--){ const j=rand(i+1); [cards[i],cards[j]]=[cards[j],cards[i]]; }
+
+    this.board=cards.map(c=>({card:c, revealed:false, removed:false}));
+
+    // 선공 결정
+    this.turn=Game.coin();
+    const firstMsg=this.turn==='me'?'🙋 당신이 선(先)':'🤖 AI가 선(先)';
+    $('mem-turn-ind').textContent=firstMsg+' — 카드 2장을 뒤집으세요.';
+    this.log('뒤집힌 카드 중 같은 숫자 2장을 찾으세요!');
+    this.render();
+
+    if(this.turn==='ai') setTimeout(()=>this.aiTurn(), 700);
+  },
+
+  log(msg){ $('mem-log').innerHTML=msg; },
+
+  render(){
+    const board=$('mem-board');
+    board.innerHTML='';
+    this.board.forEach((slot,idx)=>{
+      if(slot.removed){
+        // 빈 자리
+        const emp=document.createElement('div');
+        emp.style.cssText='aspect-ratio:3/4;border-radius:9px;background:var(--panel2);opacity:.18;border:1px solid var(--line);';
+        board.appendChild(emp);
+        return;
+      }
+      const isFlipped=slot.revealed || this.flipped.includes(idx);
+      const el=Deck.el(slot.card,{
+        back:!isFlipped,
+        clickable:!isFlipped && this.turn==='me' && !this.busy && !this.over,
+        onClick:()=>this.flipMe(idx)
+      });
+      el.style.cssText='width:100%;aspect-ratio:3/4;height:auto;font-size:clamp(12px,3vw,20px);';
+      board.appendChild(el);
+    });
+    $('mem-me-score').textContent=this.meScore;
+    $('mem-ai-score').textContent=this.aiScore;
+  },
+
+  /* 내 클릭으로 카드 뒤집기 */
+  flipMe(idx){
+    if(this.busy||this.over||this.turn!=='me') return;
+    if(this.flipped.includes(idx)) return;
+    if(this.board[idx].removed||this.board[idx].revealed) return;
+    // AI 기억 업데이트: 내가 공개한 카드도 기억
+    this.remember(idx);
+    this.flipped.push(idx);
+    this.render();
+    if(this.flipped.length===2) this.checkPair('me');
+  },
+
+  /* AI가 뒤집을 슬롯 인덱스 2개 선택 */
+  aiChoose(){
+    const P=Game.p();
+    const acc=P.dvAcc; // 0.90
+    const avail=this.board.map((_,i)=>i).filter(i=>!this.board[i].removed&&!this.board[i].revealed&&!this.flipped.includes(i));
+    if(avail.length<2) return [avail[0],avail[1]];
+
+    // 기억한 짝 중 둘 다 가용한 것 찾기
+    const memEntries=Object.entries(this.aiMem).filter(([i])=>!this.board[+i].removed&&!this.board[+i].revealed);
+    // rank별로 그룹
+    const byRank={};
+    memEntries.forEach(([i,c])=>{
+      if(!byRank[c.r]) byRank[c.r]=[];
+      byRank[c.r].push(+i);
+    });
+    const knownPair=Object.values(byRank).find(arr=>arr.length>=2);
+
+    if(knownPair && Math.random()<acc){
+      // 기억에서 짝 발견 → 맞추기
+      return [knownPair[0], knownPair[1]];
+    }
+
+    // 랜덤 탐색: 첫 번째는 완전 랜덤, 두 번째는 기억에서 짝 찾기(없으면 랜덤)
+    const first=pick(avail);
+    const avail2=avail.filter(i=>i!==first);
+    const firstRank=this.board[first].card.r;
+    const memMatch=memEntries.find(([i,c])=>+i!==first&&c.r===firstRank&&!this.board[+i].removed);
+    let second;
+    if(memMatch && Math.random()<acc){
+      second=+memMatch[0];
+    } else {
+      second=pick(avail2);
+    }
+    return [first, second];
+  },
+
+  async aiTurn(){
+    if(this.over) return;
+    this.busy=true;
+    $('mem-turn-ind').textContent='🤖 AI 차례 — 생각 중...';
+    await sleep(600);
+
+    const [i1,i2]=this.aiChoose();
+    if(i1==null||i2==null){ this.busy=false; return; }
+
+    // 첫 번째 카드 공개 + AI 기억
+    this.flipped=[i1];
+    this.remember(i1);
+    this.render();
+    await sleep(700);
+
+    // 두 번째 카드 공개 + AI 기억
+    this.flipped=[i1,i2];
+    this.remember(i2);
+    this.render();
+    await sleep(800);
+
+    this.busy=false;
+    this.checkPair('ai');
+  },
+
+  // dvAcc 확률로 AI 기억에 저장
+  remember(idx){
+    const P=Game.p();
+    if(Math.random()<P.dvAcc){
+      this.aiMem[idx]=this.board[idx].card;
+    }
+  },
+
+  async checkPair(who){
+    const [i1,i2]=this.flipped;
+    const c1=this.board[i1].card, c2=this.board[i2].card;
+    const isMatch=(c1.r===c2.r);
+
+    if(isMatch){
+      // 짝 획득: 잠시 보여준 뒤 제거
+      await sleep(300);
+      this.board[i1].removed=true;
+      this.board[i2].removed=true;
+      // AI 기억에서 제거
+      delete this.aiMem[i1]; delete this.aiMem[i2];
+      if(who==='me'){
+        this.meScore++;
+        this.log(`<b>짝!</b> ${Deck.label(c1)} + ${Deck.label(c2)} 획득. 한 번 더!`);
+      } else {
+        this.aiScore++;
+        this.log(`AI가 <b>${Deck.label(c1)} + ${Deck.label(c2)}</b> 짝 획득. AI 한 번 더.`);
+      }
+      this.flipped=[];
+      this.render();
+
+      // 종료 체크
+      if(this.board.every(s=>s.removed)){
+        this.finish(); return;
+      }
+      // 같은 사람 재시작
+      if(who==='me'){
+        $('mem-turn-ind').textContent='🙋 당신 차례 — 한 번 더!';
+      } else {
+        await sleep(500);
+        this.aiTurn();
+      }
+    } else {
+      // 틀림: 잠시 보여준 뒤 덮기
+      await sleep(900);
+      this.flipped=[];
+      this.render();
+      // 차례 전환
+      this.turn=(who==='me')?'ai':'me';
+      if(who==='me'){
+        this.log('다른 숫자입니다. AI 차례로 넘어갑니다.');
+        $('mem-turn-ind').textContent='🤖 AI 차례';
+        await sleep(400);
+        this.aiTurn();
+      } else {
+        this.log('AI가 틀렸습니다. 당신 차례입니다.');
+        $('mem-turn-ind').textContent='🙋 당신 차례 — 카드 2장을 뒤집으세요.';
+        this.render();
+      }
+    }
+  },
+
+  finish(){
+    this.over=true;
+    let cls,msg;
+    if(this.meScore>this.aiScore){
+      cls='win'; msg=`🏆 승리! ${this.meScore} : ${this.aiScore} — 짝을 더 많이 맞췄습니다!`;
+    } else if(this.aiScore>this.meScore){
+      cls='lose'; msg=`💀 패배. ${this.meScore} : ${this.aiScore} — AI가 더 많이 맞췄습니다.`;
+    } else {
+      cls='draw'; msg=`🤝 무승부! ${this.meScore} : ${this.aiScore}`;
+    }
+    $('mem-turn-ind').textContent='게임 종료';
+    $('mem-result').innerHTML=
+      `<div class="result-banner ${cls}">${msg}</div>`+
+      '<div class="center"><button class="btn gold" onclick="MEM.start()">새 게임</button></div>';
   }
 };
 </script>

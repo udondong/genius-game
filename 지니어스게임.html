@@ -1775,6 +1775,124 @@
     <div id="bj-result"></div>
   </section>
 
+  <!-- ============ 5카드 드로우 포커 ============ -->
+  <section id="draw" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">5카드 드로우 포커</div>
+      <button class="btn sm" onclick="DP.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="pc-card mini">A</span><span class="pc-card mini">A</span><span class="pc-card mini">A</span>
+          <span class="darrow">·</span>
+          <span class="pc-card mini back"></span><span class="pc-card mini back"></span>
+          <span class="dnote">→ 2장 교환</span>
+          <div class="dcap">5장을 받아 약한 카드를 한 번 버리고 새로 받습니다. 베팅 후 족보로 겨룹니다.</div>
+        </div>
+        <span class="goal">목표</span> — AI 2명과 칩 대결. 더 높은 포커 족보로 팟(판돈)을 따내 상대를 모두 탈락시키면 승리.
+        <ul>
+          <li><span class="k">진행</span> 매 핸드 모두 앤티 1칩. 5장씩 분배 → 1차 베팅 → 카드 교환(최대 3장, 1회) → 2차 베팅 → 쇼다운.</li>
+          <li><span class="k">베팅</span> 체크/벳(5)/콜/레이즈(+5)/폴드. 끝까지 남은 사람 중 가장 높은 족보가 팟을 가져갑니다.</li>
+          <li><span class="k">교환</span> 내 카드를 눌러 버릴 것을 고르고 "교환" 버튼. 강한 카드는 남기세요.</li>
+          <li><span class="k">족보</span> 스트레이트플러시 &gt; 포카드 &gt; 풀하우스 &gt; 플러시 &gt; 스트레이트 &gt; 트리플 &gt; 투페어 &gt; 원페어 &gt; 하이카드.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="draw-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="draw-seats"></div>
+      <div class="center hint">팟(판돈): <b id="draw-pot" style="color:var(--gold2);font-size:18px;">0</b> 칩</div>
+    </div>
+    <div class="panel">
+      <div class="hint" style="margin-bottom:4px;">내 패</div>
+      <div class="pc-hand" id="draw-hand"></div>
+      <div class="center" id="draw-controls" style="margin-top:8px;"></div>
+      <div class="log" id="draw-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="draw-result"></div>
+  </section>
+
+  <section id="holdem" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">텍사스 홀덤</div>
+      <button class="btn sm" onclick="TH.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="pc-card mini back"></span><span class="pc-card mini back"></span>
+          <span class="darrow">+</span>
+          <span class="pc-card mini">A</span><span class="pc-card mini">K</span><span class="pc-card mini">Q</span>
+          <span class="dnote">→ 최강 5장</span>
+          <div class="dcap">개인 2장 + 공유 5장 중 가장 높은 5장 조합으로 겨룹니다.</div>
+        </div>
+        <span class="goal">목표</span> — AI 1명과 칩 대결. 개인 패와 커뮤니티 카드로 더 높은 족보를 만들어 팟을 따내고 상대를 탈락시키면 승리.
+        <ul>
+          <li><span class="k">블라인드</span> 매 핸드 스몰 1 / 빅 2칩. 개인 2장씩 받고 프리플랍 베팅.</li>
+          <li><span class="k">진행</span> 프리플랍 → 플랍(공유 3장) → 턴(1장) → 리버(1장). 각 단계마다 베팅.</li>
+          <li><span class="k">베팅</span> 체크/벳(4)/콜/레이즈(+4)/폴드. 끝까지 남은 사람 중 가장 높은 족보가 팟을 가져갑니다.</li>
+          <li><span class="k">족보</span> 스트레이트플러시 &gt; 포카드 &gt; 풀하우스 &gt; 플러시 &gt; 스트레이트 &gt; 트리플 &gt; 투페어 &gt; 원페어 &gt; 하이카드.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="holdem-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="holdem-seats"></div>
+      <div class="center hint">팟(판돈): <b id="holdem-pot" style="color:var(--gold2);font-size:18px;">0</b> 칩</div>
+    </div>
+    <div class="panel">
+      <div class="hint" style="margin-bottom:4px;">커뮤니티 카드</div>
+      <div class="pc-pile" id="holdem-board"></div>
+      <div class="hint" style="margin:8px 0 4px;">내 패</div>
+      <div class="pc-hand" id="holdem-hand"></div>
+      <div class="center" id="holdem-controls" style="margin-top:8px;"></div>
+      <div class="log" id="holdem-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="holdem-result"></div>
+  </section>
+
+  <section id="onecard" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">원카드</div>
+      <button class="btn sm" onclick="OC.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="pc-card mini">7</span>
+          <span class="darrow">→</span>
+          <span class="pc-card mini">7</span><span class="pc-card mini red">7</span>
+          <span class="dnote">같은 숫자 / 무늬</span>
+          <div class="dcap">버린 카드와 같은 무늬 또는 같은 숫자를 내려놓아 손패를 모두 비우면 승리.</div>
+        </div>
+        <span class="goal">목표</span> — AI 1명과 1대1. 손에 든 카드를 먼저 모두 내려놓으면 승리.
+        <ul>
+          <li><span class="k">내기</span> 맨 위 버린 카드와 같은 무늬 또는 같은 숫자만 낼 수 있습니다. 못 내면 더미에서 1장 뽑습니다.</li>
+          <li><span class="k">2</span> 다음 사람 2장 먹기. <span class="k">♠A</span> 3장 먹기. <span class="k">조커</span> 5장 먹기. (공격 카드로 받아치면 장수 누적)</li>
+          <li><span class="k">J·Q</span> 상대 차례를 건너뛰어 한 번 더 냅니다. <span class="k">7</span> 원하는 무늬로 바꿉니다.</li>
+          <li><span class="k">원카드!</span> 손패가 1장 남으면 표시됩니다. 조커는 아무 때나 낼 수 있습니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="onecard-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="onecard-seats"></div>
+    </div>
+    <div class="panel">
+      <div class="hint" style="margin-bottom:4px;">버린 더미 <span id="onecard-suit" style="color:var(--gold2);font-weight:700;"></span></div>
+      <div class="pc-pile" id="onecard-pile"></div>
+      <div class="hint" style="margin:8px 0 4px;">내 패 <span id="onecard-mine" style="color:var(--gold2);"></span></div>
+      <div class="pc-hand" id="onecard-hand"></div>
+      <div class="center" id="onecard-controls" style="margin-top:8px;"></div>
+      <div class="log" id="onecard-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="onecard-result"></div>
+  </section>
+
 </div>
 
 <script>
@@ -1898,6 +2016,9 @@ const Game = {
     if(id==='oth') OTH.start();
     if(id==='hilo') HL.start();
     if(id==='bj') BJ.start();
+    if(id==='draw') DP.start();
+    if(id==='holdem') TH.start();
+    if(id==='onecard') OC.start();
   },
   show(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -4610,6 +4731,1041 @@ const BJ = {
     }
     $('bj-status').textContent='베팅을 선택하세요.';
     this.renderBet();
+  }
+};
+
+/* =====================================================================
+   GAME 27 — 5카드 드로우 포커 (나 + AI 2명, 좌석 3)
+   ===================================================================== */
+const DP = {
+  ANTE:1, BET:5,
+  seats:[], deck:[], pot:0, dealer:0, started:false,
+  // seats[i] = {name, isMe, chips, hand:[], folded, out, bet, drawn}
+
+  start(){
+    this.started=true;
+    this.seats=[
+      {name:'나',  isMe:true,  chips:50, hand:[], folded:false, out:false, bet:0, drawn:false},
+      {name:'AI 1', isMe:false, chips:50, hand:[], folded:false, out:false, bet:0, drawn:false},
+      {name:'AI 2', isMe:false, chips:50, hand:[], folded:false, out:false, bet:0, drawn:false}
+    ];
+    this.dealer=rand(3);
+    $('draw-result').innerHTML='';
+    $('draw-log').innerHTML='';
+    $('draw-hand').innerHTML='';
+    $('draw-controls').innerHTML='';
+    this.beginHand();
+  },
+
+  alive(){ return this.seats.filter(s=>!s.out); },
+
+  beginHand(){
+    $('draw-result').innerHTML='';
+    $('draw-log').innerHTML='';
+    $('draw-controls').innerHTML='';
+    $('draw-hand').innerHTML='';
+    // 탈락 갱신
+    this.seats.forEach(s=>{ if(s.chips<=0) s.out=true; });
+    const live=this.alive();
+    if(live.length<=1 || this.seats[0].out){ this.endGame(); return; }
+
+    this.deck=Deck.fresh();
+    this.pot=0;
+    this.seats.forEach(s=>{ s.hand=[]; s.folded=false; s.bet=0; s.drawn=false; });
+    // 앤티
+    for(const s of this.alive()){
+      const a=Math.min(this.ANTE, s.chips);
+      s.chips-=a; this.pot+=a;
+    }
+    // 5장 분배
+    for(let n=0;n<5;n++) for(const s of this.alive()) s.hand.push(this.deck.pop());
+    // 딜러 다음 살아있는 좌석부터
+    this.dealer=this.nextLive(this.dealer);
+    this.render();
+    $('draw-log').innerHTML='카드를 분배했습니다. 1차 베팅을 시작합니다.';
+    this.bettingRound(1);
+  },
+
+  nextLive(i){ let k=i; for(let n=0;n<this.seats.length;n++){ k=(k+1)%this.seats.length; if(!this.seats[k].out) return k; } return i; },
+
+  contenders(){ return this.alive().filter(s=>!s.folded); },
+
+  render(turnIdx){
+    $('draw-pot').textContent=this.pot;
+    const wrap=$('draw-seats'); wrap.innerHTML='';
+    this.seats.forEach((s,i)=>{
+      const d=document.createElement('div');
+      let cls='seat'+(s.isMe?' me':'');
+      if(s.out) cls+=' out';
+      if(i===turnIdx && !s.out && !s.folded) cls+=' turn';
+      d.className=cls;
+      let st;
+      if(s.out) st='탈락';
+      else if(s.folded) st='폴드';
+      else st='베팅 '+s.bet;
+      d.innerHTML=`<div class="nm${s.isMe?' me':''}">${s.name}</div>`+
+        `<div class="big">${s.chips}</div>`+
+        `<div class="st">${st}</div>`;
+      wrap.appendChild(d);
+    });
+    // 내 패
+    const me=this.seats[0];
+    const hand=$('draw-hand'); hand.innerHTML='';
+    if(me.out || me.hand.length===0){ hand.innerHTML='<div class="hint">카드 없음</div>'; return; }
+    me.hand.forEach((c,idx)=>{
+      const clickable = this.phase==='draw';
+      const sel = clickable && this.selDiscard && this.selDiscard.has(idx);
+      hand.appendChild(Deck.el(c,{
+        clickable, sel,
+        onClick: clickable ? ()=>DP.toggleDiscard(idx) : null
+      }));
+    });
+  },
+
+  log(msg){ $('draw-log').innerHTML=msg; },
+
+  /* ---------- 베팅 라운드 ---------- */
+  async bettingRound(stage){
+    this.stage=stage;
+    this.phase='bet';
+    this.currentBet=0;
+    this.contenders().forEach(s=>s.bet=0);
+    // 액션 순서: 딜러부터 시계방향
+    const order=[];
+    let k=this.dealer;
+    for(let n=0;n<this.seats.length;n++){ if(!this.seats[k].out) order.push(k); k=(k+1)%this.seats.length; }
+    // 콜이 필요한 사람이 없을 때까지 순회
+    this.acted=new Set();
+    await this.runBetting(order, stage);
+  },
+
+  async runBetting(order, stage){
+    let i=0, guard=0;
+    while(guard++<40){
+      if(this.contenders().length<=1) break;
+      // 모두 액션했고 베팅이 맞으면 종료
+      const need=this.contenders().filter(s=>!this.acted.has(this.seats.indexOf(s)) || s.bet<this.currentBet);
+      if(need.length===0) break;
+      const idx=order[i%order.length]; i++;
+      const s=this.seats[idx];
+      if(s.out||s.folded){ continue; }
+      if(s.bet===this.currentBet && this.acted.has(idx)) continue;
+      this.render(idx);
+      if(s.isMe){
+        await this.myBetTurn(idx);
+      } else {
+        await sleep(700);
+        this.aiBetTurn(idx);
+      }
+      this.render(idx);
+      if(this.contenders().length<=1) break;
+    }
+    $('draw-controls').innerHTML='';
+    if(this.contenders().length<=1){ this.showdown(); return; }
+    if(stage===1){ this.drawPhase(); }
+    else { this.showdown(); }
+  },
+
+  myBetTurn(idx){
+    return new Promise(resolve=>{
+      const s=this.seats[idx];
+      const toCall=this.currentBet - s.bet;
+      const c=$('draw-controls');
+      let h='';
+      if(toCall<=0){
+        h+=`<button class="btn" onclick="DP._act('check')">체크</button> `;
+        const raise=this.currentBet>0?this.BET:this.BET;
+        if(s.chips>=raise) h+=`<button class="btn gold" onclick="DP._act('bet')">${this.currentBet>0?'레이즈':'벳'} ${raise}</button> `;
+      } else {
+        const callAmt=Math.min(toCall, s.chips);
+        h+=`<button class="btn" onclick="DP._act('call')">콜 ${callAmt}</button> `;
+        if(s.chips>=toCall+this.BET) h+=`<button class="btn gold" onclick="DP._act('raise')">레이즈 +${this.BET}</button> `;
+        h+=`<button class="btn" onclick="DP._act('fold')">폴드</button> `;
+      }
+      c.innerHTML=h;
+      this._resolveMy=(action)=>{
+        this._applyAction(idx, action);
+        this._resolveMy=null;
+        $('draw-controls').innerHTML='';
+        resolve();
+      };
+    });
+  },
+
+  _act(action){ if(this._resolveMy) this._resolveMy(action); },
+
+  _applyAction(idx, action){
+    const s=this.seats[idx];
+    this.acted.add(idx);
+    if(action==='fold'){ s.folded=true; this.log(`${s.name} 폴드.`); return; }
+    if(action==='check'){ this.log(`${s.name} 체크.`); return; }
+    if(action==='call'){
+      const toCall=Math.min(this.currentBet - s.bet, s.chips);
+      s.chips-=toCall; s.bet+=toCall; this.pot+=toCall;
+      this.log(`${s.name} 콜 (+${toCall}).`); return;
+    }
+    if(action==='bet' || action==='raise'){
+      // 콜 후 BET 추가
+      const toCall=Math.max(0, this.currentBet - s.bet);
+      const add=Math.min(toCall+this.BET, s.chips);
+      s.chips-=add; s.bet+=add; this.pot+=add;
+      this.currentBet=Math.max(this.currentBet, s.bet);
+      // 레이즈가 생기면 다른 사람들 다시 액션 필요
+      this.acted=new Set([idx]);
+      this.log(`${s.name} ${action==='bet'&&this.currentBet===s.bet?'벳':'레이즈'} (+${add}).`);
+      return;
+    }
+  },
+
+  aiBetTurn(idx){
+    const s=this.seats[idx];
+    const score=Poker.best(s.hand);
+    const toCall=this.currentBet - s.bet;
+    const p=Game.p ? Game.p() : {};
+    const bluff=Math.random()<0.18;
+    const strong=score.rank>=2 || (score.rank===1 && score.tb[0]>=11); // 투페어↑ 또는 높은 페어
+    const decent=score.rank>=1;
+    if(toCall<=0){
+      // 체크 or 벳
+      if((strong || bluff) && s.chips>=this.BET){
+        this._applyAction(idx,'bet');
+      } else {
+        this._applyAction(idx,'check');
+      }
+    } else {
+      if(strong && s.chips>=toCall+this.BET && Math.random()<0.5){
+        this._applyAction(idx,'raise');
+      } else if((decent || bluff) && s.chips>=toCall){
+        this._applyAction(idx,'call');
+      } else {
+        this._applyAction(idx,'fold');
+      }
+    }
+  },
+
+  /* ---------- 교환 단계 ---------- */
+  drawPhase(){
+    this.phase='draw';
+    this.selDiscard=new Set();
+    // 콘텐더만, 나부터
+    this.render();
+    const me=this.seats[0];
+    if(me.folded || me.out){ this.aiDrawThenSecond(); return; }
+    $('draw-status').textContent='교환할 카드를 선택하세요 (최대 3장).';
+    this.log('카드를 눌러 버릴 것을 고르고 "교환"을 누르세요. 교환 없이 진행하려면 "스테이".');
+    $('draw-controls').innerHTML=
+      '<button class="btn gold" onclick="DP.confirmDraw()">교환</button> '+
+      '<button class="btn" onclick="DP.stay()">스테이 (교환 안 함)</button>';
+  },
+
+  toggleDiscard(idx){
+    if(this.phase!=='draw') return;
+    if(this.selDiscard.has(idx)) this.selDiscard.delete(idx);
+    else { if(this.selDiscard.size>=3){ this.log('최대 3장까지 교환할 수 있습니다.'); return; } this.selDiscard.add(idx); }
+    this.render();
+  },
+
+  confirmDraw(){
+    const me=this.seats[0];
+    const sel=[...this.selDiscard].sort((a,b)=>b-a);
+    for(const i of sel){ me.hand.splice(i,1); }
+    while(me.hand.length<5) me.hand.push(this.deck.pop());
+    me.drawn=true;
+    this.log(`${sel.length}장 교환했습니다.`);
+    this.finishDraw();
+  },
+
+  stay(){
+    this.seats[0].drawn=true;
+    this.log('교환하지 않고 그대로 갑니다.');
+    this.finishDraw();
+  },
+
+  async finishDraw(){
+    this.phase='bet';
+    this.selDiscard=null;
+    $('draw-controls').innerHTML='';
+    this.render();
+    $('draw-status').textContent='AI 교환 중...';
+    await this.aiDrawThenSecond();
+  },
+
+  async aiDrawThenSecond(){
+    for(const s of this.contenders()){
+      if(s.isMe || s.drawn) continue;
+      await sleep(600);
+      const n=this.aiDiscardCount(s);
+      // 약한 카드 n장 버림
+      const ranked=s.hand.map((c,i)=>({i, c})).slice();
+      const keep=this.aiKeepMask(s.hand);
+      const newHand=[];
+      for(let i=0;i<5;i++){ if(keep[i]) newHand.push(s.hand[i]); }
+      const drop=5-newHand.length;
+      for(let k=0;k<drop;k++) newHand.push(this.deck.pop());
+      s.hand=newHand; s.drawn=true;
+      this.log(`${s.name} ${drop}장 교환.`);
+    }
+    await sleep(500);
+    $('draw-status').textContent='2차 베팅.';
+    this.bettingRound(2);
+  },
+
+  aiDiscardCount(s){
+    const m=this.aiKeepMask(s.hand);
+    return 5 - m.filter(Boolean).length;
+  },
+
+  // 유지할 카드 마스크: 페어/트리플 등에 속한 카드는 유지, 나머지는 최대 3장까지 버림
+  aiKeepMask(hand){
+    const cnt={};
+    hand.forEach(c=>cnt[c.r]=(cnt[c.r]||0)+1);
+    const score=Poker.best(hand);
+    if(score.rank>=4) return hand.map(()=>true); // 스트레이트↑ 유지
+    const keep=hand.map(c=>cnt[c.r]>=2);
+    // 페어 하나도 없으면 가장 높은 1장만 유지(약하니 4장 교환은 과하므로 최대 3장)
+    if(keep.every(k=>!k)){
+      let hi=0; for(let i=1;i<hand.length;i++){ if(Poker.pv(hand[i].r)>Poker.pv(hand[hi].r)) hi=i; }
+      const m=hand.map(()=>false); m[hi]=true; return m;
+    }
+    // 버릴 수 있는 건 최대 3장
+    let drop=0;
+    return keep.map(k=>{ if(!k && drop<3){ drop++; return false; } return true; });
+  },
+
+  /* ---------- 쇼다운 ---------- */
+  async showdown(){
+    this.phase='show';
+    $('draw-controls').innerHTML='';
+    const cons=this.contenders();
+    if(cons.length===1){
+      const w=cons[0];
+      w.chips+=this.pot;
+      this.log(`${w.name} 외 전원 폴드 — ${w.name} 팟 ${this.pot}칩 획득!`);
+      this.render();
+      this.endHand(`${w.name} 승리 (폴드 승)`, w.isMe?'win':'lose');
+      return;
+    }
+    // AI 카드 공개 + 족보
+    $('draw-status').textContent='쇼다운!';
+    let logH='쇼다운 — ';
+    let best=null, winners=[];
+    for(const s of cons){
+      const sc=Poker.best(s.hand);
+      s._score=sc;
+      logH+=`<br>${s.name}: ${sc.name}`;
+      if(!best || Poker.cmp(sc,best)>0){ best=sc; winners=[s]; }
+      else if(Poker.cmp(sc,best)===0){ winners.push(s); }
+    }
+    // 내 패가 폴드 아니면 공개는 이미 됨; AI 패 공개 메시지
+    this.render();
+    this.log(logH);
+    await sleep(400);
+    const share=Math.floor(this.pot/winners.length);
+    let rem=this.pot - share*winners.length;
+    winners.forEach((w,i)=>{ w.chips+=share+(i<rem?1:0); });
+    this.render();
+    const names=winners.map(w=>w.name).join(', ');
+    const meWon=winners.some(w=>w.isMe);
+    if(winners.length>1){
+      this.endHand(`${names} 분할 승 (${best.name})`, meWon?'win':'draw');
+    } else {
+      this.endHand(`${names} 승리 — ${best.name}! 팟 ${this.pot}칩`, meWon?'win':'lose');
+    }
+  },
+
+  endHand(msg, cls){
+    this.phase='done';
+    this.seats.forEach(s=>{ if(s.chips<=0) s.out=true; });
+    this.render();
+    const live=this.alive();
+    const banner=cls==='win'?'win':cls==='lose'?'lose':'draw';
+    const emoji=cls==='win'?'🏆':cls==='lose'?'💀':'🤝';
+    let html=`<div class="result-banner ${banner}">${emoji} ${msg}</div>`;
+    if(live.length<=1 || this.seats[0].out){
+      // 게임 종료로 이어짐
+      $('draw-result').innerHTML=html;
+      setTimeout(()=>this.endGame(), 50);
+      return;
+    }
+    html+='<div class="center"><button class="btn gold" onclick="DP.beginHand()">다음 핸드</button> '+
+      '<button class="btn" onclick="DP.start()">처음부터</button></div>';
+    $('draw-result').innerHTML=html;
+    $('draw-status').textContent='다음 핸드를 진행하세요.';
+  },
+
+  endGame(){
+    const me=this.seats[0];
+    const live=this.alive();
+    let cls, msg;
+    if(!me.out && (live.length===1 && live[0].isMe)){
+      cls='win'; msg='🏆 최후의 1인! 모든 AI를 탈락시켰습니다. 승리!';
+    } else if(me.out){
+      cls='lose'; msg='💀 칩을 모두 잃어 탈락했습니다. 패배.';
+    } else {
+      // 나 + AI 일부 남았으나 진행 불가 상황(이론상): 칩 최다 비교
+      const top=[...this.seats].filter(s=>!s.out).sort((a,b)=>b.chips-a.chips)[0];
+      cls=top&&top.isMe?'win':'lose';
+      msg=top&&top.isMe?'🏆 칩 1위로 게임 종료! 승리!':'게임 종료.';
+    }
+    $('draw-controls').innerHTML='';
+    $('draw-status').textContent='게임 종료.';
+    $('draw-result').innerHTML=
+      `<div class="result-banner ${cls}">${msg}</div>`+
+      '<div class="center"><button class="btn gold" onclick="DP.start()">다시 시작</button></div>';
+  }
+};
+
+/* =====================================================================
+   GAME — 텍사스 홀덤 (나 + AI 2명, 스몰/빅 블라인드, 정액 베팅)
+   ===================================================================== */
+const TH = {
+  SB:1, BB:2, BET:4,
+  seats:[], deck:[], board:[], pot:0, button:0, started:false,
+  currentBet:0, stage:0, phase:'', acted:null, _resolveMy:null, _bb:0,
+  // seats[i] = {name, isMe, chips, hand:[], folded, out, bet}
+
+  start(){
+    this.started=true;
+    this.seats=[
+      {name:'나',   isMe:true,  chips:100, hand:[], folded:false, out:false, bet:0},
+      {name:'AI 1', isMe:false, chips:100, hand:[], folded:false, out:false, bet:0},
+      {name:'AI 2', isMe:false, chips:100, hand:[], folded:false, out:false, bet:0}
+    ];
+    this.button=rand(3);
+    $('holdem-result').innerHTML='';
+    $('holdem-log').innerHTML='';
+    $('holdem-hand').innerHTML='';
+    $('holdem-board').innerHTML='';
+    $('holdem-controls').innerHTML='';
+    this.beginHand();
+  },
+
+  alive(){ return this.seats.filter(s=>!s.out); },
+  contenders(){ return this.alive().filter(s=>!s.folded); },
+  nextLive(i){ let k=i; for(let n=0;n<this.seats.length;n++){ k=(k+1)%this.seats.length; if(!this.seats[k].out) return k; } return i; },
+
+  beginHand(){
+    $('holdem-result').innerHTML='';
+    $('holdem-log').innerHTML='';
+    $('holdem-controls').innerHTML='';
+    $('holdem-board').innerHTML='';
+    this.seats.forEach(s=>{ if(s.chips<=0) s.out=true; });
+    if(this.alive().length<=1 || this.seats[0].out){ this.endGame(); return; }
+
+    this.deck=Deck.fresh();
+    this.board=[];
+    this.pot=0;
+    this.currentBet=0;
+    this.seats.forEach(s=>{ s.hand=[]; s.folded=false; s.bet=0; });
+    // 버튼 이동
+    this.button=this.nextLive(this.button);
+    // 개인 2장 분배
+    for(let n=0;n<2;n++) for(const s of this.alive()) s.hand.push(this.deck.pop());
+    // 블라인드: 버튼 다음=스몰, 그 다음=빅
+    const sbIdx=this.nextLive(this.button);
+    const bbIdx=this.nextLive(sbIdx);
+    this._postBlind(sbIdx, this.SB);
+    this._postBlind(bbIdx, this.BB);
+    this.currentBet=Math.max(this.seats[sbIdx].bet, this.seats[bbIdx].bet);
+    this._bb=bbIdx;
+    this.render();
+    this.log('블라인드를 냈습니다. 프리플랍 베팅을 시작합니다.');
+    this.bettingRound(0);
+  },
+
+  _postBlind(idx, amt){
+    const s=this.seats[idx];
+    const a=Math.min(amt, s.chips);
+    s.chips-=a; s.bet+=a; this.pot+=a;
+  },
+
+  render(turnIdx){
+    $('holdem-pot').textContent=this.pot;
+    const wrap=$('holdem-seats'); wrap.innerHTML='';
+    this.seats.forEach((s,i)=>{
+      const d=document.createElement('div');
+      let cls='seat'+(s.isMe?' me':'');
+      if(s.out) cls+=' out';
+      if(i===turnIdx && !s.out && !s.folded) cls+=' turn';
+      d.className=cls;
+      let st;
+      if(s.out) st='탈락';
+      else if(s.folded) st='폴드';
+      else st='베팅 '+s.bet;
+      if(i===this.button && !s.out) st+=' (D)';
+      d.innerHTML=`<div class="nm${s.isMe?' me':''}">${s.name}</div>`+
+        `<div class="big">${s.chips}</div>`+
+        `<div class="st">${st}</div>`;
+      wrap.appendChild(d);
+    });
+    // 커뮤니티 카드
+    const bd=$('holdem-board'); bd.innerHTML='';
+    if(this.board.length===0){ bd.innerHTML='<div class="hint">아직 공개된 카드 없음</div>'; }
+    else this.board.forEach(c=>bd.appendChild(Deck.el(c)));
+    // 내 패
+    const me=this.seats[0];
+    const hand=$('holdem-hand'); hand.innerHTML='';
+    if(me.out || me.hand.length===0){ hand.innerHTML='<div class="hint">카드 없음</div>'; return; }
+    me.hand.forEach(c=>hand.appendChild(Deck.el(c)));
+  },
+
+  log(msg){ $('holdem-log').innerHTML=msg; },
+
+  /* ---------- 베팅 라운드 ---------- */
+  async bettingRound(stage){
+    this.stage=stage;
+    this.phase='bet';
+    if(stage>0){ this.currentBet=0; this.contenders().forEach(s=>s.bet=0); }
+    // 액션 순서: 프리플랍은 빅블라인드 다음부터, 그 외엔 버튼 다음(스몰)부터
+    const startIdx = stage===0 ? this.nextLive(this._bb) : this.nextLive(this.button);
+    const order=[];
+    let k=startIdx;
+    for(let n=0;n<this.seats.length;n++){ if(!this.seats[k].out) order.push(k); k=(k+1)%this.seats.length; }
+    this.acted=new Set();
+    await this.runBetting(order, stage);
+  },
+
+  async runBetting(order, stage){
+    let i=0, guard=0;
+    while(guard++<40){
+      if(this.contenders().length<=1) break;
+      const need=this.contenders().filter(s=>!this.acted.has(this.seats.indexOf(s)) || s.bet<this.currentBet);
+      if(need.length===0) break;
+      const idx=order[i%order.length]; i++;
+      const s=this.seats[idx];
+      if(s.out||s.folded) continue;
+      if(s.bet===this.currentBet && this.acted.has(idx)) continue;
+      this.render(idx);
+      if(s.isMe){
+        await this.myBetTurn(idx);
+      } else {
+        await sleep(700);
+        this.aiBetTurn(idx);
+      }
+      this.render(idx);
+      if(this.contenders().length<=1) break;
+    }
+    $('holdem-controls').innerHTML='';
+    if(this.contenders().length<=1){ this.showdown(); return; }
+    await sleep(300);
+    this.nextStreet();
+  },
+
+  myBetTurn(idx){
+    return new Promise(resolve=>{
+      const s=this.seats[idx];
+      const toCall=this.currentBet - s.bet;
+      const c=$('holdem-controls');
+      let h='';
+      if(toCall<=0){
+        h+=`<button class="btn" onclick="TH._act('check')">체크</button> `;
+        if(s.chips>=this.BET) h+=`<button class="btn gold" onclick="TH._act('bet')">${this.currentBet>0?'레이즈':'벳'} ${this.BET}</button> `;
+      } else {
+        const callAmt=Math.min(toCall, s.chips);
+        h+=`<button class="btn" onclick="TH._act('call')">콜 ${callAmt}</button> `;
+        if(s.chips>=toCall+this.BET) h+=`<button class="btn gold" onclick="TH._act('raise')">레이즈 +${this.BET}</button> `;
+        h+=`<button class="btn" onclick="TH._act('fold')">폴드</button> `;
+      }
+      c.innerHTML=h;
+      this._resolveMy=(action)=>{
+        this._applyAction(idx, action);
+        this._resolveMy=null;
+        $('holdem-controls').innerHTML='';
+        resolve();
+      };
+    });
+  },
+
+  _act(action){ if(this._resolveMy) this._resolveMy(action); },
+
+  _applyAction(idx, action){
+    const s=this.seats[idx];
+    this.acted.add(idx);
+    if(action==='fold'){ s.folded=true; this.log(`${s.name} 폴드.`); return; }
+    if(action==='check'){ this.log(`${s.name} 체크.`); return; }
+    if(action==='call'){
+      const toCall=Math.min(this.currentBet - s.bet, s.chips);
+      s.chips-=toCall; s.bet+=toCall; this.pot+=toCall;
+      this.log(`${s.name} 콜 (+${toCall}).`); return;
+    }
+    if(action==='bet' || action==='raise'){
+      const toCall=Math.max(0, this.currentBet - s.bet);
+      const add=Math.min(toCall+this.BET, s.chips);
+      s.chips-=add; s.bet+=add; this.pot+=add;
+      const isRaise=this.currentBet>0;
+      this.currentBet=Math.max(this.currentBet, s.bet);
+      this.acted=new Set([idx]);
+      this.log(`${s.name} ${isRaise?'레이즈':'벳'} (+${add}).`);
+      return;
+    }
+  },
+
+  aiBetTurn(idx){
+    const s=this.seats[idx];
+    const score=Poker.best(s.hand.concat(this.board));
+    const toCall=this.currentBet - s.bet;
+    const bluff=Math.random()<0.16;
+    // 단계별 강함 기준: 보드가 적을수록(프리플랍) 페어/하이카드 기준 완화
+    const preflop=this.board.length===0;
+    let strong, decent;
+    if(preflop){
+      const hi=Math.max(Poker.pv(s.hand[0].r), Poker.pv(s.hand[1].r));
+      const pair=s.hand[0].r===s.hand[1].r;
+      strong = pair || hi>=13;        // 포켓페어 또는 A/K 보유
+      decent = hi>=10 || s.hand[0].s===s.hand[1].s;
+    } else {
+      strong = score.rank>=2 || (score.rank===1 && score.tb[0]>=11);
+      decent = score.rank>=1;
+    }
+    if(toCall<=0){
+      if((strong || bluff) && s.chips>=this.BET) this._applyAction(idx,'bet');
+      else this._applyAction(idx,'check');
+    } else {
+      if(strong && s.chips>=toCall+this.BET && Math.random()<0.5) this._applyAction(idx,'raise');
+      else if((decent || bluff) && s.chips>=toCall) this._applyAction(idx,'call');
+      else this._applyAction(idx,'fold');
+    }
+  },
+
+  /* ---------- 다음 스트리트 ---------- */
+  async nextStreet(){
+    // stage: 0 프리플랍완료→플랍, 1 플랍완료→턴, 2 턴완료→리버, 3 리버완료→쇼다운
+    if(this.stage===0){
+      this.board.push(this.deck.pop(), this.deck.pop(), this.deck.pop());
+      this.render(); this.log('플랍 — 커뮤니티 카드 3장 공개.');
+      await sleep(500); this.bettingRound(1);
+    } else if(this.stage===1){
+      this.board.push(this.deck.pop());
+      this.render(); this.log('턴 — 4번째 커뮤니티 카드 공개.');
+      await sleep(500); this.bettingRound(2);
+    } else if(this.stage===2){
+      this.board.push(this.deck.pop());
+      this.render(); this.log('리버 — 5번째 커뮤니티 카드 공개.');
+      await sleep(500); this.bettingRound(3);
+    } else {
+      this.showdown();
+    }
+  },
+
+  /* ---------- 쇼다운 ---------- */
+  async showdown(){
+    this.phase='show';
+    $('holdem-controls').innerHTML='';
+    const cons=this.contenders();
+    if(cons.length===1){
+      const w=cons[0];
+      w.chips+=this.pot;
+      this.log(`${w.name} 외 전원 폴드 — ${w.name} 팟 ${this.pot}칩 획득!`);
+      this.render();
+      this.endHand(`${w.name} 승리 (폴드 승)`, w.isMe?'win':'lose');
+      return;
+    }
+    $('holdem-status').textContent='쇼다운!';
+    // 리버까지 안 갔는데 1명 남은 경우가 아니면 보드를 5장까지 채움(올콜 상황 대비)
+    while(this.board.length<5) this.board.push(this.deck.pop());
+    this.render();
+    let logH='쇼다운 — ';
+    let best=null, winners=[];
+    for(const s of cons){
+      const sc=Poker.best(s.hand.concat(this.board));
+      s._score=sc;
+      logH+=`<br>${s.name}: ${Deck.label(s.hand[0])} ${Deck.label(s.hand[1])} → ${sc.name}`;
+      if(!best || Poker.cmp(sc,best)>0){ best=sc; winners=[s]; }
+      else if(Poker.cmp(sc,best)===0){ winners.push(s); }
+    }
+    this.log(logH);
+    await sleep(400);
+    const share=Math.floor(this.pot/winners.length);
+    const rem=this.pot - share*winners.length;
+    winners.forEach((w,i)=>{ w.chips+=share+(i<rem?1:0); });
+    this.render();
+    const names=winners.map(w=>w.name).join(', ');
+    const meWon=winners.some(w=>w.isMe);
+    if(winners.length>1){
+      this.endHand(`${names} 분할 승 (${best.name})`, meWon?'win':'draw');
+    } else {
+      this.endHand(`${names} 승리 — ${best.name}! 팟 ${this.pot}칩`, meWon?'win':'lose');
+    }
+  },
+
+  endHand(msg, cls){
+    this.phase='done';
+    this.seats.forEach(s=>{ if(s.chips<=0) s.out=true; });
+    this.render();
+    const live=this.alive();
+    const banner=cls==='win'?'win':cls==='lose'?'lose':'draw';
+    const emoji=cls==='win'?'🏆':cls==='lose'?'💀':'🤝';
+    let html=`<div class="result-banner ${banner}">${emoji} ${msg}</div>`;
+    if(live.length<=1 || this.seats[0].out){
+      $('holdem-result').innerHTML=html;
+      setTimeout(()=>this.endGame(), 50);
+      return;
+    }
+    html+='<div class="center"><button class="btn gold" onclick="TH.beginHand()">다음 핸드</button> '+
+      '<button class="btn" onclick="TH.start()">처음부터</button></div>';
+    $('holdem-result').innerHTML=html;
+    $('holdem-status').textContent='다음 핸드를 진행하세요.';
+  },
+
+  endGame(){
+    const me=this.seats[0];
+    const live=this.alive();
+    let cls, msg;
+    if(!me.out && live.length===1 && live[0].isMe){
+      cls='win'; msg='🏆 최후의 1인! 모든 AI를 탈락시켰습니다. 승리!';
+    } else if(me.out){
+      cls='lose'; msg='💀 칩을 모두 잃어 탈락했습니다. 패배.';
+    } else {
+      const top=[...this.seats].filter(s=>!s.out).sort((a,b)=>b.chips-a.chips)[0];
+      cls=top&&top.isMe?'win':'lose';
+      msg=top&&top.isMe?'🏆 칩 1위로 게임 종료! 승리!':'게임 종료.';
+    }
+    $('holdem-controls').innerHTML='';
+    $('holdem-status').textContent='게임 종료.';
+    $('holdem-result').innerHTML=
+      `<div class="result-banner ${cls}">${msg}</div>`+
+      '<div class="center"><button class="btn gold" onclick="TH.start()">다시 시작</button></div>';
+  }
+};
+
+/* =====================================================================
+   GAME — 원카드 (한국식, 나 vs AI 1대1)
+   카드: 표준 {r,s} + 조커 {joker:true}. 버린 더미 맨 위 무늬/숫자 매칭.
+   특수: 2(+2먹기) · ♠A(+3) · 조커(+5) 공격 누적 / J·Q 한번더 / 7 무늬변경.
+   ===================================================================== */
+const OC = {
+  me:[], ai:[], stock:[], discard:[], suit:0, turn:'me',
+  attack:0, over:false, awaitDrawn:null, awaitSuit:false, pendingExtra:false,
+  // suit: 현재 유효 무늬(0..3), 7로 변경 가능
+
+  start(){
+    this.over=false; this.attack=0; this.awaitDrawn=null; this.awaitSuit=false; this.pendingExtra=false;
+    const d=Deck.fresh();
+    d.push({joker:true},{joker:true});
+    Deck.shuffle(d);
+    this.me=[]; this.ai=[];
+    for(let n=0;n<7;n++){ this.me.push(d.pop()); this.ai.push(d.pop()); }
+    // 시작 카드: 조커가 아닌 일반 카드를 첫 버린 더미로 (뽑힌 조커는 더미에 되돌림)
+    let top, held=[];
+    do { top=d.pop(); if(top.joker){ held.push(top); top=null; } } while(!top && d.length);
+    held.forEach(j=>d.unshift(j));
+    this.discard=[top];
+    this.suit=top.s;
+    this.stock=d;
+    this.turn=Game.coin();
+    $('onecard-result').innerHTML='';
+    $('onecard-controls').innerHTML='';
+    $('onecard-status').textContent = this.turn==='me'
+      ? '🙋 당신이 선(先)! 낼 카드를 누르거나 뽑으세요.'
+      : '🤖 AI가 선(先)! AI가 먼저 냅니다.';
+    this.log('같은 무늬 또는 같은 숫자를 내세요.');
+    this.render();
+    if(this.turn==='ai') setTimeout(()=>this.aiTurn(), 800);
+  },
+
+  log(msg){ $('onecard-log').innerHTML=msg; },
+  topCard(){ return this.discard[this.discard.length-1]; },
+
+  cardLabel(c){ return c.joker ? '🃏' : Deck.label(c); },
+
+  // c를 현재 더미 위에 낼 수 있나? (공격 중이면 받아치기 규칙)
+  canPlay(c){
+    if(this.attack>0){
+      // 공격받는 중: 받아칠 수 있는 공격 카드만 가능
+      if(c.joker) return true;                 // 조커
+      if(c.r===1) return true;                 // 2 (RANKS 인덱스 1)
+      if(c.r===0 && c.s===0) return true;      // ♠A
+      return false;
+    }
+    if(c.joker) return true;                    // 조커는 아무 때나
+    const top=this.topCard();
+    if(top.joker) return true;                  // 조커 위에는 무엇이든(이론상 공격으로 처리되어 도달X)
+    return c.s===this.suit || c.r===top.r;
+  },
+
+  attackOf(c){
+    if(c.joker) return 5;
+    if(c.r===1) return 2;                        // 2
+    if(c.r===0 && c.s===0) return 3;            // ♠A
+    return 0;
+  },
+
+  /* ---------- 렌더 ---------- */
+  render(turn){
+    // 시트(손패 장수)
+    const wrap=$('onecard-seats'); wrap.innerHTML='';
+    const rows=[{name:'나',isMe:true,n:this.me.length,who:'me'},{name:'AI',isMe:false,n:this.ai.length,who:'ai'}];
+    rows.forEach(r=>{
+      const d=document.createElement('div');
+      let cls='seat'+(r.isMe?' me':'');
+      if((turn||this.turn)===r.who && !this.over) cls+=' turn';
+      d.className=cls;
+      let st=r.n+'장';
+      if(r.n===1) st+=' · 원카드!';
+      d.innerHTML=`<div class="nm${r.isMe?' me':''}">${r.name}</div>`+
+        `<div class="big">${r.n}</div>`+
+        `<div class="st">${st}</div>`;
+      wrap.appendChild(d);
+    });
+    // 현재 무늬 표시
+    $('onecard-suit').textContent='— 현재 무늬 '+Deck.SUITS[this.suit];
+    $('onecard-mine').textContent = this.me.length===1 ? '· 원카드!' : '';
+    // 버린 더미 맨 위
+    const pile=$('onecard-pile'); pile.innerHTML='';
+    pile.appendChild(this.elCard(this.topCard()));
+    if(this.attack>0){
+      const tag=document.createElement('div');
+      tag.className='hint'; tag.style.alignSelf='center'; tag.style.color='var(--lose)';
+      tag.textContent='공격 누적 +'+this.attack+'장';
+      pile.appendChild(tag);
+    }
+    // 내 패
+    const hand=$('onecard-hand'); hand.innerHTML='';
+    const myTurn=this.turn==='me' && !this.over && !this.awaitSuit;
+    this.me.forEach((c,i)=>{
+      const ok=myTurn && this.canPlay(c);
+      const el=this.elCard(c, {clickable:ok, dim:myTurn&&!ok, onClick:()=>this.playMine(i)});
+      hand.appendChild(el);
+    });
+    // 내 차례엔 뽑기 버튼 노출(뽑은 카드 선택 컨트롤이 떠있는 동안엔 그대로 둠)
+    if(myTurn && $('onecard-controls').innerHTML===''){
+      const label = this.attack>0 ? `${this.attack}장 먹기` : '뽑기';
+      $('onecard-controls').innerHTML=`<button class="btn" onclick="OC.myDraw()">${label}</button>`;
+    }
+  },
+
+  // 조커는 Deck.el이 모르므로 직접 생성
+  elCard(c, opts={}){
+    if(!c.joker) return Deck.el(c, opts);
+    const d=document.createElement('div');
+    let cls='pc-card';
+    if(opts.mini) cls+=' mini';
+    if(opts.dim) cls+=' dim';
+    if(opts.clickable) cls+=' clickable';
+    d.className=cls;
+    d.innerHTML='<div class="pc-tl">JK</div><div class="pc-ctr">🃏</div><div class="pc-br">JK</div>';
+    if(opts.clickable && opts.onClick) d.onclick=()=>opts.onClick();
+    return d;
+  },
+
+  /* ---------- 더미 보충 ---------- */
+  refill(){
+    if(this.stock.length>0) return;
+    if(this.discard.length<=1) return;          // 보충 불가
+    const top=this.discard.pop();
+    this.stock=Deck.shuffle(this.discard);
+    this.discard=[top];
+  },
+
+  /* ---------- 내 차례 ---------- */
+  playMine(i){
+    if(this.over || this.turn!=='me' || this.awaitSuit) return;
+    const c=this.me[i];
+    if(!this.canPlay(c)) return;
+    this.me.splice(i,1);
+    this.applyPlay('me', c);
+  },
+
+  myDraw(){
+    if(this.over || this.turn!=='me' || this.awaitSuit) return;
+    if(this.attack>0){
+      // 공격받는 중인데 받아칠 카드가 없으면 누적분 모두 먹기
+      const got=this.takeCards('me', this.attack);
+      this.log(`받아칠 카드가 없어 ${got}장을 먹습니다.`);
+      this.attack=0;
+      this.endTurn('ai');
+      return;
+    }
+    this.refill();
+    if(this.stock.length===0){ this.log('더 뽑을 카드가 없습니다.'); this.endTurn('ai'); return; }
+    const c=this.stock.pop();
+    this.me.push(c);
+    this.render();
+    if(this.canPlay(c)){
+      // 뽑은 카드가 낼 수 있으면 낼지 선택
+      const idx=this.me.length-1;
+      this.log(`${this.cardLabel(c)} 을(를) 뽑았습니다. 낼 수 있습니다.`);
+      $('onecard-controls').innerHTML=
+        `<button class="btn gold" onclick="OC.playDrawn(${idx})">${this.cardLabel(c)} 내기</button> `+
+        '<button class="btn" onclick="OC.keepDrawn()">그냥 넘기기</button>';
+    } else {
+      this.log(`${this.cardLabel(c)} 을(를) 뽑았습니다. 낼 수 없어 턴을 넘깁니다.`);
+      setTimeout(()=>this.endTurn('ai'), 600);
+    }
+  },
+
+  playDrawn(idx){
+    if(this.turn!=='me') return;
+    const c=this.me[idx];
+    this.me.splice(idx,1);
+    $('onecard-controls').innerHTML='';
+    this.applyPlay('me', c);
+  },
+  keepDrawn(){
+    if(this.turn!=='me') return;
+    $('onecard-controls').innerHTML='';
+    this.endTurn('ai');
+  },
+
+  /* ---------- 카드 내기 공통 처리 ---------- */
+  applyPlay(who, c){
+    this.discard.push(c);
+    if(!c.joker) this.suit=c.s;
+    const name = who==='me' ? '나' : 'AI';
+    const atk=this.attackOf(c);
+    if(atk>0) this.attack+=atk;
+
+    // 승리 체크
+    const hand = who==='me' ? this.me : this.ai;
+    if(hand.length===0){ this.render(); this.win(who); return; }
+
+    // 7: 무늬 변경
+    if(!c.joker && c.r===6){
+      if(who==='me'){
+        this.render();
+        this.askSuit();
+        return;
+      } else {
+        // AI: 가장 많이 가진 무늬로 변경
+        this.suit=this.aiPickSuit();
+        this.log(`AI가 ${this.cardLabel(c)} — 무늬를 ${Deck.SUITS[this.suit]} 로 변경.`);
+      }
+    } else {
+      this.log(`${name}: ${this.cardLabel(c)}${atk>0?` — 공격! 누적 +${this.attack}장`:''}`);
+    }
+
+    // J(인덱스10) 또는 Q(인덱스11): 상대 스킵 → 같은 사람 한번 더
+    const skip = !c.joker && (c.r===10 || c.r===11);
+    this.render();
+    if(skip && this.attack===0){
+      this.log((who==='me'?'나':'AI')+`: ${this.cardLabel(c)} — 상대 차례를 건너뛰고 한 번 더!`);
+      this.endTurn(who);
+    } else {
+      this.endTurn(who==='me'?'ai':'me');
+    }
+  },
+
+  askSuit(){
+    this.awaitSuit=true;
+    this.log('7을 냈습니다. 바꿀 무늬를 고르세요.');
+    let h='';
+    Deck.SUITS.forEach((s,i)=>{ h+=`<button class="btn" onclick="OC.chooseSuit(${i})" style="font-size:20px;">${s}</button> `; });
+    $('onecard-controls').innerHTML=h;
+    this.render();
+  },
+  chooseSuit(i){
+    if(!this.awaitSuit) return;
+    this.awaitSuit=false; this.suit=i;
+    $('onecard-controls').innerHTML='';
+    this.log(`무늬를 ${Deck.SUITS[i]} 로 변경했습니다.`);
+    this.render();
+    this.endTurn('ai');
+  },
+
+  // 누적 공격분 n장을 who에게 먹임. 실제 먹은 장수 반환
+  takeCards(who, n){
+    const hand = who==='me' ? this.me : this.ai;
+    let got=0;
+    for(let k=0;k<n;k++){
+      this.refill();
+      if(this.stock.length===0) break;
+      hand.push(this.stock.pop()); got++;
+    }
+    return got;
+  },
+
+  /* ---------- 턴 전환 ---------- */
+  endTurn(next){
+    if(this.over) return;
+    this.turn=next;
+    this.render();
+    if(next==='ai'){
+      $('onecard-status').textContent='🤖 AI 차례...';
+      setTimeout(()=>this.aiTurn(), 800);
+    } else {
+      $('onecard-status').textContent = this.attack>0
+        ? `⚔️ 공격받는 중! 받아칠 카드를 내거나 ${this.attack}장을 먹으세요.`
+        : '🙋 당신 차례 — 낼 카드를 누르거나 뽑으세요.';
+      this.render();
+    }
+  },
+
+  /* ---------- AI 차례 ---------- */
+  aiPickSuit(){
+    const cnt=[0,0,0,0];
+    this.ai.forEach(c=>{ if(!c.joker) cnt[c.s]++; });
+    let best=0; for(let i=1;i<4;i++) if(cnt[i]>cnt[best]) best=i;
+    return best;
+  },
+
+  aiTurn(){
+    if(this.over || this.turn!=='ai') return;
+    const P=Game.p();
+    const playable=this.ai.map((c,i)=>({c,i})).filter(o=>this.canPlay(o.c));
+    if(playable.length===0){
+      // 못 냄: 공격 중이면 먹기, 아니면 뽑기
+      if(this.attack>0){
+        const got=this.takeCards('ai', this.attack);
+        this.log(`AI가 받아칠 카드가 없어 ${got}장을 먹습니다.`);
+        this.attack=0;
+        this.render();
+        this.endTurn('me');
+        return;
+      }
+      this.refill();
+      if(this.stock.length===0){ this.log('AI도 뽑을 카드가 없어 넘깁니다.'); this.endTurn('me'); return; }
+      const c=this.stock.pop();
+      this.ai.push(c);
+      if(this.canPlay(c) && Math.random()>=P.blunder){
+        const idx=this.ai.length-1;
+        this.ai.splice(idx,1);
+        this.log('AI가 카드를 뽑아 바로 냅니다.');
+        this.applyPlay('ai', c);
+      } else {
+        this.log('AI가 카드를 1장 뽑고 턴을 넘깁니다.');
+        this.render();
+        this.endTurn('me');
+      }
+      return;
+    }
+    // 낼 수 있음: 약간의 실수 확률로 무작위, 아니면 전략적 선택
+    let chosen;
+    if(Math.random()<P.blunder){
+      chosen=pick(playable);
+    } else {
+      chosen=this.aiBestPlay(playable);
+    }
+    this.ai.splice(chosen.i,1);
+    this.applyPlay('ai', chosen.c);
+  },
+
+  // 공격 우선, 그다음 스킵, 7은 손패 많을 때, 마지막에 일반(높은 카드부터)
+  aiBestPlay(playable){
+    const score=o=>{
+      const c=o.c;
+      if(this.attack>0) return 100 - this.attackOf(c); // 공격받는 중엔 받아치기만 가능, 작은 공격 먼저
+      let s=0;
+      const atk=this.attackOf(c);
+      if(atk>0) s+=50+atk;                              // 공격 카드 선호
+      if(!c.joker && (c.r===10||c.r===11)) s+=30;        // J/Q 스킵 선호
+      if(!c.joker && c.r===6) s+= this.ai.length>4?20:-10; // 7은 손패 많을 때만
+      if(!c.joker) s+=c.r;                              // 높은 숫자 먼저 소진
+      return s;
+    };
+    return playable.slice().sort((a,b)=>score(b)-score(a))[0];
+  },
+
+  win(who){
+    this.over=true;
+    $('onecard-controls').innerHTML='';
+    const meWon = who==='me';
+    const cls = meWon ? 'win' : 'lose';
+    const msg = meWon ? '🏆 손패를 모두 비웠습니다. 승리!' : '💀 AI가 먼저 손패를 비웠습니다. 패배.';
+    $('onecard-status').textContent='게임 종료.';
+    this.render();
+    $('onecard-result').innerHTML=
+      `<div class="result-banner ${cls}">${msg}</div>`+
+      '<div class="center"><button class="btn gold" onclick="OC.start()">새 게임</button></div>';
   }
 };
 </script>

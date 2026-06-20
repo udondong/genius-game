@@ -1675,6 +1675,106 @@
     <div id="oth-result"></div>
   </section>
 
+  <!-- ============ 하이로우 ============ -->
+  <section id="hilo" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">하이로우</div>
+      <button class="btn sm" onclick="HL.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">기준 카드 <b>7</b></span>
+          <span class="darrow">→</span>
+          <span class="dnote dwin">▲ HIGH → 다음 카드 8 이상</span>
+          <span class="darrow">·</span>
+          <span class="dnote dlose">▼ LOW → 다음 카드 6 이하</span>
+          <div class="dcap">기준 카드를 보고 다음 카드가 높을지(HIGH) 낮을지(LOW) 예측. 같은 숫자는 무승부.</div>
+        </div>
+        <span class="goal">목표</span> — AI와 칩 대결. 상대 칩을 모두 가져오거나, 덱 소진 시 칩이 더 많으면 승리.
+        <ul>
+          <li><span class="k">카드 값</span> A=1, 2~10 그대로, J=11, Q=12, K=13. 무늬 무관.</li>
+          <li><span class="k">진행</span> 이번 차례 플레이어가 HIGH 또는 LOW를 선택, 칩 1개를 겁니다.</li>
+          <li><span class="k">정산</span> 예측 성공 → 상대에서 칩 1개 획득. 실패 → 칩 1개 잃음. 동점 → 무승부.</li>
+          <li><span class="k">전략</span> 기준 카드가 낮을수록 HIGH, 높을수록 LOW가 확률상 유리합니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 칩</div><div class="val" id="hilo-me">10</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">AI 칩</div><div class="val" id="hilo-ai">10</div></div>
+      </div>
+      <div class="center hint" id="hilo-status" style="margin-top:10px;">새 게임을 시작하세요.</div>
+      <div style="display:flex;gap:24px;justify-content:center;align-items:flex-end;margin:18px 0 6px;">
+        <div style="text-align:center;">
+          <div class="hint" style="margin-bottom:6px;">기준 카드</div>
+          <div id="hilo-base"></div>
+        </div>
+        <div style="text-align:center;">
+          <div class="hint" style="margin-bottom:6px;">공개 카드</div>
+          <div id="hilo-reveal"></div>
+        </div>
+      </div>
+      <div class="center hint" id="hilo-deck" style="margin-top:4px;"></div>
+    </div>
+    <div class="panel center">
+      <div id="hilo-controls"></div>
+      <div class="log" id="hilo-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="hilo-result"></div>
+  </section>
+
+  <!-- ============ 블랙잭 ============ -->
+  <section id="bj" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">블랙잭</div>
+      <button class="btn sm" onclick="BJ.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="dnote">🃏 A+K = <span class="dwin">블랙잭 21!</span></span><span class="darrow">·</span>
+          <span class="dnote">히트 → 추가 카드</span><span class="darrow">·</span>
+          <span class="dnote dlose">22 = 버스트</span>
+          <div class="dcap">카드 합을 21에 가장 가깝게 만드세요. 딜러는 16 이하면 반드시 히트합니다.</div>
+        </div>
+        <span class="goal">목표</span> — 칩 100개로 시작. 딜러를 이겨 칩을 늘리세요.
+        <ul>
+          <li><span class="k">카드값</span> 2~10은 숫자 그대로, J·Q·K = 10, A = 1 또는 11(유리한 쪽 자동).</li>
+          <li><span class="k">진행</span> 베팅 후 딜 → 히트(카드 추가) 또는 스탠드(멈춤). 21 초과 시 즉시 버스트(패).</li>
+          <li><span class="k">딜러</span> 내가 스탠드하면 뒷면 카드 공개. 합이 16 이하면 반드시 히트, 17 이상이면 스탠드.</li>
+          <li><span class="k">블랙잭</span> 처음 2장이 A + 10값 카드 = 블랙잭. 베팅액의 1.5배 지급(딜러도 블랙잭이면 푸시).</li>
+          <li><span class="k">승패</span> 버스트한 쪽 패. 둘 다 안 버스트면 21에 가까운 쪽 승. 동점이면 푸시(베팅 반환).</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="score-row">
+        <div class="score-box me"><div class="lbl">내 칩</div><div class="val" id="bj-chips">100</div></div>
+        <div class="vs">VS</div>
+        <div class="score-box ai"><div class="lbl">베팅</div><div class="val" id="bj-bet">0</div></div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="hint" style="margin-bottom:4px;">딜러 <span id="bj-dealer-sum" style="color:var(--muted);font-size:13px;"></span></div>
+        <div class="pc-hand" id="bj-dealer-hand"></div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="hint" style="margin-bottom:4px;">나 <span id="bj-player-sum" style="color:var(--gold2);font-size:13px;"></span></div>
+        <div class="pc-hand" id="bj-player-hand"></div>
+      </div>
+    </div>
+    <div class="panel center">
+      <div class="hint" id="bj-status" style="margin-bottom:10px;">베팅을 선택하세요.</div>
+      <div id="bj-controls"></div>
+      <div class="log" id="bj-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="bj-result"></div>
+  </section>
+
 </div>
 
 <script>
@@ -1796,6 +1896,8 @@ const Game = {
     if(id==='liar') LIAR.start();
     if(id==='c4') C4.start();
     if(id==='oth') OTH.start();
+    if(id==='hilo') HL.start();
+    if(id==='bj') BJ.start();
   },
   show(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -4194,6 +4296,322 @@ const OTH = (function(){
     }
   };
 })();
+
+/* =====================================================================
+   GAME 25 — 하이로우 (Hi-Low) · 1대1
+   ===================================================================== */
+const HL = {
+  start(){
+    this.meChips=10; this.aiChips=10; this.over=false;
+    this.deck=Deck.fresh(); this.baseCard=null; this.turn=null;
+    $('hilo-result').innerHTML='';
+    $('hilo-log').innerHTML='HIGH 또는 LOW를 골라 칩을 겁니다.';
+    $('hilo-base').innerHTML='<div class="pc-slot"></div>';
+    $('hilo-reveal').innerHTML='<div class="pc-slot"></div>';
+    this.syncScore();
+    const first=Game.coin();
+    this.turn=first;
+    $('hilo-status').textContent=first==='me'?'🙋 당신이 선(先) — HIGH 또는 LOW를 선택하세요.':'🤖 AI가 선(先) — AI가 먼저 예측합니다.';
+    this.drawBase();
+  },
+  syncScore(){
+    $('hilo-me').textContent=this.meChips;
+    $('hilo-ai').textContent=this.aiChips;
+    $('hilo-deck').textContent=`남은 덱 ${this.deck.length}장`;
+  },
+  drawBase(){
+    if(this.deck.length<2){ this.finishByChips(); return; }
+    this.baseCard=this.deck.pop();
+    $('hilo-base').innerHTML=''; $('hilo-base').appendChild(Deck.el(this.baseCard,{}));
+    $('hilo-reveal').innerHTML='<div class="pc-slot"></div>';
+    this.syncScore();
+    if(this.turn==='me') this.renderControls();
+    else { $('hilo-controls').innerHTML=''; this.aiTurn(); }
+  },
+  renderControls(){
+    if(this.over){ $('hilo-controls').innerHTML=''; return; }
+    $('hilo-controls').innerHTML=
+      '<button class="btn gold" onclick="HL.pick(\'high\')" style="margin:0 8px;">▲ HIGH</button>'+
+      '<button class="btn" onclick="HL.pick(\'low\')" style="margin:0 8px;">▼ LOW</button>';
+  },
+  cardVal(c){ return c.r+1; },  // r:0=A(1)..12=K(13)
+  aiDecide(base){
+    const v=this.cardVal(base);
+    let prefer=v<=6?'high':(v>=8?'low':(Math.random()<.5?'high':'low'));
+    if(Math.random()<(Game.p().blunder||0)) prefer=prefer==='high'?'low':'high';
+    return prefer;
+  },
+  async aiTurn(){
+    await sleep(520);
+    const choice=this.aiDecide(this.baseCard);
+    $('hilo-log').innerHTML=`🤖 AI 선택: <b>${choice==='high'?'▲ HIGH':'▼ LOW'}</b>`;
+    await sleep(600);
+    this.resolve(choice,'ai');
+  },
+  pick(choice){
+    if(this.over||this.turn!=='me') return;
+    $('hilo-controls').innerHTML='';
+    this.resolve(choice,'me');
+  },
+  async resolve(choice,actor){
+    if(this.deck.length<1){ this.finishByChips(); return; }
+    const next=this.deck.pop();
+    $('hilo-reveal').innerHTML=''; $('hilo-reveal').appendChild(Deck.el(next,{}));
+    this.syncScore();
+    await sleep(300);
+    const bv=this.cardVal(this.baseCard), nv=this.cardVal(next);
+    let outcome;
+    if(nv===bv) outcome='draw';
+    else if(choice==='high') outcome=nv>bv?'win':'lose';
+    else outcome=nv<bv?'win':'lose';
+    const actorName=actor==='me'?'당신':'AI';
+    const oppName=actor==='me'?'AI':'당신';
+    let msg;
+    if(outcome==='draw'){
+      msg=`무승부 — ${bv}와 ${nv} 동점, 칩 변동 없음.`;
+    } else if(outcome==='win'){
+      if(actor==='me'){ this.meChips++; this.aiChips--; }
+      else { this.aiChips++; this.meChips--; }
+      msg=`<b>${actorName}</b> 적중! (${bv}→${nv}, ${choice==='high'?'▲ HIGH':'▼ LOW'}) 칩 +1.`;
+    } else {
+      if(actor==='me'){ this.meChips--; this.aiChips++; }
+      else { this.aiChips--; this.meChips++; }
+      msg=`<b>${actorName}</b> 빗나감. (${bv}→${nv}) ${oppName} 칩 +1.`;
+    }
+    this.syncScore();
+    $('hilo-log').innerHTML=msg;
+    if(this.meChips<=0){ this.finish('lose'); return; }
+    if(this.aiChips<=0){ this.finish('win'); return; }
+    if(this.deck.length<1){ this.finishByChips(); return; }
+    this.turn=this.turn==='me'?'ai':'me';
+    $('hilo-status').textContent=this.turn==='me'?'당신 차례 — HIGH 또는 LOW를 선택하세요.':'AI 차례...';
+    await sleep(700);
+    this.baseCard=next;
+    $('hilo-base').innerHTML=''; $('hilo-base').appendChild(Deck.el(this.baseCard,{}));
+    $('hilo-reveal').innerHTML='<div class="pc-slot"></div>';
+    this.syncScore();
+    if(this.turn==='me') this.renderControls();
+    else this.aiTurn();
+  },
+  finishByChips(){
+    this.over=true; $('hilo-controls').innerHTML='';
+    $('hilo-status').textContent='덱 소진 — 칩 비교로 승패 결정.';
+    if(this.meChips>this.aiChips) this.finish('win');
+    else if(this.aiChips>this.meChips) this.finish('lose');
+    else this.finish('draw');
+  },
+  finish(res){
+    this.over=true; $('hilo-controls').innerHTML='';
+    const map={
+      win:['win','🏆 승리! AI의 칩을 모두 가져왔습니다.'],
+      lose:['lose','💀 패배 — AI에게 칩을 모두 잃었습니다.'],
+      draw:['draw','🤝 무승부 — 칩이 같습니다.']
+    };
+    const [cls,txt]=map[res];
+    $('hilo-result').innerHTML=`<div class="result-banner ${cls}">${txt}</div><div class="center"><button class="btn gold" onclick="HL.start()">다시 도전</button></div>`;
+  }
+};
+
+/* =====================================================================
+   GAME 26 — 블랙잭 (Blackjack)
+   ===================================================================== */
+const BJ = {
+  chips:100, bet:0, deck:[], playerHand:[], dealerHand:[], over:false, phase:'bet',
+
+  start(){
+    this.chips=100; this.bet=0; this.over=false; this.phase='bet';
+    $('bj-result').innerHTML='';
+    $('bj-log').innerHTML='';
+    $('bj-dealer-hand').innerHTML='';
+    $('bj-player-hand').innerHTML='';
+    $('bj-dealer-sum').textContent='';
+    $('bj-player-sum').textContent='';
+    this.updateScore();
+    this.renderBet();
+    $('bj-status').textContent='베팅을 선택하세요.';
+  },
+
+  updateScore(){
+    $('bj-chips').textContent=this.chips;
+    $('bj-bet').textContent=this.bet;
+  },
+
+  calcSum(hand){
+    let sum=0, aces=0;
+    for(const c of hand){
+      const rv=c.r===0?11:(c.r>=9?10:c.r+1);
+      if(c.r===0) aces++;
+      sum+=rv;
+    }
+    while(sum>21 && aces>0){ sum-=10; aces--; }
+    return sum;
+  },
+
+  sumLabel(hand){
+    let sum=0, aces=0;
+    for(const c of hand){
+      const rv=c.r===0?11:(c.r>=9?10:c.r+1);
+      if(c.r===0) aces++;
+      sum+=rv;
+    }
+    let softAces=aces;
+    while(sum>21 && softAces>0){ sum-=10; softAces--; }
+    const hardSum=sum-(softAces>0?10:0);
+    if(softAces>0 && hardSum!==sum) return hardSum+'/'+sum;
+    return String(sum);
+  },
+
+  isBlackjack(hand){
+    if(hand.length!==2) return false;
+    return this.calcSum(hand)===21;
+  },
+
+  renderBet(){
+    this.bet=0; this.updateScore();
+    $('bj-dealer-hand').innerHTML='';
+    $('bj-player-hand').innerHTML='';
+    $('bj-dealer-sum').textContent='';
+    $('bj-player-sum').textContent='';
+    const c=$('bj-controls');
+    if(this.chips<=0){
+      $('bj-status').textContent='칩이 없습니다. 게임 종료.';
+      c.innerHTML='<button class="btn gold" onclick="BJ.start()">다시 시작</button>';
+      return;
+    }
+    let h='<div class="hint" style="margin-bottom:8px;">베팅액을 고르세요</div>';
+    const bets=[5,10,25,50];
+    for(const b of bets){
+      const dis=this.chips<b?'disabled':'';
+      h+=`<button class="btn" ${dis} onclick="BJ.placeBet(${b})">+${b}</button> `;
+    }
+    $('bj-controls').innerHTML=h;
+  },
+
+  placeBet(b){
+    if(this.chips<b) return;
+    this.bet=b; this.chips-=b; this.updateScore();
+    $('bj-controls').innerHTML='';
+    $('bj-status').textContent='딜링 중...';
+    this.deal();
+  },
+
+  deal(){
+    this.deck=Deck.fresh();
+    this.playerHand=[this.deck.pop(), this.deck.pop()];
+    this.dealerHand=[this.deck.pop(), this.deck.pop()];
+    this.over=false; this.phase='player';
+    this.renderHands(true);
+    $('bj-player-sum').textContent=this.sumLabel(this.playerHand);
+    const pBJ=this.isBlackjack(this.playerHand);
+    const dBJ=this.isBlackjack(this.dealerHand);
+    if(pBJ){
+      this.renderHands(false);
+      $('bj-dealer-sum').textContent=this.sumLabel(this.dealerHand);
+      if(dBJ){
+        this.chips+=this.bet; this.updateScore();
+        this.endRound('push','블랙잭 동점 — 푸시! 베팅 반환.');
+      } else {
+        const gain=Math.floor(this.bet*1.5);
+        this.chips+=this.bet+gain; this.updateScore();
+        this.endRound('win',`블랙잭! 베팅의 1.5배(+${gain}칩) 획득!`);
+      }
+      return;
+    }
+    $('bj-status').textContent='히트(카드 추가) 또는 스탠드(멈춤)를 선택하세요.';
+    this.renderActions();
+  },
+
+  renderHands(dealerHide){
+    const dh=$('bj-dealer-hand'); dh.innerHTML='';
+    this.dealerHand.forEach((c,i)=>{
+      dh.appendChild(Deck.el(c, (dealerHide && i===1) ? {back:true} : {}));
+    });
+    const ph=$('bj-player-hand'); ph.innerHTML='';
+    this.playerHand.forEach(c=>{ ph.appendChild(Deck.el(c,{})); });
+  },
+
+  renderActions(){
+    const sum=this.calcSum(this.playerHand);
+    if(sum>=21){ this.stand(); return; }
+    $('bj-controls').innerHTML=
+      '<button class="btn" onclick="BJ.hit()">히트 (카드 추가)</button> '+
+      '<button class="btn gold" onclick="BJ.stand()">스탠드 (멈춤)</button>';
+  },
+
+  hit(){
+    if(this.phase!=='player') return;
+    this.playerHand.push(this.deck.pop());
+    this.renderHands(true);
+    const sum=this.calcSum(this.playerHand);
+    $('bj-player-sum').textContent=this.sumLabel(this.playerHand);
+    if(sum>21){
+      $('bj-controls').innerHTML='';
+      this.renderHands(false);
+      $('bj-dealer-sum').textContent=this.sumLabel(this.dealerHand);
+      this.endRound('lose','버스트! 21을 초과했습니다. 패배.');
+      return;
+    }
+    if(sum===21){ this.stand(); return; }
+    this.renderActions();
+  },
+
+  async stand(){
+    if(this.phase!=='player') return;
+    this.phase='dealer';
+    $('bj-controls').innerHTML='';
+    $('bj-status').textContent='딜러 턴...';
+    this.renderHands(false);
+    $('bj-dealer-sum').textContent=this.sumLabel(this.dealerHand);
+    await sleep(600);
+    while(this.calcSum(this.dealerHand)<=16){
+      this.dealerHand.push(this.deck.pop());
+      this.renderHands(false);
+      $('bj-dealer-sum').textContent=this.sumLabel(this.dealerHand);
+      await sleep(600);
+    }
+    const pSum=this.calcSum(this.playerHand);
+    const dSum=this.calcSum(this.dealerHand);
+    if(dSum>21){
+      this.chips+=this.bet*2; this.updateScore();
+      this.endRound('win',`딜러 버스트(${dSum})! 내 합계 ${pSum} — 승리! +${this.bet}칩`);
+    } else if(pSum>dSum){
+      this.chips+=this.bet*2; this.updateScore();
+      this.endRound('win',`${pSum} vs ${dSum} — 승리! +${this.bet}칩`);
+    } else if(pSum<dSum){
+      this.endRound('lose',`${pSum} vs ${dSum} — 패배. −${this.bet}칩`);
+    } else {
+      this.chips+=this.bet; this.updateScore();
+      this.endRound('push',`${pSum} vs ${dSum} — 동점 푸시! 베팅 반환.`);
+    }
+  },
+
+  endRound(result, msg){
+    this.over=true; this.phase='done';
+    $('bj-log').innerHTML=msg;
+    $('bj-status').textContent='';
+    const cls=result==='win'?'win':result==='lose'?'lose':'draw';
+    const emoji=result==='win'?'🏆':result==='lose'?'💀':'🤝';
+    const label=result==='win'?'승리!':result==='lose'?'패배':result==='push'?'푸시':'';
+    $('bj-result').innerHTML=
+      `<div class="result-banner ${cls}">${emoji} ${label} — ${msg}</div>`+
+      `<div class="center">`+
+      (this.chips>0?`<button class="btn gold" onclick="BJ.nextRound()">다음 판</button> `:'')+
+      `<button class="btn" onclick="BJ.start()">처음부터</button></div>`;
+  },
+
+  nextRound(){
+    $('bj-result').innerHTML='';
+    $('bj-log').innerHTML='';
+    this.bet=0; this.updateScore();
+    if(this.chips<=0){
+      $('bj-status').textContent='칩이 없습니다. 게임 종료.';
+      $('bj-controls').innerHTML='<button class="btn gold" onclick="BJ.start()">다시 시작</button>';
+      return;
+    }
+    $('bj-status').textContent='베팅을 선택하세요.';
+    this.renderBet();
+  }
+};
 </script>
 </body>
 </html>

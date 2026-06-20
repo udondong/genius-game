@@ -1893,6 +1893,76 @@
     <div id="onecard-result"></div>
   </section>
 
+  <section id="uno" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">우노 (UNO)</div>
+      <button class="btn sm" onclick="UNO.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <div class="diagram">
+          <span class="uno-card mini b">5</span>
+          <span class="darrow">→</span>
+          <span class="uno-card mini b">8</span><span class="uno-card mini g">5</span>
+          <span class="dnote">같은 색 / 같은 숫자·기호</span>
+          <div class="dcap">버린 더미 맨 위와 같은 색 또는 같은 숫자·기호를 내려놓아 손패를 모두 비우면 승리.</div>
+        </div>
+        <span class="goal">목표</span> — AI 2명과 3인전. 손에 든 카드를 먼저 모두 내려놓으면 승리.
+        <ul>
+          <li><span class="k">내기</span> 맨 위 카드와 같은 색 또는 같은 숫자·기호만 낼 수 있습니다. 못 내면 더미에서 1장 뽑습니다.</li>
+          <li><span class="k">⊘</span> 다음 사람 차례 건너뜀. <span class="k">⇄</span> 진행 방향 전환. <span class="k">+2</span> 다음 사람 2장 먹고 스킵.</li>
+          <li><span class="k">🌈</span> 색 지정. <span class="k">+4</span> 색 지정 + 다음 사람 4장 먹고 스킵. (와일드는 아무 때나)</li>
+          <li><span class="k">UNO!</span> 손패가 1장 남으면 표시됩니다.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="uno-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="uno-seats"></div>
+    </div>
+    <div class="panel">
+      <div class="hint" style="margin-bottom:4px;">버린 더미 <span id="uno-color" style="color:var(--gold2);font-weight:700;"></span></div>
+      <div class="pc-pile" id="uno-pile"></div>
+      <div class="hint" style="margin:8px 0 4px;">내 패 <span id="uno-mine" style="color:var(--gold2);"></span></div>
+      <div class="pc-hand" id="uno-hand"></div>
+      <div class="center" id="uno-controls" style="margin-top:8px;"></div>
+      <div class="log" id="uno-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="uno-result"></div>
+  </section>
+
+  <section id="thief" class="screen">
+    <div class="topbar">
+      <button class="btn sm" onclick="Game.home()">← 메뉴</button>
+      <div class="gtitle">도둑잡기</div>
+      <button class="btn sm" onclick="TF.start()">↻ 새 게임</button>
+    </div>
+    <details class="howto" open><summary>게임 방법</summary>
+      <div class="rc">
+        <span class="goal">목표</span> — 나 + AI 3명(총 4인). 53장(표준 52장 + 조커 1장)을 나누어 가진 뒤, 짝을 모두 버리세요. 마지막에 짝 없는 조커를 든 1명이 패배(도둑)합니다.
+        <ul>
+          <li><span class="k">짝 버리기</span> 같은 숫자(rank) 2장이 한 짝. 시작 시 각자 손패에서 가능한 짝을 모두 자동으로 버립니다.</li>
+          <li><span class="k">차례</span> 내 차례엔 다음 사람의 카드가 뒷면으로 보입니다. 그 중 한 장을 클릭해 뽑으세요. 새 짝이 생기면 즉시 자동으로 버립니다.</li>
+          <li><span class="k">AI 차례</span> AI가 내 카드 또는 다른 AI 카드를 한 장 뽑습니다. 내 카드를 AI가 뽑을 땐 뒷면으로 표시됩니다.</li>
+          <li><span class="k">탈락(안전)</span> 손패가 0장이 되면 안전하게 탈락합니다. 조커를 마지막에 든 1명이 패배.</li>
+        </ul>
+      </div>
+    </details>
+    <div class="panel">
+      <div class="center hint" id="thief-status">새 게임을 시작하세요.</div>
+      <div class="seats" id="thief-seats"></div>
+    </div>
+    <div class="panel" id="thief-board">
+      <div class="hint" style="margin-bottom:6px;" id="thief-phase-label">진행 중...</div>
+      <div class="pc-hand" id="thief-opponent-hand"></div>
+      <div class="hint" style="margin:10px 0 4px;">내 패</div>
+      <div class="pc-hand" id="thief-my-hand"></div>
+      <div class="log" id="thief-log" style="margin-top:12px;"></div>
+    </div>
+    <div id="thief-result"></div>
+  </section>
+
 </div>
 
 <script>
@@ -2019,6 +2089,8 @@ const Game = {
     if(id==='draw') DP.start();
     if(id==='holdem') TH.start();
     if(id==='onecard') OC.start();
+    if(id==='uno') UNO.start();
+    if(id==='thief') TF.start();
   },
   show(id){
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -5766,6 +5838,561 @@ const OC = {
     $('onecard-result').innerHTML=
       `<div class="result-banner ${cls}">${msg}</div>`+
       '<div class="center"><button class="btn gold" onclick="OC.start()">새 게임</button></div>';
+  }
+};
+
+/* =====================================================================
+   GAME 26 — 우노 (UNO)   ※ 전용 카드 사용 (표준 Deck 미사용)
+   카드: {color:'r'|'g'|'b'|'y'|'w', kind:'num'|'skip'|'rev'|'draw2'|'wild'|'wild4', num}
+   ===================================================================== */
+const UNO = {
+  hands:[[],[],[]],            // 0=나, 1=AI1, 2=AI2
+  names:['나','AI 1','AI 2'],
+  stock:[], discard:[],
+  color:'r', dir:1, cur:0, over:false,
+  awaitColor:false, awaitDrawn:null,
+
+  COLORS:['r','g','b','y'],
+  COLNAME:{r:'빨강', g:'초록', b:'파랑', y:'노랑', w:'와일드'},
+  SWATCH:{r:'🟥', g:'🟩', b:'🟦', y:'🟨'},
+
+  buildDeck(){
+    const d=[];
+    this.COLORS.forEach(c=>{
+      d.push({color:c, kind:'num', num:0});
+      for(let n=1;n<=9;n++){ d.push({color:c,kind:'num',num:n}); d.push({color:c,kind:'num',num:n}); }
+      ['skip','rev','draw2'].forEach(k=>{ d.push({color:c,kind:k}); d.push({color:c,kind:k}); });
+    });
+    for(let i=0;i<4;i++){ d.push({color:'w',kind:'wild'}); d.push({color:'w',kind:'wild4'}); }
+    return d;
+  },
+  shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; },
+
+  start(){
+    this.over=false; this.dir=1; this.awaitColor=false; this.awaitDrawn=null;
+    const d=this.shuffle(this.buildDeck());
+    this.hands=[[],[],[]];
+    for(let n=0;n<7;n++) for(let p=0;p<3;p++) this.hands[p].push(d.pop());
+    // 시작 카드: 숫자 카드가 나올 때까지 (특수/와일드는 더미 아래로)
+    let top, held=[];
+    do { top=d.pop(); if(top.kind!=='num'){ held.push(top); top=null; } } while(!top && d.length);
+    held.forEach(c=>d.unshift(c));
+    this.discard=[top];
+    this.color=top.color;
+    this.stock=d;
+    this.cur = Game.coin()==='me' ? 0 : (Math.random()<0.5?1:2);
+    $('uno-result').innerHTML='';
+    $('uno-controls').innerHTML='';
+    $('uno-status').textContent = this.cur===0
+      ? '🙋 당신이 선(先)! 낼 카드를 누르거나 뽑으세요.'
+      : `🤖 ${this.names[this.cur]}이(가) 선(先)! 먼저 냅니다.`;
+    this.log('같은 색 또는 같은 숫자·기호를 내세요.');
+    this.render();
+    if(this.cur!==0) setTimeout(()=>this.aiTurn(), 800);
+  },
+
+  log(msg){ $('uno-log').innerHTML=msg; },
+  top(){ return this.discard[this.discard.length-1]; },
+
+  cardText(c){
+    if(c.kind==='num') return ''+c.num;
+    if(c.kind==='skip') return '⊘';
+    if(c.kind==='rev') return '⇄';
+    if(c.kind==='draw2') return '+2';
+    if(c.kind==='wild') return '🌈';
+    if(c.kind==='wild4') return '+4';
+    return '?';
+  },
+  cardLabel(c){ return (c.color==='w'?'':this.SWATCH[c.color]) + this.cardText(c); },
+
+  // div.uno-card 생성
+  card(c, opts={}){
+    const el=document.createElement('div');
+    let cls='uno-card '+c.color;
+    if(opts.mini) cls+=' mini';
+    if(opts.back) cls+=' back';
+    if(opts.dim) cls+=' dim';
+    if(opts.clickable) cls+=' clickable';
+    el.className=cls;
+    el.textContent = opts.back ? 'UNO' : this.cardText(c);
+    if(opts.clickable && opts.onClick) el.onclick=()=>opts.onClick();
+    return el;
+  },
+
+  canPlay(c){
+    if(c.color==='w') return true;
+    const t=this.top();
+    if(c.color===this.color) return true;
+    if(c.kind==='num' && t.kind==='num') return c.num===t.num;
+    if(c.kind!=='num' && c.kind===t.kind) return true;
+    return false;
+  },
+
+  next(from){ return (from + this.dir + 3) % 3; },
+
+  /* ---------- 렌더 ---------- */
+  render(){
+    const wrap=$('uno-seats'); wrap.innerHTML='';
+    for(let p=0;p<3;p++){
+      const n=this.hands[p].length;
+      const d=document.createElement('div');
+      let cls='seat'+(p===0?' me':'');
+      if(this.cur===p && !this.over) cls+=' turn';
+      d.className=cls;
+      let st=n+'장'; if(n===1) st+=' · UNO!';
+      d.innerHTML=`<div class="nm${p===0?' me':''}">${this.names[p]}</div>`+
+        `<div class="big">${n}</div><div class="st">${st}</div>`;
+      wrap.appendChild(d);
+    }
+    $('uno-color').textContent='— 현재 색 '+(this.color==='w'?'-':this.COLNAME[this.color])+' · 방향 '+(this.dir===1?'정방향 →':'역방향 ←');
+    $('uno-mine').textContent = this.hands[0].length===1 ? '· UNO!' : '';
+    const pile=$('uno-pile'); pile.innerHTML='';
+    pile.appendChild(this.card(this.top()));
+    // 내 패
+    const hand=$('uno-hand'); hand.innerHTML='';
+    const myTurn = this.cur===0 && !this.over && !this.awaitColor;
+    this.hands[0].forEach((c,i)=>{
+      const ok=myTurn && this.canPlay(c);
+      hand.appendChild(this.card(c, {clickable:ok, dim:myTurn&&!ok, onClick:()=>this.playMine(i)}));
+    });
+    if(myTurn && $('uno-controls').innerHTML===''){
+      $('uno-controls').innerHTML='<button class="btn" onclick="UNO.myDraw()">뽑기</button>';
+    }
+  },
+
+  refill(){
+    if(this.stock.length>0) return;
+    if(this.discard.length<=1) return;
+    const top=this.discard.pop();
+    this.stock=this.shuffle(this.discard);
+    this.discard=[top];
+  },
+  drawOne(p){
+    this.refill();
+    if(this.stock.length===0) return null;
+    const c=this.stock.pop();
+    this.hands[p].push(c);
+    return c;
+  },
+  takeCards(p,n){ let got=0; for(let k=0;k<n;k++){ if(this.drawOne(p)) got++; else break; } return got; },
+
+  /* ---------- 내 차례 ---------- */
+  playMine(i){
+    if(this.over || this.cur!==0 || this.awaitColor) return;
+    const c=this.hands[0][i];
+    if(!this.canPlay(c)) return;
+    this.hands[0].splice(i,1);
+    this.applyPlay(0, c);
+  },
+  myDraw(){
+    if(this.over || this.cur!==0 || this.awaitColor) return;
+    const c=this.drawOne(0);
+    if(!c){ this.log('더 뽑을 카드가 없습니다.'); this.advance(0); return; }
+    this.render();
+    if(this.canPlay(c)){
+      const idx=this.hands[0].length-1;
+      this.log(`${this.cardLabel(c)} 을(를) 뽑았습니다. 낼 수 있습니다.`);
+      $('uno-controls').innerHTML=
+        `<button class="btn gold" onclick="UNO.playDrawn(${idx})">${this.cardLabel(c)} 내기</button> `+
+        '<button class="btn" onclick="UNO.keepDrawn()">그냥 넘기기</button>';
+    } else {
+      this.log(`${this.cardLabel(c)} 을(를) 뽑았습니다. 낼 수 없어 턴을 넘깁니다.`);
+      setTimeout(()=>this.advance(0), 600);
+    }
+  },
+  playDrawn(idx){
+    if(this.cur!==0) return;
+    const c=this.hands[0][idx];
+    this.hands[0].splice(idx,1);
+    $('uno-controls').innerHTML='';
+    this.applyPlay(0, c);
+  },
+  keepDrawn(){
+    if(this.cur!==0) return;
+    $('uno-controls').innerHTML='';
+    this.advance(0);
+  },
+
+  /* ---------- 카드 내기 공통 ---------- */
+  applyPlay(p, c){
+    this.discard.push(c);
+    if(c.color!=='w') this.color=c.color;
+    const name=this.names[p];
+
+    if(this.hands[p].length===0){
+      // 마지막 카드가 와일드면 색은 의미 없음 — 바로 승리
+      this.render(); this.win(p); return;
+    }
+
+    if(c.kind==='rev'){ this.dir*=-1; this.log(`${name}: ⇄ 방향 전환!`); }
+    else if(c.kind==='skip'){ this.log(`${name}: ⊘ 다음 사람 건너뜀!`); }
+    else if(c.kind==='draw2'){ this.log(`${name}: +2 — 다음 사람 2장 먹고 스킵!`); }
+    else if(c.kind==='wild'){ /* 색 선택 후 로그 */ }
+    else if(c.kind==='wild4'){ /* 색 선택 후 로그 */ }
+    else { this.log(`${name}: ${this.cardLabel(c)}`); }
+
+    // 와일드 색 선택
+    if(c.color==='w'){
+      if(p===0){ this.render(); this.askColor(c.kind); return; }
+      else { this.color=this.aiPickColor(p); this.log(`${name}: ${this.cardText(c)} — 색을 ${this.COLNAME[this.color]}(으)로 지정.`); }
+    }
+    this.render();
+    this.resolveTurn(p, c);
+  },
+
+  // 특수효과 적용 후 턴 진행
+  resolveTurn(p, c){
+    const victim=this.next(p);
+    if(c.kind==='draw2'){
+      const got=this.takeCards(victim, 2);
+      this.log(`${this.names[victim]}이(가) ${got}장을 먹고 차례를 건너뜁니다.`);
+      this.render();
+      this.cur=this.next(victim); this.go();
+    } else if(c.kind==='wild4'){
+      const got=this.takeCards(victim, 4);
+      this.log(`${this.names[victim]}이(가) ${got}장을 먹고 차례를 건너뜁니다. (색: ${this.COLNAME[this.color]})`);
+      this.render();
+      this.cur=this.next(victim); this.go();
+    } else if(c.kind==='skip'){
+      this.cur=this.next(victim); this.go();
+    } else {
+      this.cur=victim; this.go();
+    }
+  },
+
+  askColor(kind){
+    this.awaitColor=true;
+    this.log(kind==='wild4' ? '+4! 지정할 색을 고르세요.' : '와일드! 지정할 색을 고르세요.');
+    let h='';
+    this.COLORS.forEach(col=>{ h+=`<button class="btn" onclick="UNO.chooseColor('${col}')" style="font-size:18px;">${this.SWATCH[col]} ${this.COLNAME[col]}</button> `; });
+    $('uno-controls').innerHTML=h;
+    this.render();
+  },
+  chooseColor(col){
+    if(!this.awaitColor) return;
+    this.awaitColor=false; this.color=col;
+    $('uno-controls').innerHTML='';
+    this.log(`색을 ${this.COLNAME[col]}(으)로 지정했습니다.`);
+    this.render();
+    const c=this.top();
+    this.resolveTurn(0, c);
+  },
+
+  /* ---------- 턴 진행 ---------- */
+  advance(p){
+    if(this.over) return;
+    this.cur=this.next(p);
+    this.go();
+  },
+  go(){
+    if(this.over) return;
+    this.render();
+    if(this.cur===0){
+      $('uno-status').textContent='🙋 당신 차례 — 낼 카드를 누르거나 뽑으세요.';
+    } else {
+      $('uno-status').textContent=`🤖 ${this.names[this.cur]} 차례...`;
+      setTimeout(()=>this.aiTurn(), 800);
+    }
+  },
+
+  /* ---------- AI ---------- */
+  aiPickColor(p){
+    const cnt={r:0,g:0,b:0,y:0};
+    this.hands[p].forEach(c=>{ if(c.color!=='w') cnt[c.color]++; });
+    let best='r'; this.COLORS.forEach(col=>{ if(cnt[col]>cnt[best]) best=col; });
+    return best;
+  },
+  aiTurn(){
+    if(this.over || this.cur===0) return;
+    const p=this.cur, P=Game.p();
+    const playable=this.hands[p].map((c,i)=>({c,i})).filter(o=>this.canPlay(o.c));
+    if(playable.length===0){
+      const c=this.drawOne(p);
+      if(!c){ this.log(`${this.names[p]}도 뽑을 카드가 없어 넘깁니다.`); this.advance(p); return; }
+      if(this.canPlay(c) && Math.random()>=P.blunder){
+        this.hands[p].splice(this.hands[p].length-1,1);
+        this.log(`${this.names[p]}이(가) 카드를 뽑아 바로 냅니다.`);
+        this.applyPlay(p, c);
+      } else {
+        this.log(`${this.names[p]}이(가) 카드를 1장 뽑고 넘깁니다.`);
+        this.render(); this.advance(p);
+      }
+      return;
+    }
+    let chosen;
+    if(Math.random()<P.blunder) chosen=pick(playable);
+    else chosen=this.aiBest(playable, p);
+    this.hands[p].splice(chosen.i,1);
+    this.applyPlay(p, chosen.c);
+  },
+  // 손패 적게 만들수록 좋음: 공격/스킵 우선, 와일드는 마지막에 보존
+  aiBest(playable, p){
+    const score=o=>{
+      const c=o.c; let s=0;
+      if(c.kind==='wild4') s+=8;
+      else if(c.kind==='draw2') s+=40;
+      else if(c.kind==='skip') s+=35;
+      else if(c.kind==='rev') s+=20;
+      else if(c.kind==='wild') s+=5;     // 와일드는 아껴두기(낮은 점수)
+      else s+=15 + c.num;                 // 일반 숫자: 큰 숫자 먼저 소진
+      return s;
+    };
+    return playable.slice().sort((a,b)=>score(b)-score(a))[0];
+  },
+
+  win(p){
+    this.over=true;
+    $('uno-controls').innerHTML='';
+    const meWon = p===0;
+    const cls = meWon ? 'win' : 'lose';
+    const msg = meWon ? '🏆 손패를 모두 비웠습니다. 승리!' : `💀 ${this.names[p]}이(가) 먼저 손패를 비웠습니다. 패배.`;
+    $('uno-status').textContent='게임 종료.';
+    this.render();
+    $('uno-result').innerHTML=
+      `<div class="result-banner ${cls}">${msg}</div>`+
+      '<div class="center"><button class="btn gold" onclick="UNO.start()">새 게임</button></div>';
+  }
+};
+
+/* =====================================================================
+   GAME 31 — 도둑잡기 (Old Maid)
+   4인전: 나 + AI 3명. 53장(표준 52장 + 조커 1). 조커 든 1명 패배.
+   ===================================================================== */
+const TF = {
+  // hands[0]=나, hands[1..3]=AI. names, safe[], over
+  hands: [], names: ['나','AI 1','AI 2','AI 3'],
+  safe: [], over: false, turn: 0, totalPlayers: 4,
+
+  start(){
+    this.over = false;
+    this.safe = [false,false,false,false];
+    this.hands = [[],[],[],[]];
+    $('thief-result').innerHTML = '';
+    $('thief-log').innerHTML = '';
+
+    // 덱 만들기: 표준 52장 + 조커 1장
+    const deck = Deck.make();
+    deck.push({joker:true});
+    Deck.shuffle(deck);
+
+    // 4명에게 고루 분배
+    deck.forEach((c,i) => this.hands[i % 4].push(c));
+
+    // 선(先) 결정
+    this.turn = Game.coin() === 'me' ? 0 : rand(3)+1;
+    const firstMsg = this.turn === 0 ? '🙋 당신이 선(先)!' : `🤖 ${this.names[this.turn]}이(가) 선(先)!`;
+    $('thief-status').textContent = firstMsg + ' 시작 전 짝을 자동으로 버립니다...';
+
+    // 시작 짝 자동 버리기 (연출: 즉시)
+    for(let p=0;p<4;p++) this.removePairs(p);
+
+    // 안전 처리
+    for(let p=0;p<4;p++) if(this.hands[p].length===0) this.safe[p]=true;
+
+    this.render();
+    this.log('각자 짝이 되는 카드를 모두 버렸습니다. 게임 시작!');
+
+    // 선이 나이면 내 차례 UI, AI이면 AI 턴 진행
+    if(this.turn === 0){
+      this.promptMe();
+    } else {
+      setTimeout(()=>this.aiLoop(), 900);
+    }
+  },
+
+  /* 손패에서 같은 rank 짝을 모두 제거 */
+  removePairs(p){
+    let changed = true;
+    while(changed){
+      changed = false;
+      const h = this.hands[p];
+      for(let i=0;i<h.length;i++){
+        if(h[i].joker) continue;
+        for(let j=i+1;j<h.length;j++){
+          if(!h[j].joker && h[i].r === h[j].r){
+            h.splice(j,1); h.splice(i,1);
+            changed = true; break;
+          }
+        }
+        if(changed) break;
+      }
+    }
+  },
+
+  /* 활성 플레이어 목록(safe 아닌 사람) */
+  activePlayers(){
+    return [0,1,2,3].filter(p => !this.safe[p] && this.hands[p].length > 0);
+  },
+
+  /* 다음 차례 플레이어(시계 방향, safe 건너뜀) */
+  nextPlayer(cur){
+    let n = (cur+1) % 4;
+    let tries = 0;
+    while((this.safe[n] || this.hands[n].length===0) && tries<4){
+      n = (n+1) % 4; tries++;
+    }
+    return n;
+  },
+
+  log(msg){ $('thief-log').innerHTML = msg; },
+
+  /* ---- 렌더 ---- */
+  render(){
+    // 좌석 표시
+    const seats = $('thief-seats');
+    seats.innerHTML = '';
+    for(let p=0;p<4;p++){
+      const d = document.createElement('div');
+      let cls = 'seat' + (p===0?' me':'');
+      if(p === this.turn && !this.over) cls += ' turn';
+      if(this.safe[p]) cls += ' safe';
+      d.className = cls;
+      const nm = p===0 ? '<span class="nm me">나</span>' : `<span class="nm">${this.names[p]}</span>`;
+      const cnt = this.hands[p].length;
+      const stTxt = this.safe[p] ? '안전 ✓' : cnt+'장';
+      d.innerHTML = nm + `<div class="big">${cnt}</div><div class="st">${stTxt}</div>`;
+      seats.appendChild(d);
+    }
+
+    // 내 패 (앞면)
+    const myH = $('thief-my-hand');
+    myH.innerHTML = '';
+    this.hands[0].forEach(c => myH.appendChild(Deck.el(c, {mini:false})));
+
+    // 상대 패 영역: 내 차례이면 다음 사람 뒷면 표시
+    const opH = $('thief-opponent-hand');
+    opH.innerHTML = '';
+    const phaseLabel = $('thief-phase-label');
+
+    if(!this.over && this.turn === 0){
+      const target = this.nextPlayer(0);
+      if(this.hands[target].length > 0){
+        phaseLabel.textContent = `${this.names[target]}의 패에서 한 장을 뽑으세요 (뒷면)`;
+        this.hands[target].forEach((_,idx) => {
+          const el = Deck.el({joker:false,r:0,s:0},{back:true,clickable:true,onClick:()=>this.pickFromTarget(target,idx)});
+          opH.appendChild(el);
+        });
+      } else {
+        phaseLabel.textContent = '...';
+      }
+    } else if(!this.over){
+      phaseLabel.textContent = `${this.names[this.turn]} 차례...`;
+    } else {
+      phaseLabel.textContent = '게임 종료';
+    }
+  },
+
+  /* 내가 target의 idx번째 카드를 뽑음 */
+  pickFromTarget(target, idx){
+    if(this.over || this.turn !== 0) return;
+    // idx가 범위 밖이면 0으로 클램프
+    const safeIdx = Math.min(idx, this.hands[target].length-1);
+    const drawn = this.hands[target].splice(safeIdx,1)[0];
+    this.hands[0].push(drawn);
+    const label = drawn.joker ? '🃏 조커' : Deck.label(drawn);
+    this.log(`${this.names[target]}에게서 <b>${label}</b>을(를) 뽑았습니다.`);
+    this.removePairs(0);
+    if(this.hands[target].length === 0) this.safe[target] = true;
+    if(this.hands[0].length === 0){ this.safe[0] = true; }
+    this.render();
+    if(this.checkEnd()) return;
+    this.turn = this.nextPlayer(0);
+    if(this.turn === 0){
+      this.promptMe();
+    } else {
+      setTimeout(()=>this.aiLoop(), 700);
+    }
+  },
+
+  promptMe(){
+    const target = this.nextPlayer(0);
+    if(this.safe[target] || this.hands[target].length===0){
+      // 뽑을 사람이 없으면 넘김
+      this.turn = this.nextPlayer(0);
+      if(this.turn !== 0) setTimeout(()=>this.aiLoop(), 600);
+      return;
+    }
+    $('thief-status').textContent = `🙋 내 차례 — ${this.names[target]}의 카드를 한 장 뽑으세요.`;
+    this.render();
+  },
+
+  /* AI 루프: this.turn이 AI인 동안 순차 진행 */
+  async aiLoop(){
+    while(!this.over && this.turn !== 0){
+      const cur = this.turn;
+      const target = this.nextPlayer(cur);
+      if(this.hands[target].length === 0){
+        this.turn = this.nextPlayer(cur);
+        continue;
+      }
+      $('thief-status').textContent = `🤖 ${this.names[cur]} 차례...`;
+      this.render();
+      await sleep(700);
+      if(this.over) return;
+
+      // AI 심리: 조커를 갖고 있으면 가운데 카드를 선호(뽑는 사람 혼동)
+      const tLen = this.hands[target].length;
+      let pickIdx;
+      const hasJoker = this.hands[cur].some(c=>c.joker);
+      if(hasJoker && tLen > 1){
+        // 가운데 근처 선택 (심리전)
+        pickIdx = Math.floor(tLen/2) + (rand(3)-1);
+        pickIdx = Math.max(0, Math.min(tLen-1, pickIdx));
+      } else {
+        pickIdx = rand(tLen);
+      }
+
+      const drawn = this.hands[target].splice(pickIdx,1)[0];
+      this.hands[cur].push(drawn);
+      const label = drawn.joker ? '🃏 조커' : Deck.label(drawn);
+
+      if(target === 0){
+        this.log(`🤖 ${this.names[cur]}이(가) 내 패에서 <b>${label}</b>을(를) 가져갔습니다.`);
+      } else {
+        this.log(`🤖 ${this.names[cur]}이(가) ${this.names[target]}에서 카드 1장을 뽑았습니다.`);
+      }
+
+      this.removePairs(cur);
+      if(this.hands[target].length === 0) this.safe[target] = true;
+      if(this.hands[cur].length === 0) this.safe[cur] = true;
+      this.render();
+      if(this.checkEnd()) return;
+
+      await sleep(400);
+      this.turn = this.nextPlayer(cur);
+    }
+    // 루프 종료 = 내 차례
+    if(!this.over){
+      this.promptMe();
+    }
+  },
+
+  /* 종료 조건 체크: 손패 있는 사람이 1명(조커 보유자)이면 게임 종료 */
+  checkEnd(){
+    const remaining = [0,1,2,3].filter(p => this.hands[p].length > 0);
+    if(remaining.length <= 1){
+      this.over = true;
+      // 조커를 든 사람 찾기
+      let loser = remaining.length===1 ? remaining[0] : [0,1,2,3].find(p=>this.hands[p].some(c=>c.joker));
+      if(loser===undefined) loser=0;
+      const loserName = loser===0 ? '나' : this.names[loser];
+      const meIsLoser = loser===0;
+      const cls = meIsLoser ? 'lose' : 'win';
+      const msg = meIsLoser
+        ? '😱 조커를 들고 있었습니다. 당신이 도둑! 패배.'
+        : `🏆 ${loserName}이(가) 조커를 들고 있었습니다. 도둑은 ${loserName}! 승리.`;
+      $('thief-status').textContent = '게임 종료.';
+
+      // 조커 공개
+      this.render();
+      $('thief-phase-label').textContent = `도둑: ${loserName} 🃏`;
+
+      $('thief-result').innerHTML =
+        `<div class="result-banner ${cls}">${msg}</div>`+
+        '<div class="center"><button class="btn gold" onclick="TF.start()">새 게임</button></div>';
+      return true;
+    }
+    return false;
   }
 };
 </script>
